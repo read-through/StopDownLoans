@@ -1,0 +1,75 @@
+direction: down
+
+vars: {
+  green: "#2f7d38"
+  cyan: "#00838f"
+  blue: "#1767c2"
+  purple: "#6841c5"
+  actorFill: "#e8f5e9"
+  clientFill: "#e0f7fa"
+  backendFill: "#eef5ff"
+  clobFill: "#e3f2fd"
+  keeperFill: "#eaf3ff"
+  dbFill: "#fffde7"
+  chainFill: "#ede7f6"
+}
+
+actors: {
+  label: "Actors\n\nBorrower: creates loan, posts collateral, repays\nLender: funds selected loans and claims payout\nTrader: trades YES or NO risk"
+  shape: rectangle
+  style.fill: ${actorFill}
+  style.stroke: ${green}
+}
+
+client: {
+  label: "Client\n\nReact frontend: loan screens, exchange, portfolio\nWallet / Circle path: signs txs and EIP-712 orders"
+  shape: rectangle
+  style.fill: ${clientFill}
+  style.stroke: ${cyan}
+}
+
+backend: {
+  label: "Backend Platform"
+  style.fill: ${backendFill}
+  style.stroke: ${blue}
+
+  clob: {
+    label: "CLOB Service\n\nHTTP API + WebSocket\nMatching + admission\nTrade executor for matched fills"
+    shape: rectangle
+    style.fill: ${clobFill}
+    style.stroke: ${blue}
+  }
+
+  keeper: {
+    label: "Lending Keeper Service\n\nLoan / market reader\nLifecycle keeper\nActivation, repaid/default, recovery"
+    shape: rectangle
+    style.fill: ${keeperFill}
+    style.stroke: ${blue}
+  }
+
+  pg: {
+    label: "PostgreSQL\n\nShared backend state:\norders, trades, reservations, snapshots"
+    shape: cylinder
+    style.fill: ${dbFill}
+    style.stroke: ${blue}
+  }
+}
+
+arc: {
+  label: "ARC Contracts\n\nLoanPositionToken: loans, lender positions, claims\nOutcomeToken: loan-linked YES and NO ERC-1155 markets\nOutcomeExchange: signed order settlement"
+  shape: rectangle
+  style.fill: ${chainFill}
+  style.stroke: ${purple}
+}
+
+actors -> client: product UI path { style.stroke: ${green} }
+actors -> backend.clob: direct API path for bots and market makers { style.stroke: ${green} }
+
+client -> backend.clob: reads, signed orders, book feed { style.stroke: ${blue} }
+client -> arc: user txs and approvals { style.stroke: ${purple} }
+
+backend.clob -> backend.pg: "orderbook state\ntrade attempts" { style.stroke: ${blue} }
+backend.keeper -> backend.pg: "loan snapshots\nlifecycle status" { style.stroke: ${blue} }
+
+backend.clob -> arc: matchOrders settlement { style.stroke: ${blue} }
+backend.keeper -> arc: lifecycle txs { style.stroke: ${blue} }

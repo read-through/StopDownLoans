@@ -1,0 +1,72 @@
+import type { ApiMarketLinkedLoan } from "./api";
+export type LoanState = "Funding" | "Funded" | "Active" | "Cancelled" | "Repaid" | "Defaulted";
+export type LoanFilter = "All" | LoanState;
+export type MarketState = "Proto" | "Active" | "Cancelled" | "Resolved";
+export type MarketFilter = "All" | MarketState;
+export type Outcome = "YES" | "NO";
+export type AppScreen = "overview" | "create" | "loans" | "exchange" | "portfolio";
+
+export type LoanOpportunity = {
+  loanId: string;
+  borrower: string;
+  principal: string;
+  repayment: string;
+  rate: string;
+  fundedPct: number;
+  remainingFunding: string;
+  marketIndexed: boolean;
+  nextDeadline: string;
+  state: LoanState;
+};
+
+export type LoanDetail = {
+  loanId: string;
+  borrower: string;
+  principalRaw: string;
+  fundedAmountRaw: string;
+  repaymentAmountRaw: string;
+  creditedAmountRaw: string;
+  repaymentSatisfiedAtRaw: string;
+  principal: string;
+  fundedAmount: string;
+  fundingRemaining: string;
+  creditedAmount: string;
+  repaymentAmount: string;
+  repaymentRemaining: string;
+  interestRate: string;
+  feeRate: string;
+  collateralRatio: string;
+  borrowerCollateralAmountRaw: string;
+  borrowerCollateralDepositedAmountRaw: string;
+  borrowerCollateralAmount: string;
+  borrowerCollateralDepositedAmount: string;
+  borrowerCollateralRemaining: string;
+  loanWithdrawFreezeDeadlineRaw: string;
+  activationDeadlineRaw: string;
+  repaymentDeadlineRaw: string;
+  loanWithdrawFreezeDeadline: string;
+  activationDeadline: string;
+  repaymentDeadline: string;
+  marketId: string;
+  fundingPct: number;
+  collateralPct: number;
+  repaymentPct: number;
+  state: LoanState;
+};
+
+export type PredictionMarket = {
+  marketId: string;
+  outcomeToken: string;
+  loan: ApiMarketLinkedLoan | null;
+  outcome: string;
+  state: MarketState;
+  bestBid: string;
+  bestAsk: string;
+  volume: string;
+  defaultTickUnits: string;
+  edgeTickUnits: string;
+  lowerEdgePriceUnits: string;
+  upperEdgePriceUnits: string;
+  minOrderOutcomeAmount: string | null;
+  maxOrderOutcomeAmount: string | null;
+};
