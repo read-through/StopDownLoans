@@ -11,6 +11,8 @@ The production-like MVP path is wallet-agnostic and uses an injected EVM provide
 - frontend requests accounts with `eth_requestAccounts`;
 - frontend verifies `eth_chainId` against ARC testnet `5042002`;
 - if a connected wallet is on the wrong chain, frontend requests `wallet_switchEthereumChain`;
+- if the wallet does not know ARC testnet, frontend falls back to `wallet_addEthereumChain` with
+  ARC chain id, RPC URL, explorer URL, and USDC-as-gas currency metadata;
 - frontend sends contract transactions with `eth_sendTransaction`;
 - frontend signs orders and cancellations with `eth_signTypedData_v4`;
 - backend verifies EIP-712 signatures and never stores user private keys.
@@ -124,8 +126,8 @@ Before testing a real ARC frontend flow:
 The following wallet-related work remains:
 
 - add Circle User-Controlled Wallet frontend integration;
-- add ARC onboarding/kit integration where it improves chain setup or funding;
-- add automatic ARC chain registration for wallets that do not already know chain `5042002`;
+- add ARC App Kit onboarding/fund-flow integration where it improves USDC bridging, sending, or
+  unified-balance readiness;
 - add a documented real-wallet browser walkthrough with screenshots or recording;
 - add frontend checks that distinguish missing gas, missing USDC, missing allowance, wrong chain, and missing injected wallet more clearly;
 - add production operator key management instead of a local hot executor key;

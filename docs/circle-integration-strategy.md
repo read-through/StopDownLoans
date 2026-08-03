@@ -87,13 +87,36 @@ Future alternatives:
 Current status:
 
 - implemented: injected-wallet path;
+- implemented: injected-wallet ARC chain registration fallback through `wallet_addEthereumChain`;
 - implemented: backend executor key path;
 - implemented: centralized demo mock signer for no-wallet UI review;
 - documented: Circle User-Controlled Wallet target;
 - documented: Circle gas UX target;
+- documented: ARC App Kit target for USDC onboarding/fund flows;
 - not implemented: Circle frontend onboarding/signing;
 - not implemented: Circle gas sponsorship;
 - not implemented: managed executor custody.
+
+## ARC App Kit Boundary
+
+ARC App Kit belongs in onboarding and fund movement, not in CLOB matching.
+
+Useful future flows:
+
+- bridge USDC to ARC before a borrower posts collateral;
+- bridge or send USDC before a lender funds a loan;
+- show unified USDC readiness before a trader places a BUY order;
+- add developer-fee-aware fund flows only outside the signed order settlement core.
+
+Do not use App Kit to change the lending contract accounting or CLOB order format. The protocol
+still settles with ARC USDC and EIP-712 orders.
+
+References:
+
+- ARC contract addresses and native USDC model: https://docs.arc.io/arc/references/contract-addresses
+- ARC App Kit SDK reference: https://docs.arc.io/app-kit/references/sdk-reference
+- Circle User-Controlled Wallet typed-data signing: https://developers.circle.com/api-reference/wallets/user-controlled-wallets/sign-user-typed-data
+- Circle Paymaster overview: https://developers.circle.com/paymaster
 
 Before implementing Circle in code, decide one concrete product flow:
 

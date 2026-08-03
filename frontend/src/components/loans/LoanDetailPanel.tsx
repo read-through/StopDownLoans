@@ -7,6 +7,7 @@ import { ReadinessMetric } from "../shared/ReadinessMetric";
 import { StateBadge } from "../shared/StateBadge";
 import { BorrowerCollateralForm } from "./BorrowerCollateralForm";
 import { LoanActivationAction } from "./LoanActivationAction";
+import { LoanLifecyclePanel } from "./LoanLifecyclePanel";
 import { LoanFundingForm } from "./LoanFundingForm";
 import { LoanPaymentAction } from "./LoanPaymentAction";
 import { ArrowRight } from "lucide-react";
@@ -43,6 +44,7 @@ export function LoanDetailPanel(props: {
         </div>
         <StateBadge state={props.loan.state} />
       </div>
+      <LoanLifecyclePanel loan={props.loan} marketAvailable={props.marketKey !== null} />
       <div className="loanReadinessStrip" aria-label="Loan readiness">
         <ReadinessMetric label="Funding" value={props.loan.fundingPct} />
         <ReadinessMetric label="Collateral" value={props.loan.collateralPct} />

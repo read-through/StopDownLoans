@@ -17,7 +17,23 @@ It does not prove live ARC transactions. For live ARC testing, use `docs/arc-tes
 
 ## Start Mock UI
 
-Open two terminals from the repository root.
+From the repository root:
+
+```powershell
+npm.cmd run demo:reviewer
+```
+
+Expected output includes:
+
+```text
+StopDown reviewer demo
+Starting fixture-backed API and mock-wallet frontend.
+Open http://127.0.0.1:5173/#overview after Vite prints its ready message.
+```
+
+Open that URL in a browser.
+
+If the wrapper does not fit the test environment, use the two-terminal fallback.
 
 Terminal 1:
 

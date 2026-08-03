@@ -3,6 +3,17 @@ const expectedArcChainIdInput = import.meta.env.VITE_ARC_CHAIN_ID ?? "5042002";
 export const enableMockWallet = import.meta.env.VITE_ENABLE_MOCK_WALLET === "true";
 export const expectedArcChainIdHex = toHexChainId(expectedArcChainIdInput);
 export const expectedArcChainIdNumber = toChainIdNumber(expectedArcChainIdInput);
+export const arcWalletChain = {
+  chainId: expectedArcChainIdHex,
+  chainName: import.meta.env.VITE_ARC_CHAIN_NAME ?? "Arc Testnet",
+  nativeCurrency: {
+    name: "USDC",
+    symbol: "USDC",
+    decimals: 18,
+  },
+  rpcUrls: [import.meta.env.VITE_ARC_RPC_URL ?? "https://rpc.testnet.arc.network"],
+  blockExplorerUrls: [import.meta.env.VITE_ARC_EXPLORER_URL ?? "https://testnet.arcscan.app"],
+};
 export const frontendContracts = {
   loanPositionToken: normalizeOptionalAddress(import.meta.env.VITE_LOAN_POSITION_TOKEN_ADDRESS),
   outcomeExchange: normalizeOptionalAddress(import.meta.env.VITE_OUTCOME_EXCHANGE_ADDRESS),

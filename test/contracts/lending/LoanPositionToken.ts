@@ -35,6 +35,7 @@ describe("LoanPositionToken", function () {
     await loanPositions.write.createLoan([
       principal,
       interestBps,
+      10_000n,
       loanWithdrawFreezeDeadline,
       activationDeadline,
       repaymentDeadline
@@ -154,28 +155,20 @@ describe("LoanPositionToken", function () {
     assert.equal((await loanPositions.read.platformFeeRecipient()).toLowerCase(), lenderA.account.address.toLowerCase());
   });
 
-  it("lets the owner set collateral bps used by new loans", async function () {
+  it("uses borrower-selected collateral bps for the new loan", async function () {
     const { loanPositions, owner, borrower } = await networkHelpers.loadFixture(deployLoanPositionToken);
     const now = await networkHelpers.time.latest();
     await setMockOutcomeToken(loanPositions, owner);
 
-    await assert.rejects(
-      loanPositions.write.setPlatformCollateralBps([12_000n], { account: borrower.account })
-    );
-
-    await loanPositions.write.setPlatformCollateralBps([12_000n], { account: owner.account });
-
     await loanPositions.write.createLoan([
       usdc(1000n),
       500n,
+      12_000n,
       BigInt(now + networkHelpers.time.duration.days(3)),
       BigInt(now + networkHelpers.time.duration.days(7)),
       BigInt(now + networkHelpers.time.duration.days(37))
     ], { account: borrower.account });
 
-    await loanPositions.write.setPlatformCollateralBps([8_000n], { account: owner.account });
-
-    assert.equal(await loanPositions.read.platformCollateralBps(), 8_000n);
     assert.equal(await loanPositions.read.loanCollateralBps([1n]), 12_000n);
     assert.equal(await loanPositions.read.getBorrowerCollateralAmount([1n]), usdc(1260n));
   });
@@ -193,6 +186,7 @@ describe("LoanPositionToken", function () {
     await loanPositions.write.createLoan([
       usdc(1000n),
       500n,
+      10_000n,
       BigInt(now + networkHelpers.time.duration.days(3)),
       BigInt(now + networkHelpers.time.duration.days(7)),
       BigInt(now + networkHelpers.time.duration.days(37))
@@ -230,6 +224,7 @@ describe("LoanPositionToken", function () {
     await loanPositions.write.createLoan([
       principal,
       500n,
+      10_000n,
       BigInt(now + networkHelpers.time.duration.days(3)),
       BigInt(now + networkHelpers.time.duration.days(7)),
       BigInt(now + networkHelpers.time.duration.days(37))
@@ -261,6 +256,7 @@ describe("LoanPositionToken", function () {
     await loanPositions.write.createLoan([
       usdc(1000n),
       500n,
+      10_000n,
       BigInt(now + networkHelpers.time.duration.days(3)),
       BigInt(now + networkHelpers.time.duration.days(7)),
       BigInt(now + networkHelpers.time.duration.days(37))
@@ -294,6 +290,7 @@ describe("LoanPositionToken", function () {
     await loanPositions.write.createLoan([
       usdc(1000n),
       500n,
+      10_000n,
       loanWithdrawFreezeDeadline,
       BigInt(now + networkHelpers.time.duration.days(7)),
       BigInt(now + networkHelpers.time.duration.days(37))
@@ -328,6 +325,7 @@ describe("LoanPositionToken", function () {
     await loanPositions.write.createLoan([
       principal,
       500n,
+      10_000n,
       loanWithdrawFreezeDeadline,
       BigInt(now + networkHelpers.time.duration.days(7)),
       BigInt(now + networkHelpers.time.duration.days(37))
@@ -356,6 +354,7 @@ describe("LoanPositionToken", function () {
     await loanPositions.write.createLoan([
       principal,
       500n,
+      10_000n,
       BigInt(now + networkHelpers.time.duration.days(3)),
       BigInt(now + networkHelpers.time.duration.days(7)),
       BigInt(now + networkHelpers.time.duration.days(37))
@@ -381,6 +380,7 @@ describe("LoanPositionToken", function () {
       loanPositions.write.createLoan([
         principal,
         500n,
+        10_000n,
         loanWithdrawFreezeDeadline,
         BigInt(now + networkHelpers.time.duration.days(7)),
         BigInt(now + networkHelpers.time.duration.days(37))
@@ -399,6 +399,7 @@ describe("LoanPositionToken", function () {
     await loanPositions.write.createLoan([
       principal,
       500n,
+      10_000n,
       loanWithdrawFreezeDeadline,
       BigInt(now + networkHelpers.time.duration.days(7)),
       BigInt(now + networkHelpers.time.duration.days(37))
@@ -432,6 +433,7 @@ describe("LoanPositionToken", function () {
     await loanPositions.write.createLoan([
       principal,
       500n,
+      10_000n,
       loanWithdrawFreezeDeadline,
       activationDeadline,
       BigInt(now + networkHelpers.time.duration.days(37))
@@ -460,6 +462,7 @@ describe("LoanPositionToken", function () {
     await loanPositions.write.createLoan([
       principal,
       500n,
+      10_000n,
       loanWithdrawFreezeDeadline,
       BigInt(now + networkHelpers.time.duration.days(7)),
       BigInt(now + networkHelpers.time.duration.days(37))
@@ -502,6 +505,7 @@ describe("LoanPositionToken", function () {
     await loanPositions.write.createLoan([
       principal,
       500n,
+      10_000n,
       loanWithdrawFreezeDeadline,
       BigInt(now + networkHelpers.time.duration.days(7)),
       BigInt(now + networkHelpers.time.duration.days(37))
@@ -539,6 +543,7 @@ describe("LoanPositionToken", function () {
     await loanPositions.write.createLoan([
       principal,
       500n,
+      10_000n,
       loanWithdrawFreezeDeadline,
       BigInt(now + networkHelpers.time.duration.days(7)),
       repaymentDeadline
@@ -585,6 +590,7 @@ describe("LoanPositionToken", function () {
     await loanPositions.write.createLoan([
       principal,
       500n,
+      10_000n,
       loanWithdrawFreezeDeadline,
       activationDeadline,
       repaymentDeadline
@@ -640,6 +646,7 @@ describe("LoanPositionToken", function () {
     await loanPositions.write.createLoan([
       principal,
       500n,
+      10_000n,
       loanWithdrawFreezeDeadline,
       activationDeadline,
       repaymentDeadline
@@ -686,6 +693,7 @@ describe("LoanPositionToken", function () {
     await loanPositions.write.createLoan([
       principal,
       500n,
+      10_000n,
       loanWithdrawFreezeDeadline,
       BigInt(now + networkHelpers.time.duration.days(7)),
       BigInt(now + networkHelpers.time.duration.days(37))
@@ -715,6 +723,7 @@ describe("LoanPositionToken", function () {
     await loanPositions.write.createLoan([
       principal,
       500n,
+      10_000n,
       loanWithdrawFreezeDeadline,
       BigInt(now + networkHelpers.time.duration.days(7)),
       repaymentDeadline
@@ -760,6 +769,7 @@ describe("LoanPositionToken", function () {
     await loanPositions.write.createLoan([
       principal,
       500n,
+      10_000n,
       loanWithdrawFreezeDeadline,
       BigInt(now + networkHelpers.time.duration.days(7)),
       repaymentDeadline
@@ -793,6 +803,7 @@ describe("LoanPositionToken", function () {
     await loanPositions.write.createLoan([
       principal,
       500n,
+      10_000n,
       loanWithdrawFreezeDeadline,
       BigInt(now + networkHelpers.time.duration.days(7)),
       BigInt(now + networkHelpers.time.duration.days(37))
@@ -848,6 +859,7 @@ describe("LoanPositionToken", function () {
     await loanPositions.write.createLoan([
       principal,
       500n,
+      10_000n,
       loanWithdrawFreezeDeadline,
       BigInt(now + networkHelpers.time.duration.days(7)),
       BigInt(now + networkHelpers.time.duration.days(37))
@@ -897,6 +909,7 @@ describe("LoanPositionToken", function () {
     await loanPositions.write.createLoan([
       principal,
       500n,
+      10_000n,
       loanWithdrawFreezeDeadline,
       BigInt(now + networkHelpers.time.duration.days(7)),
       repaymentDeadline
@@ -939,6 +952,7 @@ describe("LoanPositionToken", function () {
     await loanPositions.write.createLoan([
       principal,
       500n,
+      10_000n,
       loanWithdrawFreezeDeadline,
       BigInt(now + networkHelpers.time.duration.days(7)),
       repaymentDeadline
@@ -986,6 +1000,7 @@ describe("LoanPositionToken", function () {
     await loanPositions.write.createLoan([
       principal,
       500n,
+      10_000n,
       loanWithdrawFreezeDeadline,
       BigInt(now + networkHelpers.time.duration.days(7)),
       repaymentDeadline
@@ -1039,6 +1054,7 @@ describe("LoanPositionToken", function () {
     await loanPositions.write.createLoan([
       usdc(1000n),
       500n,
+      10_000n,
       loanWithdrawFreezeDeadline,
       activationDeadline,
       BigInt(now + networkHelpers.time.duration.days(37))
@@ -1076,6 +1092,7 @@ describe("LoanPositionToken", function () {
     await loanPositions.write.createLoan([
       principal,
       500n,
+      10_000n,
       loanWithdrawFreezeDeadline,
       activationDeadline,
       BigInt(now + networkHelpers.time.duration.days(37))

@@ -10,20 +10,27 @@ read endpoints, best bid/ask, book reads, and WebSocket subscription all pass th
 
 ARC is used as the settlement chain. The contracts are deployed on ARC testnet:
 
-- `LoanPositionToken`: `0x7e1a9611f61a40fac7e2f18831a13edf9e8d25e6`
-- `OutcomeToken`: `0xfb5d4095bc502bd0774d8e4437b94573fd29028c`
-- `OutcomeExchange`: `0x45333a5b06a95a2a84cea9ab67f486558943c626`
+- `LoanPositionToken`: `0x4f8e2d32ad62835353b70f2fa091979d513a43ac`
+- `OutcomeToken`: `0x06c08af6a3ad503560f3010105f1ec32052c7f2f`
+- `OutcomeExchange`: `0xddba15b2ddadec73f06fab4011b37c100efe6c30`
 - ARC USDC: `0x3600000000000000000000000000000000000000`
 
-The ARC walkthrough created `LOAN_ID=1` with principal `1 USDC`, repayment `1.05 USDC`, and borrower collateral `1.05 USDC`. The linked market is `0xc3851385000c2d86f34b031cfa5e672e6651cce7d7af2fc3e0c9b3365fda5427`. The loan was created, collateralized, funded, and activated on ARC, and a direct on-chain `OutcomeExchange` trade sold `0.2 YES` for `0.12 USDC`.
+The current contracts were redeployed after the borrower-controlled `collateralBps` source change.
+A fresh current-deployment ARC walkthrough created `LOAN_ID=3` with principal `1 USDC`,
+repayment `1.05 USDC`, and borrower collateral `1.05 USDC`. The linked market is
+`0x1489a4e8bf6c349a62c1892e03c1206051f11bac3bdf1adaba8aaa6800322ea1`. That loan was created,
+collateralized, funded, and activated on ARC. On a clean reviewer database, the backend CLOB
+admitted/matched signed orders into `trade_id=1`; the executor submitted settlement tx
+`0x532c31c774c0cd96b1c5aa0e5f3f606a26631dd60f28b2cd625dbf83f3d1f15c`, which was reconciled as
+`CONFIRMED`.
 
 Important transaction hashes:
 
-- Create loan: `0xe34f44bb2a6f42895f2d5d1a8308c9d8ba3c04988e42c349c434b62ae3618930`
-- Deposit borrower collateral: `0xa13db8e54f22f8b23f7cdac4b817259e106d531549fcc51d1641d573c9f8e6e4`
-- Fund loan: `0xe88c06dc5d28300eb85f525a763e79f552479c8e14f1043c200808ae5a469c42`
-- Activate loan and market: `0x66a7137e344411332ae4a80c41e0120f1f52c3567a5725375de2572fe069a308`
-- Trade `0.2 YES`: `0x4fe309716988dd0f30857683f0661c2d4698bcdc7c0789d375d99cf6a4499551`
+- Create loan: `0x20ee75626f7d0b36eae19c0ccd1e4876f76459f0c25d338b01b7edef0b1aee25`
+- Deposit borrower collateral: `0xd58afa4f343d4390bf1be5ac2de8b5bd3f088db663468e90429e8380e9ffd17e`
+- Fund loan: `0x8714023addb75b33efa59e8c870f2e0b170e8667497327b531d09d9ceddb28a6`
+- Activate loan and market: `0x98dec90ed4d25cec4a6b2ab633a7720852579083df2db04fa3eef820a2be3a6f`
+- CLOB backend settlement trade: `0x532c31c774c0cd96b1c5aa0e5f3f606a26631dd60f28b2cd625dbf83f3d1f15c`
 
 For reviewers without an injected ARC wallet, the repo includes a local UI demo path:
 

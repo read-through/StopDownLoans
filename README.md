@@ -10,14 +10,17 @@ The current codebase contains:
 - PostgreSQL loan snapshots for loan/market list reads, so the frontend does not scan ARC RPC on every list request;
 - a Vite/React frontend for borrower, lender, and YES/NO trading flows against the local or ARC-backed stack.
 
-For a short hackathon reviewer guide, see `docs/mid-submission.md`. For intentional MVP shortcuts
-and cleanup items, see `docs/known-limitations.md`. Current ARC testnet deployment addresses are
-recorded in `docs/arc-testnet-deployment.md`. For running the live ARC testnet stack with a
-settlement executor wallet, see `docs/arc-testnet-runbook.md`. For user wallet, executor wallet,
-mock signer, Circle, and market-maker paths, see `docs/wallet-path.md` and
-`docs/circle-integration-strategy.md`. For the current reproducible product walkthrough, see
+For a short hackathon reviewer guide, see `docs/mid-submission.md`. For the final-submission MVP
+roadmap and current progress estimate, see `docs/final-mvp-roadmap.md`. For intentional MVP
+shortcuts and cleanup items, see `docs/known-limitations.md`. Current ARC testnet deployment
+addresses are recorded in `docs/arc-testnet-deployment.md`. For running the live ARC testnet stack
+with a settlement executor wallet, see `docs/arc-testnet-runbook.md`. For user wallet, executor
+wallet, mock signer, Circle, and market-maker paths, see `docs/wallet-path.md` and
+`docs/circle-integration-strategy.md`. For the final reviewer demo sequence, see
+`docs/final-demo-guide.md`. For the current reproducible product walkthrough, see
 `docs/happy-path.md`. For a click-by-click mock UI checklist for manual testers, see
-`docs/manual-testing.md`.
+`docs/manual-testing.md`. For the production/deployment plan, see
+`docs/production-deployment-plan.md`.
 
 ## Product Flow
 
@@ -33,8 +36,8 @@ sequenceDiagram
   participant CLOB as CLOB + trade settlement
   participant Keeper as Off-chain keeper / resolver
 
-  Borrower->>Loan: createLoan(P, interestBps, deadlines)
-  Loan->>Market: createMarket(loanId, requiredCollateral)
+  Borrower->>Loan: createLoan(P, interestBps, collateralBps, deadlines)
+  Loan->>Market: createProtoMarket(loanId, requiredCollateral)
   Borrower->>Market: depositBorrowerCollateral(C)
   Note right of Market: Pre-activation until loan funding and borrower collateral are present
   Lenders->>Loan: fund(loanId, amount) until P is funded
@@ -42,7 +45,7 @@ sequenceDiagram
   Traders->>Market: depositPairCollateral(x USDC)
   Note over Traders,Market: Pair mint rule: x USDC mints x YES plus x NO after activation
   Lenders->>Loan: optional withdrawFunding() before loan withdraw freeze deadline
-  Keeper->>Loan: activateLoan(loanId)
+  Keeper->>Loan: activate(loanId)
   Loan-->>Borrower: transfer principal P
   Loan->>Market: activateMarket()
   Market-->>Borrower: mint borrower YES
@@ -58,7 +61,7 @@ sequenceDiagram
   end
   alt Repayment on time - YES wins
     Borrower->>Loan: depositToLoan(R)
-    Keeper->>Loan: markRepaidIfFundedOnTime(loanId)
+    Keeper->>Loan: settleRepaid(loanId)
     Loan->>Market: resolve(YES)
     Note right of Loan: Loan state changes only after R is credited. Lenders claim from contract balance.
     Lenders->>Loan: claim repayment share
@@ -76,8 +79,9 @@ sequenceDiagram
 Example:
 
 - Borrower wants `$1,000` principal.
+- Borrower chooses `5%` interest and `100%` collateral ratio.
 - Required repayment is `$1,050`.
-- Borrower commits `$1,050` collateral behind the loan.
+- Borrower commits `$1,050` collateral behind the loan because `collateralBps = 10,000`.
 - Lenders fund `$1,000` and receive lender positions representing their share of repayment/recovery.
 - The YES/NO market represents the question: "Will the required `$1,050` repayment arrive before the deadline?"
 - Independent market participants can also deposit pair collateral: `$1` mints `1 YES + 1 NO` after activation.
@@ -120,11 +124,10 @@ npm.cmd install
 npm.cmd run build:frontend
 npm.cmd run typecheck:backend
 npm.cmd run test:backend
-npm.cmd run demo:api
-npm.cmd run demo:frontend
+npm.cmd run demo:reviewer
 ```
 
-Open `http://127.0.0.1:5173`.
+Open `http://127.0.0.1:5173/#overview`.
 
 The demo API is intentionally non-production. It lets reviewers inspect the frontend screens without
 requiring a live ARC deployment or funded wallets. In no-wallet mode, mock transactions return demo
@@ -132,9 +135,11 @@ hashes and mock order submissions can emit WebSocket updates, but the demo API u
 read models and does not persist real protocol or orderbook state. Use local scripts/tests or ARC
 deployment for stateful protocol verification.
 
-Current ARC testnet evidence is recorded in `docs/arc-testnet-deployment.md`, including deployed
-contract addresses, `LOAN_ID=1`, its linked `MARKET_ID`, activation transactions, and a direct
-`OutcomeExchange` YES trade on the active loan market.
+Current ARC testnet deployment addresses are recorded in `docs/arc-testnet-deployment.md`. The
+contracts were redeployed after the borrower-controlled `collateralBps` source change, and
+deployment wiring verification passes. Fresh current-deployment evidence is recorded there:
+`LOAN_ID=3` is the current clean reviewer loan: it was created, collateralized, funded, activated,
+and traded through the backend CLOB executor/reconciliation path.
 
 The frontend uses hash routes for reviewable deep links:
 
@@ -146,14 +151,14 @@ The frontend uses hash routes for reviewable deep links:
 For UI transaction/signature testing without a browser wallet, use the committed demo env:
 
 ```powershell
-npm.cmd run demo:api
-npm.cmd run demo:frontend
+npm.cmd run demo:reviewer
 ```
 
-`demo:frontend` loads `frontend/.env.demo`, which points the UI at the fixture-backed demo API,
-demo contracts, and the mock signer. All mocks are registered in `mocks/README.md`. The mock signer is
-disabled by default outside demo mode and should stay disabled for production-like ARC testing.
-Manual UI testing steps are documented in `docs/manual-testing.md`.
+`demo:reviewer` starts the fixture-backed demo API and the Vite frontend in demo mode. The frontend
+loads `frontend/.env.demo`, which points the UI at demo contracts and the mock signer. All mocks are
+registered in `mocks/README.md`. The mock signer is disabled by default outside demo mode and should
+stay disabled for production-like ARC testing. Manual UI testing steps and the two-terminal fallback
+are documented in `docs/manual-testing.md`.
 
 For stateful local protocol checks:
 
@@ -415,6 +420,7 @@ $env:OUTCOME_TOKEN_ADDRESS='0x...'
 $env:DEPLOYER_PRIVATE_KEY='0x...' # borrower signer for this command
 $env:LOAN_PRINCIPAL='1000000000'
 $env:LOAN_INTEREST_BPS='500'
+$env:LOAN_COLLATERAL_BPS='10000'
 $env:LOAN_WITHDRAW_FREEZE_DEADLINE='1780000000'
 $env:LOAN_ACTIVATION_DEADLINE='1780003600'
 $env:LOAN_REPAYMENT_DEADLINE='1782595600'

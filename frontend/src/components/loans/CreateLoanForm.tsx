@@ -11,6 +11,7 @@ import {
 } from "../../lib/parsing";
 import type { WalletAccount } from "../../wallet";
 import { getInjectedWalletProvider } from "../../wallet";
+import { DetailMetric } from "../shared/DetailMetric";
 
 export function CreateLoanForm(props: {
   walletAccount: WalletAccount | null;
@@ -19,6 +20,7 @@ export function CreateLoanForm(props: {
 }) {
   const [principal, setPrincipal] = useState("1000");
   const [interestBps, setInterestBps] = useState("500");
+  const [collateralBps, setCollateralBps] = useState("10000");
   const [loanWithdrawFreezeDeadline, setLoanWithdrawFreezeDeadline] = useState(() => toDatetimeLocalInput(daysFromNow(1)));
   const [activationDeadline, setActivationDeadline] = useState(() => toDatetimeLocalInput(daysFromNow(3)));
   const [repaymentDeadline, setRepaymentDeadline] = useState(() => toDatetimeLocalInput(daysFromNow(30)));
@@ -28,6 +30,7 @@ export function CreateLoanForm(props: {
 
   const parsedPrincipal = useMemo(() => parseUsdcInput(principal), [principal]);
   const parsedInterestBps = useMemo(() => parseBpsInput(interestBps), [interestBps]);
+  const parsedCollateralBps = useMemo(() => parseBpsInput(collateralBps), [collateralBps]);
   const parsedDeadlines = useMemo(
     () =>
       parseLoanDeadlineInputs({
@@ -40,6 +43,8 @@ export function CreateLoanForm(props: {
   const formError =
     parsedPrincipal.error ??
     parsedInterestBps.error ??
+    parsedCollateralBps.error ??
+    (parsedCollateralBps.value === 0n ? "Collateral bps must be positive." : null) ??
     parsedDeadlines.error ??
     (props.walletAccount === null ? "Connect wallet to create a loan." : null) ??
     (!props.walletOnExpectedChain ? "Switch wallet to ARC." : null);
@@ -48,8 +53,18 @@ export function CreateLoanForm(props: {
     props.walletOnExpectedChain &&
     parsedPrincipal.value !== null &&
     parsedInterestBps.value !== null &&
+    parsedCollateralBps.value !== null &&
+    parsedCollateralBps.value > 0n &&
     parsedDeadlines.value !== null &&
     status !== "creating";
+  const repaymentPreview =
+    parsedPrincipal.value !== null && parsedInterestBps.value !== null
+      ? parsedPrincipal.value + (parsedPrincipal.value * parsedInterestBps.value) / 10_000n
+      : null;
+  const collateralPreview =
+    repaymentPreview !== null && parsedCollateralBps.value !== null
+      ? (repaymentPreview * parsedCollateralBps.value) / 10_000n
+      : null;
 
   useEffect(() => {
     setStatus("idle");
@@ -62,6 +77,7 @@ export function CreateLoanForm(props: {
       props.walletAccount === null ||
       parsedPrincipal.value === null ||
       parsedInterestBps.value === null ||
+      parsedCollateralBps.value === null ||
       parsedDeadlines.value === null
     ) {
       return;
@@ -83,6 +99,7 @@ export function CreateLoanForm(props: {
       account: props.walletAccount,
       principal: parsedPrincipal.value,
       interestBps: parsedInterestBps.value,
+      collateralBps: parsedCollateralBps.value,
       loanWithdrawFreezeDeadline: parsedDeadlines.value.loanWithdrawFreezeDeadline,
       activationDeadline: parsedDeadlines.value.activationDeadline,
       repaymentDeadline: parsedDeadlines.value.repaymentDeadline,
@@ -116,6 +133,10 @@ export function CreateLoanForm(props: {
           <input value={interestBps} onChange={(event) => setInterestBps(event.target.value)} inputMode="numeric" />
         </label>
         <label>
+          Collateral bps
+          <input value={collateralBps} onChange={(event) => setCollateralBps(event.target.value)} inputMode="numeric" />
+        </label>
+        <label>
           Withdraw freeze
           <input
             value={loanWithdrawFreezeDeadline}
@@ -132,10 +153,16 @@ export function CreateLoanForm(props: {
           <input value={repaymentDeadline} onChange={(event) => setRepaymentDeadline(event.target.value)} type="datetime-local" />
         </label>
       </div>
-      {parsedPrincipal.value !== null && parsedInterestBps.value !== null && (
-        <div className="ticketNote">
-          Interest {formatBps(parsedInterestBps.value)}% / repayment target{" "}
-          {formatUsdc(parsedPrincipal.value + (parsedPrincipal.value * parsedInterestBps.value) / 10_000n)} USDC
+      {repaymentPreview !== null && collateralPreview !== null && parsedPrincipal.value !== null && parsedInterestBps.value !== null && parsedCollateralBps.value !== null && (
+        <div className="loanCreationPreview" aria-label="Loan economics preview">
+          <DetailMetric label="Principal requested" value={`${formatUsdc(parsedPrincipal.value)} USDC`} />
+          <DetailMetric label="Interest" value={`${formatBps(parsedInterestBps.value)}%`} />
+          <DetailMetric label="Collateral ratio" value={`${formatBps(parsedCollateralBps.value)}%`} />
+          <DetailMetric label="Repayment target" value={`${formatUsdc(repaymentPreview)} USDC`} />
+          <DetailMetric label="Required borrower collateral" value={`${formatUsdc(collateralPreview)} USDC`} />
+          <div className="previewNote">
+            Borrower chooses both interest and collateral ratio. The contract snapshots both values when the loan is created.
+          </div>
         </div>
       )}
       {formError !== null && <div className={props.walletAccount === null ? "ticketNote" : "ticketNote errorState"}>{formError}</div>}

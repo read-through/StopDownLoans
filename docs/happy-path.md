@@ -75,7 +75,7 @@ npm.cmd run arc:live-check
 Then open:
 
 ```text
-http://127.0.0.1:5173/#exchange/0xfb5d4095bc502bd0774d8e4437b94573fd29028c:0xd1ee39ba1234d6fb0a71db25f743d2e22b55bb9a9490986e0537a82526b6b4c8
+http://127.0.0.1:5173/#exchange/0x06c08af6a3ad503560f3010105f1ec32052c7f2f:<MARKET_ID>
 ```
 
 For a real browser-wallet test:

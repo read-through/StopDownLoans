@@ -1,4 +1,4 @@
-import { network } from "hardhat";
+﻿import { network } from "hardhat";
 
 const { viem, networkHelpers } = await network.create();
 
@@ -40,6 +40,7 @@ console.log(`OutcomeToken: ${outcomeToken.address}`);
 await loanPositionToken.write.createLoan([
   principal,
   interestBps,
+      10_000n,
   loanWithdrawFreezeDeadline,
   activationDeadline,
   repaymentDeadline,

@@ -85,7 +85,6 @@ contract LoanPositionToken is ERC1155, ERC1155Holder {
     address public owner;
     address public pendingOwner;
     uint256 public platformFeeBps;
-    uint256 public platformCollateralBps = 10_000;
     address public platformFeeRecipient;
     address public outcomeToken;
     uint256 public nextLoanId = 1;
@@ -119,7 +118,6 @@ contract LoanPositionToken is ERC1155, ERC1155Holder {
     event DefaultCollateralRedeemed(uint256 indexed loanId, bytes32 indexed marketId, uint256 amount);
     event OwnershipTransferred(address indexed oldOwner, address indexed newOwner);
     event PlatformFeeUpdated(uint256 oldFeeBps, uint256 newFeeBps);
-    event PlatformCollateralUpdated(uint256 oldCollateralBps, uint256 newCollateralBps);
     event PlatformFeeRecipientUpdated(address indexed oldRecipient, address indexed newRecipient);
     event OutcomeTokenUpdated(address indexed oldOutcomeToken, address indexed newOutcomeToken);
     event Cancelled(uint256 indexed loanId);
@@ -179,11 +177,13 @@ contract LoanPositionToken is ERC1155, ERC1155Holder {
     function createLoan(
         uint256 principal,
         uint256 interestBps,
+        uint256 collateralBps,
         uint256 loanWithdrawFreezeDeadline,
         uint256 activationDeadline,
         uint256 repaymentDeadline
     ) external returns (uint256 loanId) {
         if (principal == 0) revert ZeroAmount();
+        if (collateralBps == 0) revert InvalidAmount();
         if (outcomeToken == address(0)) revert OutcomeTokenNotSet();
         if (loanWithdrawFreezeDeadline <= block.timestamp) revert InvalidDeadline();
         if (activationDeadline <= block.timestamp) revert InvalidDeadline();
@@ -207,7 +207,7 @@ contract LoanPositionToken is ERC1155, ERC1155Holder {
         loanInterestBps[loanId] = interestBps;
         loanFeeBps[loanId] = platformFeeBps;
         loanFeeRecipient[loanId] = platformFeeRecipient;
-        loanCollateralBps[loanId] = platformCollateralBps;
+        loanCollateralBps[loanId] = collateralBps;
 
         IOutcomeProtoMarket(outcomeToken).createProtoMarket(
             loanId,
@@ -216,16 +216,22 @@ contract LoanPositionToken is ERC1155, ERC1155Holder {
             marketId
         );
 
+        _emitLoanCreated(loanId, msg.sender, marketId);
+    }
+
+    function _emitLoanCreated(uint256 loanId, address borrower, bytes32 marketId) internal {
+        Loan storage loan = loans[loanId];
+
         emit LoanCreated(
             loanId,
-            msg.sender,
-            principal,
-            repaymentAmount,
-            interestBps,
-            loanWithdrawFreezeDeadline,
-            activationDeadline,
-            repaymentDeadline,
-            platformCollateralBps,
+            borrower,
+            loan.principal,
+            loan.repaymentAmount,
+            loanInterestBps[loanId],
+            loan.loanWithdrawFreezeDeadline,
+            loan.activationDeadline,
+            loan.repaymentDeadline,
+            loanCollateralBps[loanId],
             marketId
         );
     }
@@ -271,15 +277,6 @@ contract LoanPositionToken is ERC1155, ERC1155Holder {
         platformFeeBps = newFeeBps;
 
         emit PlatformFeeUpdated(oldFeeBps, newFeeBps);
-    }
-
-    function setPlatformCollateralBps(uint256 newCollateralBps) external {
-        if (msg.sender != owner) revert NotOwner();
-
-        uint256 oldCollateralBps = platformCollateralBps;
-        platformCollateralBps = newCollateralBps;
-
-        emit PlatformCollateralUpdated(oldCollateralBps, newCollateralBps);
     }
 
     function setOutcomeToken(address newOutcomeToken) external {

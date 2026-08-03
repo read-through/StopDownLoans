@@ -6,6 +6,7 @@ import { shortHex } from "../../lib/format";
 import { StateBadge } from "../shared/StateBadge";
 import { FeedStatusBadge } from "./FeedStatusBadge";
 import { MarketLoanContext } from "./MarketLoanContext";
+import { MarketLifecyclePanel } from "./MarketLifecyclePanel";
 import { OrderbookSide } from "./OrderbookSide";
 import { OrderTicket } from "./OrderTicket";
 import { OutcomePositionPanel } from "./OutcomePositionPanel";
@@ -55,6 +56,7 @@ export function MarketDetail(props: {
           <StateBadge state={props.market.state} />
         </div>
       </div>
+      <MarketLifecyclePanel market={props.market} selectedOutcome={props.selectedOutcome} />
       <MarketLoanContext market={props.market} />
 
       {props.status === "loading" && (
@@ -99,14 +101,14 @@ export function MarketDetail(props: {
       <OrderTicket
         market={props.market}
         outcome={props.selectedOutcome}
-            walletAccount={props.walletAccount}
-            walletOnExpectedChain={props.walletOnExpectedChain}
-            walletBalances={props.walletBalances}
-            walletBalancesStatus={props.walletBalancesStatus}
-            walletBalancesError={props.walletBalancesError}
-            onAccountChanged={props.onAccountChanged}
-            onOrderSubmitted={props.onOrderSubmitted}
-          />
+        walletAccount={props.walletAccount}
+        walletOnExpectedChain={props.walletOnExpectedChain}
+        walletBalances={props.walletBalances}
+        walletBalancesStatus={props.walletBalancesStatus}
+        walletBalancesError={props.walletBalancesError}
+        onAccountChanged={props.onAccountChanged}
+        onOrderSubmitted={props.onOrderSubmitted}
+      />
     </section>
   );
 }

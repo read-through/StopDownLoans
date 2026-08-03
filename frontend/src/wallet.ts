@@ -11,6 +11,18 @@ export type EthereumProvider = {
   removeListener?: (event: string, handler: (...args: unknown[]) => void) => void;
 };
 
+export type WalletChainConfig = {
+  chainId: string;
+  chainName: string;
+  nativeCurrency: {
+    name: string;
+    symbol: string;
+    decimals: number;
+  };
+  rpcUrls: string[];
+  blockExplorerUrls?: string[];
+};
+
 declare global {
   interface Window {
     ethereum?: EthereumProvider;
@@ -50,16 +62,27 @@ export async function requestWalletAccount(): Promise<WalletAccount> {
   return account;
 }
 
-export async function switchWalletChain(chainId: string): Promise<void> {
+export async function switchWalletChain(chainId: string, chainConfig?: WalletChainConfig): Promise<void> {
   const provider = getInjectedWalletProvider();
   if (provider === null) {
     throw new Error("No injected wallet found.");
   }
 
-  await provider.request({
-    method: "wallet_switchEthereumChain",
-    params: [{ chainId }],
-  });
+  try {
+    await provider.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId }],
+    });
+  } catch (error) {
+    if (chainConfig === undefined || !isUnknownChainError(error)) {
+      throw error;
+    }
+
+    await provider.request({
+      method: "wallet_addEthereumChain",
+      params: [chainConfig],
+    });
+  }
 }
 
 export function subscribeWalletAccountsChanged(handler: () => void): () => void {
@@ -104,4 +127,13 @@ async function requestAccounts(provider: EthereumProvider, method: string): Prom
 async function requestChainId(provider: EthereumProvider): Promise<string | null> {
   const result = await provider.request({ method: "eth_chainId" });
   return typeof result === "string" ? result : null;
+}
+
+function isUnknownChainError(error: unknown): boolean {
+  if (typeof error !== "object" || error === null || !("code" in error)) {
+    return false;
+  }
+
+  const code = (error as { code: unknown }).code;
+  return code === 4902 || code === "4902";
 }

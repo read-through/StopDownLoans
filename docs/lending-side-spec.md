@@ -53,17 +53,18 @@ getMarketId(loanId) = keccak256(abi.encode(address(this), loanId))
 - `principal`;
 - `repaymentAmount`;
 - `interestBps`;
+- `collateralBps`;
 - `loanWithdrawFreezeDeadline`;
 - `activationDeadline`;
 - `repaymentDeadline`;
 - `repaymentSatisfiedAt`;
-- snapshotted collateral setting.
+- borrower-selected collateral setting.
 
 `getLoanView(loanId)` exposes the same loan-facing data as a single read model:
 
 - core loan terms and lifecycle accounting;
 - loan state;
-- snapshotted interest, fee, fee recipient, and collateral settings;
+- snapshotted interest, borrower-selected collateral, fee, and fee recipient settings;
 - required borrower collateral amount;
 - deterministic `marketId`.
 
@@ -83,11 +84,11 @@ The borrower creates the loan directly.
 - `borrower = msg.sender`;
 - `principal`;
 - `repaymentAmount = principal + principal * interestBps / 10_000`;
+- `collateralBps`;
 - `loanWithdrawFreezeDeadline`;
 - `activationDeadline`;
 - `repaymentDeadline`;
 - current platform fee settings snapshot;
-- current platform collateral settings snapshot;
 - initial state `Funding`.
 
 Deadline constraints:
@@ -97,7 +98,7 @@ Deadline constraints:
 - `loanWithdrawFreezeDeadline <= activationDeadline`;
 - `repaymentDeadline > activationDeadline`.
 
-`interestBps`, fee settings, and collateral settings are stored as per-loan snapshots outside the core `Loan` struct:
+`interestBps`, borrower-selected collateral settings, and fee settings are stored as per-loan snapshots outside the core `Loan` struct:
 
 - `loanInterestBps[loanId]`;
 - `loanFeeBps[loanId]`;
@@ -365,21 +366,9 @@ This preserves payout accounting when a position is split after partial claims.
 
 ## Borrower Collateral Requirement
 
-Borrower collateral amount is determined by the lending contract, not by the borrower.
+Borrower collateral amount is determined from the full loan offer created by the borrower.
 
-The platform-level coefficient is:
-
-```solidity
-platformCollateralBps
-```
-
-Default:
-
-```text
-platformCollateralBps = 10_000
-```
-
-That means borrower collateral equals 100% of `repaymentAmount`.
+The borrower selects `collateralBps` together with `principal`, `interestBps`, and deadlines.
 
 For each loan:
 
@@ -391,7 +380,7 @@ The collateral coefficient is snapshotted at loan creation:
 
 - `loanCollateralBps[loanId]`.
 
-Later platform collateral changes do not change existing loans.
+There is no owner-controlled platform collateral coefficient in the current MVP.
 
 The required borrower collateral is read through:
 
@@ -442,7 +431,6 @@ Owner-only functions:
 
 - `setPlatformFeeBps`;
 - `setPlatformFeeRecipient`;
-- `setPlatformCollateralBps`;
 - `setOutcomeToken`, only while `outcomeToken` is unset;
 - `transferOwnership`;
 - `claimPlatformFee`.

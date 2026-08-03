@@ -25,7 +25,7 @@ import {
 } from "../api";
 import { subscribeBookFeed } from "../bookFeed";
 import { readWalletBalances, type WalletBalances } from "../chainReads";
-import { expectedArcChainIdHex, expectedArcChainIdNumber, frontendContracts } from "../config";
+import { arcWalletChain, expectedArcChainIdHex, expectedArcChainIdNumber, frontendContracts } from "../config";
 import { errorMessage, formatTopbarTime, shortHex, walletButtonLabel, formatUsdc } from "../lib/format";
 import {
   getMarketKey,
@@ -678,7 +678,7 @@ export function useAppController() {
     setWalletStatus("connecting");
     setWalletError(null);
 
-    switchWalletChain(expectedArcChainIdHex)
+    switchWalletChain(expectedArcChainIdHex, arcWalletChain)
       .then(() => requestWalletAccount())
       .then((account) => {
         setWalletAccount(account);

@@ -390,6 +390,135 @@ a {
   gap: 12px;
 }
 
+.demoPathPanel {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.78fr) minmax(0, 1.22fr);
+  gap: 18px;
+  align-items: stretch;
+  min-width: 0;
+  padding: 22px;
+  color: #10201c;
+  background: #f7faf6;
+  border: 1px solid #dce2d8;
+  border-radius: 8px;
+}
+
+.demoPathIntro {
+  display: grid;
+  align-content: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.demoPathIntro span {
+  color: #1f4d36;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.demoPathIntro h2 {
+  max-width: 390px;
+  margin: 0;
+  font-size: 30px;
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+
+.demoPathIntro p {
+  max-width: 430px;
+  margin: 0;
+  color: #53615a;
+  line-height: 1.45;
+}
+
+.demoPathSteps {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.demoPathStep {
+  display: grid;
+  grid-template-columns: 28px 38px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  min-width: 0;
+  padding: 12px;
+  background: #ffffff;
+  border: 1px solid #e1e7dd;
+  border-radius: 7px;
+}
+
+.demoStepNumber,
+.demoStepIcon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+
+.demoStepNumber {
+  width: 28px;
+  height: 28px;
+  color: #ffffff;
+  background: #1f4d36;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.demoStepIcon {
+  width: 38px;
+  height: 38px;
+  color: #6841c5;
+  background: #ede7f6;
+  border-radius: 7px;
+}
+
+.demoPathStep h3 {
+  margin: 0;
+  font-size: 15px;
+  letter-spacing: 0;
+}
+
+.demoPathStep p {
+  margin: 4px 0 8px;
+  color: #53615a;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.demoPathStep code {
+  display: inline-flex;
+  max-width: 100%;
+  min-height: 24px;
+  align-items: center;
+  padding: 0 8px;
+  overflow: hidden;
+  color: #0d2418;
+  background: #eef3ed;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.demoPathLink {
+  display: inline-flex;
+  grid-column: 2;
+  align-items: center;
+  justify-self: start;
+  gap: 8px;
+  min-height: 34px;
+  padding: 0 12px;
+  color: #1f4d36;
+  background: #e7efe5;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 850;
+}
+
 .roleAction {
   display: grid;
   gap: 16px;
@@ -478,6 +607,81 @@ a {
   border-top: 1px solid #e1e7dd;
 }
 
+.loanLifecyclePanel {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.75fr) minmax(0, 1.25fr);
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+  background: #f7faf6;
+  border: 1px solid #e1e7dd;
+  border-radius: 7px;
+}
+
+.loanLifecycleLead {
+  display: grid;
+  align-content: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.loanLifecycleLead span {
+  color: #1f4d36;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.loanLifecycleLead h3 {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: 0;
+}
+
+.loanLifecycleLead p {
+  margin: 0;
+  color: #53615a;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.loanLifecycleSteps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.loanLifecycleStep {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  min-height: 92px;
+  padding: 10px;
+  background: #ffffff;
+  border: 1px solid #e2e7df;
+  border-radius: 7px;
+}
+
+.loanLifecycleStep svg {
+  color: #6841c5;
+}
+
+.loanLifecycleStep span {
+  color: #64716a;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.loanLifecycleStep strong {
+  min-width: 0;
+  overflow: hidden;
+  color: #0d2418;
+  font-size: 13px;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+}
+
 .loanDetailGrid,
 .loanTimeline {
   display: grid;
@@ -563,6 +767,26 @@ a {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 10px;
+}
+
+.loanCreationPreview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  padding-top: 2px;
+}
+
+.loanCreationPreview .detailMetric {
+  min-height: 68px;
+  background: #ffffff;
+  border: 1px solid #e1e7dd;
+}
+
+.previewNote {
+  grid-column: 1 / -1;
+  color: #64716a;
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 .loanFilterBar,
@@ -1019,6 +1243,81 @@ a {
   border-top: 1px solid #e1e7dd;
 }
 
+.marketLifecyclePanel {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.75fr) minmax(0, 1.25fr);
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+  background: #f7faf6;
+  border: 1px solid #e1e7dd;
+  border-radius: 7px;
+}
+
+.marketLifecycleLead {
+  display: grid;
+  align-content: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.marketLifecycleLead span {
+  color: #6841c5;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.marketLifecycleLead h3 {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: 0;
+}
+
+.marketLifecycleLead p {
+  margin: 0;
+  color: #53615a;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.marketLifecycleSteps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.marketLifecycleStep {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  min-height: 92px;
+  padding: 10px;
+  background: #ffffff;
+  border: 1px solid #e2e7df;
+  border-radius: 7px;
+}
+
+.marketLifecycleStep svg {
+  color: #1f4d36;
+}
+
+.marketLifecycleStep span {
+  color: #64716a;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.marketLifecycleStep strong {
+  min-width: 0;
+  overflow: hidden;
+  color: #0d2418;
+  font-size: 13px;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+}
+
 .detailHeader {
   display: flex;
   align-items: flex-start;
@@ -1268,7 +1567,10 @@ a {
   .appShell,
   .contentGrid,
   .createScreenGrid,
+  .demoPathPanel,
+  .loanLifecyclePanel,
   .loansScreenGrid,
+  .marketLifecyclePanel,
   .overviewPreviewGrid,
   .roleStrip,
   .marketGrid,
@@ -1280,6 +1582,10 @@ a {
     position: static;
     border-right: 0;
     border-bottom: 1px solid #d8ded5;
+  }
+
+  .demoPathLink {
+    grid-column: 1;
   }
 
   .navList {
@@ -1340,15 +1646,31 @@ a {
   }
 
   .quoteGrid,
+  .demoPathStep,
   .loanReadinessStrip,
   .loanDetailGrid,
+  .loanLifecycleSteps,
   .loanTimeline,
   .marketLoanContext,
+  .marketLifecycleSteps,
   .walletReadinessPanel,
   .walletBalancePanel,
   .loanCreateGrid,
   .ticketGrid,
   .bookGrid {
     grid-template-columns: 1fr;
+  }
+
+  .demoPathPanel {
+    padding: 18px;
+  }
+
+  .demoPathIntro h2 {
+    font-size: 24px;
+  }
+
+  .demoStepNumber,
+  .demoStepIcon {
+    display: none;
   }
 }

@@ -1,5 +1,6 @@
-import { Activity, Clock3 } from "lucide-react";
+import { Activity } from "lucide-react";
 import type { LoanDetail, PredictionMarket } from "../types";
+import { DemoPathPanel } from "../components/shared/DemoPathPanel";
 import { OverviewPreview } from "../components/shared/OverviewPreview";
 import { RoleAction } from "../components/shared/RoleAction";
 
@@ -24,6 +25,8 @@ export function OverviewScreen(props: {
           );
         })}
       </section>
+
+      <DemoPathPanel />
 
       <section className="roleStrip" aria-label="Role shortcuts">
         <RoleAction

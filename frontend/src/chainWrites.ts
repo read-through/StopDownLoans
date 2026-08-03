@@ -5,7 +5,7 @@ const SET_APPROVAL_FOR_ALL_SELECTOR = "0xa22cb465";
 const ERC20_APPROVE_SELECTOR = "0x095ea7b3";
 const ACTIVATE_LOAN_SELECTOR = "0xb260c42a";
 const CLAIM_POSITION_SELECTOR = "0x379607f5";
-const CREATE_LOAN_SELECTOR = "0xcf2b4cbc";
+const CREATE_LOAN_SELECTOR = "0xfa01c754";
 const DEPOSIT_BORROWER_COLLATERAL_SELECTOR = "0x79389c85";
 const DEPOSIT_PAIR_COLLATERAL_SELECTOR = "0xec647d6c";
 const DEPOSIT_TO_LOAN_SELECTOR = "0x09748259";
@@ -83,6 +83,7 @@ export async function createLoan(params: {
   account: WalletAccount;
   principal: bigint;
   interestBps: bigint;
+  collateralBps: bigint;
   loanWithdrawFreezeDeadline: bigint;
   activationDeadline: bigint;
   repaymentDeadline: bigint;
@@ -99,6 +100,7 @@ export async function createLoan(params: {
       `${CREATE_LOAN_SELECTOR}` +
       `${encodeUint256(params.principal)}` +
       `${encodeUint256(params.interestBps)}` +
+      `${encodeUint256(params.collateralBps)}` +
       `${encodeUint256(params.loanWithdrawFreezeDeadline)}` +
       `${encodeUint256(params.activationDeadline)}` +
       `${encodeUint256(params.repaymentDeadline)}`,

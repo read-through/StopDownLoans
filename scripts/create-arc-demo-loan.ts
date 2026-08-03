@@ -24,6 +24,7 @@ const loanPositionTokenAddress = readAddressEnv("LOAN_POSITION_TOKEN_ADDRESS");
 const outcomeTokenAddress = readAddressEnv("OUTCOME_TOKEN_ADDRESS");
 const principal = readUintEnv("LOAN_PRINCIPAL");
 const interestBps = readUintEnv("LOAN_INTEREST_BPS");
+const collateralBps = readUintEnv("LOAN_COLLATERAL_BPS");
 const loanWithdrawFreezeDeadline = readUintEnv("LOAN_WITHDRAW_FREEZE_DEADLINE");
 const activationDeadline = readUintEnv("LOAN_ACTIVATION_DEADLINE");
 const repaymentDeadline = readUintEnv("LOAN_REPAYMENT_DEADLINE");
@@ -39,6 +40,7 @@ const outcomeToken = await viem.getContractAt("OutcomeToken", outcomeTokenAddres
 const txHash = await loanPositionToken.write.createLoan([
   principal,
   interestBps,
+  collateralBps,
   loanWithdrawFreezeDeadline,
   activationDeadline,
   repaymentDeadline,

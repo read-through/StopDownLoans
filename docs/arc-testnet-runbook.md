@@ -7,9 +7,9 @@ path for users and the backend executor wallet for settlement.
 
 ## Contracts
 
-- `LoanPositionToken`: `0x7e1a9611f61a40fac7e2f18831a13edf9e8d25e6`
-- `OutcomeToken`: `0xfb5d4095bc502bd0774d8e4437b94573fd29028c`
-- `OutcomeExchange`: `0x45333a5b06a95a2a84cea9ab67f486558943c626`
+- `LoanPositionToken`: `0x4f8e2d32ad62835353b70f2fa091979d513a43ac`
+- `OutcomeToken`: `0x06c08af6a3ad503560f3010105f1ec32052c7f2f`
+- `OutcomeExchange`: `0xddba15b2ddadec73f06fab4011b37c100efe6c30`
 - ARC USDC: `0x3600000000000000000000000000000000000000`
 
 ## Local Environment
@@ -20,9 +20,9 @@ The local `.env` file is intentionally ignored by git. It must contain:
 DATABASE_URL=postgres://stopdown:stopdown@localhost:55432/stopdown
 ARC_RPC_URL=https://rpc.testnet.arc.network
 ARC_CHAIN_ID=5042002
-LOAN_POSITION_TOKEN_ADDRESS=0x7e1a9611f61a40fac7e2f18831a13edf9e8d25e6
-OUTCOME_TOKEN_ADDRESS=0xfb5d4095bc502bd0774d8e4437b94573fd29028c
-OUTCOME_EXCHANGE_ADDRESS=0x45333a5b06a95a2a84cea9ab67f486558943c626
+LOAN_POSITION_TOKEN_ADDRESS=0x4f8e2d32ad62835353b70f2fa091979d513a43ac
+OUTCOME_TOKEN_ADDRESS=0x06c08af6a3ad503560f3010105f1ec32052c7f2f
+OUTCOME_EXCHANGE_ADDRESS=0xddba15b2ddadec73f06fab4011b37c100efe6c30
 USDC_ADDRESS=0x3600000000000000000000000000000000000000
 EXECUTOR_PRIVATE_KEY=0x...
 ```
@@ -47,22 +47,46 @@ npm.cmd run db:migrate
 npm.cmd run db:check
 ```
 
-Register the active ARC market in the local CLOB database:
+For a reviewer/live ARC run, use a clean PostgreSQL volume or clean database. Mixing old local demo
+orders with live ARC contracts can make background workers inspect stale mock `outcomeToken`
+addresses and can leave reconciliation cursors far behind the current ARC head. If you intentionally
+reuse an old local database, inspect `backend_cursors` before claiming live CLOB reconciliation
+evidence.
+
+Recommended reviewer reset:
 
 ```powershell
-npm.cmd run market-config:upsert -- --outcome-token 0xfb5d4095bc502bd0774d8e4437b94573fd29028c --market-id 0xc3851385000c2d86f34b031cfa5e672e6651cce7d7af2fc3e0c9b3365fda5427 --default-tick-units 1000 --edge-tick-units 100 --lower-edge-price-units 100000 --upper-edge-price-units 900000 --min-order-outcome-amount 1
+npm.cmd run db:up
+npm.cmd run db:migrate
+npm.cmd run db:reset:reviewer -- --yes
+npm.cmd run db:check
 ```
 
-Current additional live market created on 2026-07-26:
+`db:reset:reviewer` clears orders, reservations, trades, settlement attempts, market configs,
+processed chain events, cursors, and loan snapshots. It preserves the database schema and
+`schema_migrations`.
+
+When creating live demo loans from PowerShell, derive deadlines from UTC Unix time:
 
 ```powershell
-npm.cmd run market-config:upsert -- --outcome-token 0xfb5d4095bc502bd0774d8e4437b94573fd29028c --market-id 0xd5cf42e5e9cb299e61742c19f6f1958e4e737b22c0ca6b1a31ee86f9fcfe4738 --default-tick-units 1000 --edge-tick-units 100 --lower-edge-price-units 100000 --upper-edge-price-units 900000 --min-order-outcome-amount 1
+$now = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
+$env:LOAN_PRINCIPAL = "1000000"
+$env:LOAN_INTEREST_BPS = "500"
+$env:LOAN_COLLATERAL_BPS = "10000"
+$env:LOAN_WITHDRAW_FREEZE_DEADLINE = ($now + 120).ToString()
+$env:LOAN_ACTIVATION_DEADLINE = ($now + 1200).ToString()
+$env:LOAN_REPAYMENT_DEADLINE = ($now + 3600).ToString()
+npm.cmd run arc:create-demo-loan
 ```
 
-Current active live market for reviewer trading checks:
+Do not use `Get-Date -UFormat %s` for this. In PowerShell it can produce a timestamp shifted by the
+local timezone, which makes the loan withdraw freeze deadline much later than intended.
+
+Register a current-deployment active ARC market in the local CLOB database after creating and
+activating a fresh loan:
 
 ```powershell
-npm.cmd run market-config:upsert -- --outcome-token 0xfb5d4095bc502bd0774d8e4437b94573fd29028c --market-id 0xd1ee39ba1234d6fb0a71db25f743d2e22b55bb9a9490986e0537a82526b6b4c8 --default-tick-units 1000 --edge-tick-units 100 --lower-edge-price-units 100000 --upper-edge-price-units 900000 --min-order-outcome-amount 1
+npm.cmd run market-config:upsert -- --outcome-token 0x06c08af6a3ad503560f3010105f1ec32052c7f2f --market-id <MARKET_ID> --default-tick-units 1000 --edge-tick-units 100 --lower-edge-price-units 100000 --upper-edge-price-units 900000 --min-order-outcome-amount 1
 ```
 
 Run the backend with settlement/keeper loops:
@@ -92,7 +116,7 @@ Optional env:
 
 ```powershell
 $env:CLOB_API_URL='http://127.0.0.1:3001'
-$env:MARKET_ID='0xd1ee39ba1234d6fb0a71db25f743d2e22b55bb9a9490986e0537a82526b6b4c8'
+$env:MARKET_ID='<MARKET_ID>'
 npm.cmd run arc:live-check
 ```
 
@@ -113,7 +137,7 @@ real browser wallet to sign and submit orders through the frontend.
 Open:
 
 ```text
-http://127.0.0.1:5173/#exchange/0xfb5d4095bc502bd0774d8e4437b94573fd29028c:0xc3851385000c2d86f34b031cfa5e672e6651cce7d7af2fc3e0c9b3365fda5427
+http://127.0.0.1:5173/#exchange/0x06c08af6a3ad503560f3010105f1ec32052c7f2f:<MARKET_ID>
 ```
 
 ## API-only Mode
@@ -138,10 +162,8 @@ Expected for the current demo state:
 
 - health `status = ok`;
 - health `executorEnabled = true` when `EXECUTOR_PRIVATE_KEY` is set and `dev:clob` is used;
-- loan `#1` is `DEFAULTED`;
-- loan `#3` was used for backend checks and may be `DEFAULTED`;
-- loan `#4` is the current active reviewer market;
-- loan `#4` market id is `0xd1ee39ba1234d6fb0a71db25f743d2e22b55bb9a9490986e0537a82526b6b4c8`.
+- loan `#3` is the current active reviewer market;
+- loan `#3` market id is `0x1489a4e8bf6c349a62c1892e03c1206051f11bac3bdf1adaba8aaa6800322ea1`.
 
 ## Live CLOB Trade Script
 
@@ -149,7 +171,7 @@ The live backend trade walkthrough submits a borrower SELL and a temporary buyer
 running CLOB API:
 
 ```powershell
-$env:LOAN_ID='4'
+$env:LOAN_ID='3'
 $env:CLOB_API_URL='http://127.0.0.1:3000'
 npm.cmd run arc:clob-trade-active-loan
 ```
@@ -162,7 +184,7 @@ separate backend with conservative worker intervals:
 ```powershell
 $env:PORT='3001'
 $env:CLOB_API_URL='http://127.0.0.1:3001'
-$env:RECONCILIATION_START_BLOCK='53785400'
+$env:RECONCILIATION_START_BLOCK='<CURRENT_ARC_BLOCK_BEFORE_STARTING_BACKEND>'
 $env:RECONCILIATION_INTERVAL_MS='15000'
 $env:MARKET_CONFIG_EVENT_SWEEP_INTERVAL_MS='60000'
 $env:LENDING_KEEPER_INTERVAL_MS='60000'
@@ -172,6 +194,11 @@ $env:EXECUTOR_INTERVAL_MS='5000'
 $env:LOAN_SNAPSHOT_SYNC_INTERVAL_MS='30000'
 npm.cmd run dev:clob
 ```
+
+For a clean reviewer database, choose `RECONCILIATION_START_BLOCK` at or just before backend
+startup, before submitting the reviewer trade. Starting before old demo trades can make
+reconciliation see historical `OrderFilled` events whose orders are no longer present after
+`db:reset:reviewer`.
 
 ## Funding the Executor
 

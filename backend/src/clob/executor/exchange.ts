@@ -70,6 +70,10 @@ export async function simulateMatchOrders(input: SimulateMatchOrdersInput): Prom
 }
 
 export async function submitMatchOrders(input: SubmitMatchOrdersInput): Promise<Hex> {
+  if (input.walletClient.account === undefined) {
+    throw new Error("Executor wallet client must be configured with a local account.");
+  }
+
   const simulation = await input.publicClient.simulateContract({
     address: input.outcomeExchange,
     abi: outcomeExchangeAbi,
@@ -78,7 +82,10 @@ export async function submitMatchOrders(input: SubmitMatchOrdersInput): Promise<
     account: input.operator,
   });
 
-  return input.walletClient.writeContract(simulation.request);
+  return input.walletClient.writeContract({
+    ...simulation.request,
+    account: input.walletClient.account,
+  });
 }
 
 function toContractArgs(args: MatchOrdersArgs) {

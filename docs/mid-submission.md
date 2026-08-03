@@ -34,14 +34,14 @@ sequenceDiagram
   participant CLOB as CLOB + trade settlement
   participant Keeper as Keeper / resolver
 
-  Borrower->>Loan: createLoan(P, interestBps, deadlines)
+  Borrower->>Loan: createLoan(P, interestBps, collateralBps, deadlines)
   Loan->>Market: create linked repayment market
   Borrower->>Market: deposit borrower collateral C
   Lenders->>Loan: fund P in parts
   Loan-->>Lenders: mint transferable lender positions
   Traders->>Market: deposit pair collateral
   Note over Traders,Market: Pair mint rule: 1 USDC mints 1 YES plus 1 NO after activation
-  Keeper->>Loan: activateLoan()
+  Keeper->>Loan: activate()
   Loan-->>Borrower: transfer principal P
   Loan->>Market: activate and mint outcomes
   Market-->>Borrower: borrower YES
@@ -57,7 +57,7 @@ sequenceDiagram
   end
   alt repayment R arrives before deadline - YES wins
     Borrower->>Loan: depositToLoan(R)
-    Keeper->>Loan: markRepaidIfFundedOnTime()
+    Keeper->>Loan: settleRepaid()
     Loan->>Market: resolve(YES)
     Note right of Loan: Loan state changes only after R is credited. Lenders claim from contract balance.
     Lenders->>Loan: claim repayment
@@ -75,8 +75,9 @@ sequenceDiagram
 Concrete example:
 
 - Borrower requests `$1,000`.
+- Borrower chooses `5%` interest and `100%` collateral ratio.
 - Required repayment is `$1,050`.
-- Borrower commits `$1,050` as loan-linked collateral.
+- Borrower commits `$1,050` as loan-linked collateral because `collateralBps = 10,000`.
 - Lenders fund `$1,000` and receive transferable lender positions.
 - Traders trade YES/NO shares on whether the `$1,050` repayment will arrive before the deadline.
 - Any pair minter can deposit `$1` and later mint `1 YES + 1 NO`.
@@ -198,15 +199,15 @@ Live contracts:
 
 | Contract | Address |
 | --- | --- |
-| `LoanPositionToken` | `0x7e1a9611f61a40fac7e2f18831a13edf9e8d25e6` |
-| `OutcomeToken` | `0xfb5d4095bc502bd0774d8e4437b94573fd29028c` |
-| `OutcomeExchange` | `0x45333a5b06a95a2a84cea9ab67f486558943c626` |
+| `LoanPositionToken` | `0x4f8e2d32ad62835353b70f2fa091979d513a43ac` |
+| `OutcomeToken` | `0x06c08af6a3ad503560f3010105f1ec32052c7f2f` |
+| `OutcomeExchange` | `0xddba15b2ddadec73f06fab4011b37c100efe6c30` |
 | ARC USDC | `0x3600000000000000000000000000000000000000` |
 
-Demo loan:
+Current demo loan:
 
-- `LOAN_ID=1`
-- `MARKET_ID=0xc3851385000c2d86f34b031cfa5e672e6651cce7d7af2fc3e0c9b3365fda5427`
+- `LOAN_ID=3`
+- `MARKET_ID=0x1489a4e8bf6c349a62c1892e03c1206051f11bac3bdf1adaba8aaa6800322ea1`
 - Principal: `1 USDC`
 - Required repayment and borrower collateral: `1.05 USDC`
 - State after walkthrough: `Active`
@@ -215,14 +216,16 @@ Recorded ARC transactions:
 
 | Step | Transaction |
 | --- | --- |
-| Create loan | `0xe34f44bb2a6f42895f2d5d1a8308c9d8ba3c04988e42c349c434b62ae3618930` |
-| Deposit borrower collateral | `0xa13db8e54f22f8b23f7cdac4b817259e106d531549fcc51d1641d573c9f8e6e4` |
-| Fund loan | `0xe88c06dc5d28300eb85f525a763e79f552479c8e14f1043c200808ae5a469c42` |
-| Activate loan and market | `0x66a7137e344411332ae4a80c41e0120f1f52c3567a5725375de2572fe069a308` |
-| Sell `0.2 YES` through `OutcomeExchange` | `0x4fe309716988dd0f30857683f0661c2d4698bcdc7c0789d375d99cf6a4499551` |
+| Create loan | `0x20ee75626f7d0b36eae19c0ccd1e4876f76459f0c25d338b01b7edef0b1aee25` |
+| Deposit borrower collateral | `0xd58afa4f343d4390bf1be5ac2de8b5bd3f088db663468e90429e8380e9ffd17e` |
+| Fund loan | `0x8714023addb75b33efa59e8c870f2e0b170e8667497327b531d09d9ceddb28a6` |
+| Activate loan and market | `0x98dec90ed4d25cec4a6b2ab633a7720852579083df2db04fa3eef820a2be3a6f` |
+| Backend CLOB settlement tx for `trade_id=1` | `0x532c31c774c0cd96b1c5aa0e5f3f606a26631dd60f28b2cd625dbf83f3d1f15c` |
 
 The recorded demo loan was intentionally left unrepaid/unresolved in the walkthrough, so reviewers
-can inspect the active loan-linked market while the ARC testnet state remains available.
+can inspect the active loan-linked market while the ARC testnet state remains available. The backend
+CLOB path admitted signed maker/taker orders, matched them, submitted settlement, and reconciled
+`trade_id=1` as `CONFIRMED` on a clean reviewer database.
 
 ## Placeholders
 
@@ -238,7 +241,8 @@ See `docs/known-limitations.md` for the full cleanup list.
 - Full production auth, rate limiting, and abuse controls for the backend.
 - Security audit, governance, upgradeability, and production incident controls.
 - Polished frontend onboarding and real wallet demo recording.
-- Browser UI execution of the live ARC trade path; direct on-chain settlement has been verified.
+- Browser UI execution of the live ARC trade path; direct on-chain and backend CLOB settlement have
+  been verified through scripts.
 
 ## Safety Notes
 
