@@ -1,6 +1,6 @@
 # Wallet Path
 
-This document defines the wallet paths for the MVP and separates live ARC behavior from demo-only mocks.
+This document defines the live wallet paths for the MVP.
 Circle-specific integration boundaries are detailed in `docs/circle-integration-strategy.md`.
 
 ## Current Live ARC Path
@@ -82,30 +82,6 @@ Accepted paths:
 - Circle wallet only if its latency and API constraints fit the maker strategy.
 
 The CLOB backend accepts signed orders, not wallet sessions. That keeps the matching engine independent from wallet vendor choice.
-
-## Demo Mock Path
-
-The mock signer exists only for local reviewer/demo UI checks when no injected EVM wallet is available.
-
-It is enabled only when:
-
-```ini
-VITE_ENABLE_MOCK_WALLET=true
-```
-
-The committed demo command uses:
-
-```powershell
-npm.cmd run demo:api
-npm.cmd run demo:frontend
-```
-
-Mock limitations:
-
-- reviewer API reads local fixtures instead of indexed live ARC state;
-- mock transactions return demo hashes;
-- mock signer does not prove live ARC wallet compatibility;
-- mock signer is not a custody model.
 
 ## Required Live Wallet Checklist
 

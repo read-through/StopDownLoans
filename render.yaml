@@ -100,5 +100,3 @@ services:
         value: 0xddba15b2ddadec73f06fab4011b37c100efe6c30
       - key: PUBLIC_USDC_ADDRESS
         value: 0x3600000000000000000000000000000000000000
-      - key: VITE_ENABLE_MOCK_WALLET
-        value: "false"

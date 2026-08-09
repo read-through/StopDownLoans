@@ -72,7 +72,6 @@ function printEnv(addresses: {
   console.log(`VITE_ARC_CHAIN_ID=5042002`);
   console.log(`VITE_CLOB_API_URL=http://127.0.0.1:3000`);
   console.log(`VITE_CLOB_WS_URL=ws://127.0.0.1:3000/v1/ws`);
-  console.log(`VITE_ENABLE_MOCK_WALLET=false`);
   console.log(`VITE_LOAN_POSITION_TOKEN_ADDRESS=${addresses.loanPositionToken}`);
   console.log(`VITE_OUTCOME_TOKEN_ADDRESS=${addresses.outcomeToken}`);
   console.log(`VITE_OUTCOME_EXCHANGE_ADDRESS=${addresses.outcomeExchange}`);

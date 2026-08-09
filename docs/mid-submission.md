@@ -113,7 +113,7 @@ npm.cmd run demo:api
 npm.cmd run demo:frontend
 ```
 
-No-wallet UI mode:
+Read-only UI mode:
 
 ```powershell
 npm.cmd run demo:api
@@ -121,7 +121,8 @@ npm.cmd run demo:frontend
 ```
 
 `demo:frontend` loads `frontend/.env.demo`, so the frontend contract addresses match the demo API
-and the mock signer is enabled without relying on local ignored `.env` files.
+without relying on local ignored `.env` files. It uses the normal frontend entrypoint and does not
+install a wallet provider.
 
 Open:
 
@@ -137,11 +138,9 @@ The demo frontend exposes screens for:
 4. a loan-linked YES/NO exchange screen;
 5. wallet portfolio surfaces for positions, reservations, claims, and balances.
 
-Mock signer note: all mocks are registered in `mocks/README.md`. The mock signer is off by default
-and is only for local UI testing when a reviewer does not have an injected EVM wallet available.
-Mock transactions return demo hashes, and mock order submissions can emit WebSocket updates. The
-demo API still uses fixture-backed reads and does not persist real protocol or orderbook state.
-Production-like ARC testing should use deployed contracts plus a real wallet.
+The demo API uses fixture-backed reads and does not persist real protocol or orderbook state. Wallet
+actions require an injected EVM wallet or configured Circle Wallet credentials. Production-like ARC
+testing uses deployed contracts plus one of those real wallet paths.
 
 Contract and backend verification:
 
@@ -189,7 +188,7 @@ book reads, and WebSocket subscription.
   bot signer can submit signed orders, because the backend matching engine is wallet-agnostic.
 - ARC App Kit provides an estimate-first USDC funding command outside the matching core; deeper
   retail kit usage remains optional.
-- The local mock signer is not a custody model. It is a public demo key for UI checks only.
+- The read-only demo does not provide transaction or signature simulation.
 
 ## ARC Testnet Evidence
 

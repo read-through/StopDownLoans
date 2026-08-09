@@ -78,7 +78,6 @@ Future alternatives:
 - StopDown backend must not store retail user private keys.
 - Circle integration must not introduce a second order format.
 - Market makers must not be forced into the retail wallet path.
-- Demo mock signer must not be described as custody, wallet security, or live protocol behavior.
 - Gas sponsorship must not hide contract approvals, order signing, or repayment obligations from the
   user.
 
@@ -94,7 +93,6 @@ Current status:
 - implemented: EIP-712 `Order` and `CancelOrder` signing through the same CLOB order format;
 - implemented: Circle challenge-to-transaction polling; UI completion waits for ARC `CONFIRMED` or `COMPLETE`;
 - implemented: backend executor key path;
-- implemented: centralized demo mock signer for no-wallet UI review;
 - implemented: ARC App Kit estimate-first USDC send command for funding an ARC Testnet wallet;
 - documented: Circle gas UX target;
 - documented: ARC App Kit target for USDC onboarding/fund flows;

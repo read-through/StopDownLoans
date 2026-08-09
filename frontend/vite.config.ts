@@ -1,10 +1,10 @@
 import { fileURLToPath } from "node:url";
-import { defineConfig, normalizePath, type Plugin } from "vite";
+import { defineConfig, normalizePath } from "vite";
 import react from "@vitejs/plugin-react";
 
-export default defineConfig(({ mode }) => ({
+export default defineConfig({
   root: "frontend",
-  plugins: [react(), demoEntrypoint(mode)],
+  plugins: [react()],
   resolve: {
     alias: {
       jsonwebtoken: normalizePath(
@@ -18,22 +18,4 @@ export default defineConfig(({ mode }) => ({
   preview: {
     port: 4173,
   },
-}));
-
-function demoEntrypoint(mode: string): Plugin {
-  return {
-    name: "stopdown-demo-entrypoint",
-    transformIndexHtml(html) {
-      if (mode !== "demo") {
-        return html;
-      }
-
-      return html.replace("/src/main.tsx", toViteFsPath("../mocks/frontend/main.demo.tsx"));
-    },
-  };
-}
-
-function toViteFsPath(relativePath: string): string {
-  const absolutePath = fileURLToPath(new URL(relativePath, import.meta.url));
-  return `/@fs/${absolutePath.replace(/\\/g, "/")}`;
-}
+});

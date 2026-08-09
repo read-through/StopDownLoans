@@ -40,7 +40,7 @@ npm.cmd run demo:api
 npm.cmd run demo:frontend
 ```
 
-This opens a fixture-backed reviewer API plus a mock-wallet frontend flow. The mock signer is only a reviewer/demo helper and is centralized under `mocks/`; it is not a custody model and is not intended for production.
+This opens a fixture-backed reviewer API plus the normal frontend in read-only mode. The frontend contains no mock wallet or embedded private key; transaction and signature testing requires an injected wallet or configured Circle Wallet.
 
 Circle User-Controlled Wallet Social Login is implemented as an optional retail path for borrowers, lenders, and traders. It creates an ARC Testnet EOA, executes protocol calls through user-approved Circle challenges, and signs the same EIP-712 orders as injected wallets; StopDown never receives the user key. Circle Gas Station / Paymaster remains future gas UX work. Market makers can use any compatible signer. ARC App Kit is integrated through an estimate-first ARC USDC funding command and remains outside matching.
 

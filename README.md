@@ -16,11 +16,11 @@ For the hackathon submission checklist and 3-minute video script, see
 `docs/final-mvp-roadmap.md`. For intentional MVP shortcuts and cleanup items, see
 `docs/known-limitations.md`. Current ARC testnet deployment addresses are recorded in
 `docs/arc-testnet-deployment.md`. For running the live ARC testnet stack with a settlement executor
-wallet, see `docs/arc-testnet-runbook.md`. For user wallet, executor wallet, mock signer, Circle,
+wallet, see `docs/arc-testnet-runbook.md`. For injected user wallets, the executor wallet, Circle,
 and market-maker paths, see `docs/wallet-path.md` and `docs/circle-integration-strategy.md`. The
 ARC App Kit funding command is documented in `docs/arc-app-kit.md`. For the
 final reviewer demo sequence, see `docs/final-demo-guide.md`. For the current reproducible product
-walkthrough, see `docs/happy-path.md`. For a click-by-click mock UI checklist for manual testers,
+walkthrough, see `docs/happy-path.md`. For a click-by-click UI checklist for manual testers,
 see `docs/manual-testing.md`. For the production/deployment plan, see
 `docs/production-deployment-plan.md`. For the public Render demo deployment, see
 `docs/render-deployment.md`.
@@ -104,7 +104,6 @@ contracts/              Production Solidity contracts
 backend/src/            CLOB API, matching, repositories, keepers, ARC readers
 frontend/src/           Production React app and wallet-agnostic chain calls
 mocks/                  Demo/test substitutes only
-mocks/frontend/         Demo frontend entrypoint and mock wallet installer
 mocks/backend/          Fixture-backed reviewer API
 mocks/contracts/        Solidity test doubles
 scripts/                Local and ARC walkthrough scripts
@@ -132,11 +131,10 @@ npm.cmd run demo:reviewer
 
 Open `http://127.0.0.1:5173/#overview`.
 
-The demo API is intentionally non-production. It lets reviewers inspect the frontend screens without
-requiring a live ARC deployment or funded wallets. In no-wallet mode, mock transactions return demo
-hashes and mock order submissions can emit WebSocket updates, but the demo API uses fixture-backed
-read models and does not persist real protocol or orderbook state. Use local scripts/tests or ARC
-deployment for stateful protocol verification.
+The demo API is intentionally non-production. It lets reviewers inspect read-only frontend screens
+without requiring a live ARC deployment or funded wallets. It uses fixture-backed read models and
+does not provide wallet actions or persist real protocol/orderbook state. Use the live ARC stack with
+an injected or Circle wallet for transaction and signature testing.
 
 Current ARC testnet deployment addresses are recorded in `docs/arc-testnet-deployment.md`. The
 contracts were redeployed after the borrower-controlled `collateralBps` source change, and
@@ -151,17 +149,16 @@ The frontend uses hash routes for reviewable deep links:
 - `#exchange` for the market list;
 - `#exchange/<outcomeToken>:<marketId>` for one YES/NO market.
 
-For UI transaction/signature testing without a browser wallet, use the committed demo env:
+For read-only UI inspection without a browser wallet, use the committed demo env:
 
 ```powershell
 npm.cmd run demo:reviewer
 ```
 
-`demo:reviewer` starts the fixture-backed demo API and the Vite frontend in demo mode. The frontend
-loads `frontend/.env.demo`, which points the UI at demo contracts and the mock signer. All mocks are
-registered in `mocks/README.md`. The mock signer is disabled by default outside demo mode and should
-stay disabled for production-like ARC testing. Manual UI testing steps and the two-terminal fallback
-are documented in `docs/manual-testing.md`.
+`demo:reviewer` starts the fixture-backed demo API and the normal Vite frontend in demo mode. The
+frontend loads `frontend/.env.demo`, which points read requests at the fixture API. Wallet actions
+remain unavailable unless the browser provides an injected wallet or the backend has Circle
+credentials. Manual UI testing steps are documented in `docs/manual-testing.md`.
 
 For stateful local protocol checks:
 
@@ -323,8 +320,6 @@ Required frontend values:
   `VITE_OUTCOME_EXCHANGE_ADDRESS`, `VITE_USDC_ADDRESS`: must match the backend and deployed
   contracts. The topbar health badge reports `Frontend config missing`, `Chain mismatch`, or
   `Contract mismatch` when these drift.
-- `VITE_ENABLE_MOCK_WALLET`: optional. Keep `false` for production-like runs. Set `true` only for
-  local mid-submission/demo UI testing without an injected browser wallet.
 
 Vite also loads root `.env` for `VITE_*` keys, so keeping one aligned root `.env` is enough for
 local full-stack work.
@@ -355,10 +350,9 @@ npm.cmd run preview:frontend
 The wallet must be on ARC testnet (`5042002`) with an injected provider. The backend never stores
 user private keys; order submission and cancellations are EIP-712 signed in the browser.
 
-Mock signer mode is only a demo helper. It returns demo transaction receipts and signs EIP-712
-orders with a public local test key from `mocks/frontend/mockWallet.ts`; it does not simulate
-ARC state or replace contract deployment. See `docs/manual-testing.md` and `mocks/README.md` for
-the full mock registry.
+The frontend contains no mock wallet or embedded private key. Wallet actions require either an
+injected EIP-1193 wallet or configured Circle User-Controlled Wallet credentials. The fixture API is
+read-only UI support and does not replace ARC state or contract deployment.
 
 ### 7. Deploy to ARC testnet
 

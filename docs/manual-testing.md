@@ -1,196 +1,108 @@
 # Manual Testing Guide
 
-This guide is for a manual tester who needs to inspect the StopDown UI without setting up a real ARC wallet.
+This guide separates read-only UI inspection from real ARC wallet testing. The frontend contains no
+mock wallet, private key, fake transaction receipt, or fake EIP-712 signer.
 
-## What This Tests
+## Read-Only UI Inspection
 
-The mock path tests:
-
-- screen navigation;
-- loan list and loan detail layout;
-- market list and market detail layout;
-- order ticket validation and submit flow;
-- portfolio wallet state screens;
-- mock transaction/signature handling.
-
-It does not prove live ARC transactions. For live ARC testing, use `docs/arc-testnet-runbook.md`.
-
-## Start Mock UI
-
-From the repository root:
+Use this path to inspect navigation, responsive layout, lists, details, orderbook presentation, and
+empty/error states without preparing a wallet:
 
 ```powershell
 npm.cmd run demo:reviewer
 ```
 
-Expected output includes:
+Open `http://127.0.0.1:5173/#overview` after Vite prints its ready message.
+
+`demo:reviewer` starts:
+
+- the fixture-backed API from `mocks/backend/serve-demo-api.ts`;
+- the normal production frontend entrypoint;
+- no wallet provider and no transaction simulation.
+
+Expected wallet behavior:
+
+- `Connect wallet` offers Browser wallet and Circle Wallet;
+- Browser wallet reports that no injected provider exists when MetaMask/Rabby is unavailable;
+- Circle Wallet reports that it is not configured when backend Circle credentials are absent;
+- transaction, order-signing, claim, and approval actions remain unavailable without a real wallet.
+
+## Read-Only Screen Checklist
+
+Inspect these routes:
 
 ```text
-StopDown reviewer demo
-Starting fixture-backed API and mock-wallet frontend.
-Open http://127.0.0.1:5173/#overview after Vite prints its ready message.
+#overview
+#create
+#loans
+#loans/<loanId>
+#exchange
+#exchange/<outcomeToken>:<marketId>
+#portfolio
 ```
 
-Open that URL in a browser.
+Verify:
 
-If the wrapper does not fit the test environment, use the two-terminal fallback.
+- list and detail screens are separate;
+- loan and market pagination controls do not resize or overflow the page;
+- loan funding, collateral, activation, repayment, orderbook, and outcome sections are readable;
+- mobile width has no horizontal page overflow;
+- wallet-required actions explain why they are unavailable;
+- fixture data is never presented as a confirmed ARC transaction.
 
-Terminal 1:
+## Real Injected-Wallet Test
 
-```powershell
-npm.cmd run demo:api
-```
+1. Start PostgreSQL and the live backend as described in `docs/arc-testnet-runbook.md`.
+2. Copy `frontend/.env.arc-testnet.example` to `frontend/.env.local`.
+3. Run `npm.cmd run dev:frontend`.
+4. Open the frontend in Chrome, Brave, or another browser with MetaMask/Rabby installed.
+5. Click `Connect wallet`, then choose `Browser wallet`.
+6. Approve adding or switching to ARC testnet chain `5042002`.
+7. Confirm that Portfolio shows the connected address, USDC, outcome balances, approvals, orders,
+   lender positions, and reservations.
+8. Execute only actions valid for the connected account and current loan/market lifecycle.
 
-Expected output:
+The wallet needs ARC testnet USDC for gas and for funding, collateral, repayment, pair minting, or
+BUY orders. StopDown never receives the injected wallet's private key.
 
-```text
-Demo CLOB API listening on http://127.0.0.1:3000
-```
+## Real Circle-Wallet Test
 
-Terminal 2:
-
-```powershell
-npm.cmd run demo:frontend
-```
-
-Expected output contains a local Vite URL, usually:
-
-```text
-http://127.0.0.1:5173/
-```
-
-Open that URL in a browser.
-
-`demo:frontend` loads `frontend/.env.demo`, which enables:
+Configure these backend-only deployment values:
 
 ```ini
-VITE_ENABLE_MOCK_WALLET=true
+CIRCLE_API_KEY=...
+CIRCLE_APP_ID=...
+CIRCLE_GOOGLE_CLIENT_ID=...
+CIRCLE_GOOGLE_REDIRECT_URI=...
 ```
 
-## Wallet Behavior
+Then:
 
-The tester does not install MetaMask and does not enter a private key.
+1. Open `Connect wallet` and choose `Continue with Google`.
+2. Complete Google OAuth and the Circle challenge.
+3. Confirm that an `ARC-TESTNET` EOA is created or loaded.
+4. Execute one protocol transaction and wait for its confirmed ARC transaction hash.
+5. Sign one EIP-712 order and verify backend admission under the Circle wallet address.
 
-Click `Connect wallet`.
+Circle credentials are deployment-specific. Without all four values the backend deliberately
+returns `{ "enabled": false }` and the frontend keeps the Circle option disabled.
 
-Expected:
+## Live Stack Gate
 
-- wallet button changes from `No wallet` to a shortened address;
-- Portfolio page shows wallet readiness;
-- no browser wallet popup appears, because the mock signer handles requests inside the app.
+Before transaction testing, run:
 
-The mock signer uses a public local demo key from `mocks/frontend/mockWallet.ts`. It is not a custody model and must not be used as production behavior.
-
-## Basic Screen Checklist
-
-### Overview
-
-Open:
-
-```text
-http://127.0.0.1:5173/#overview
+```powershell
+npm.cmd run arc:live-check
 ```
 
-Check:
+Expected evidence:
 
-- page loads without `request failed`;
-- top navigation is visible;
-- protocol overview cards are readable.
+- PostgreSQL is reachable;
+- ARC chain id is `5042002`;
+- executor has operator permission and gas;
+- backend health and sync are `ok`;
+- an active market has linked loan context;
+- WebSocket book feed returns a snapshot.
 
-### Create Loan
-
-Open:
-
-```text
-http://127.0.0.1:5173/#create
-```
-
-Check:
-
-- create-loan form is visible;
-- wallet can be connected;
-- submitting returns a mock transaction hash or visible action status.
-
-The reviewer API is fixture-backed, so a created loan will not be appended to the demo loan list.
-
-### Loans
-
-Open:
-
-```text
-http://127.0.0.1:5173/#loans
-```
-
-Check:
-
-- loan list is visible;
-- pagination/load-more controls do not break layout;
-- clicking a loan opens a single-loan detail route;
-- loan detail shows funding, collateral, activation, repayment/default sections.
-
-### Exchange
-
-Open:
-
-```text
-http://127.0.0.1:5173/#exchange
-```
-
-Check:
-
-- market list is visible;
-- clicking a market opens a single-market detail route;
-- orderbook, recent trades, and order ticket are visible;
-- order outcome can switch between YES and NO if the UI exposes the control.
-
-Submit a mock order:
-
-1. Connect wallet.
-2. Choose market.
-3. Enter order amount and price.
-4. Submit order.
-
-Expected:
-
-- UI does not ask for MetaMask;
-- order submission completes or returns a visible mock order state;
-- demo API may broadcast a book update.
-
-### Portfolio
-
-Open:
-
-```text
-http://127.0.0.1:5173/#portfolio
-```
-
-Check:
-
-- wallet readiness panel is visible;
-- balances, open orders, lender positions, and reservations sections render;
-- cancel/claim actions either show mock status or disabled state with a clear reason.
-
-## Expected Demo Limitations
-
-- Demo API data is static.
-- Mock transaction hashes are fake.
-- Mock `eth_call` returns canned balances/allowances.
-- Mock order submission does not prove live ARC settlement.
-- This path is for UI review and manual product inspection only.
-
-## Production-Like Manual Test
-
-For a real wallet test:
-
-1. Copy `frontend/.env.arc-testnet.example` to `frontend/.env.local`.
-2. Run the backend and frontend from `docs/arc-testnet-runbook.md`.
-3. Open the app in a browser with an injected EVM wallet.
-4. Connect wallet.
-5. Switch to ARC testnet chain `5042002`.
-6. Use ARC testnet USDC for gas, funding, collateral, and orders.
-
-In production-like mode, keep:
-
-```ini
-VITE_ENABLE_MOCK_WALLET=false
-```
+The fixture-backed API is useful only for visual inspection. It does not prove wallet integration,
+state mutation, settlement, reconciliation, or keeper behavior.

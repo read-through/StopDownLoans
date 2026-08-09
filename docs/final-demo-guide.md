@@ -92,8 +92,8 @@ Expected reviewer screens:
 Expected limitation:
 
 - the demo API is fixture-backed;
-- mock wallet transactions produce demo hashes;
-- this path is for UI review, not live ARC settlement proof.
+- wallet actions require an injected wallet or configured Circle Wallet;
+- this path is for read-only UI review, not live ARC settlement proof.
 
 ### 3. Run the live ARC readiness check
 

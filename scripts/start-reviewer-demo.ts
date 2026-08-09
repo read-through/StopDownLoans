@@ -60,8 +60,9 @@ function stopAll(exitCode = 0): void {
 
 console.log("StopDown reviewer demo");
 console.log("");
-console.log("Starting fixture-backed API and mock-wallet frontend.");
+console.log("Starting fixture-backed API and read-only frontend.");
 console.log("Open http://127.0.0.1:5173/#overview after Vite prints its ready message.");
+console.log("Wallet actions require an injected wallet or configured Circle Wallet.");
 console.log("This is the UI review path, not live ARC settlement proof.");
 console.log("");
 

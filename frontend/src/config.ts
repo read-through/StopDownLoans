@@ -1,6 +1,5 @@
 const expectedArcChainIdInput = import.meta.env.VITE_ARC_CHAIN_ID ?? "5042002";
 
-export const enableMockWallet = import.meta.env.VITE_ENABLE_MOCK_WALLET === "true";
 export const expectedArcChainIdHex = toHexChainId(expectedArcChainIdInput);
 export const expectedArcChainIdNumber = toChainIdNumber(expectedArcChainIdInput);
 export const arcWalletChain = {
