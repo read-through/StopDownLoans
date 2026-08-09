@@ -67,34 +67,34 @@ export function navigateToMarket(marketKey: string): void {
 export function getScreenCopy(screen: AppScreen): { title: string; description: string } {
   if (screen === "loans") {
     return {
-      title: "Loan Marketplace",
-      description: "All credit lines, funding progress, collateral state, and loan-level settlement controls.",
+      title: "Credit lines",
+      description: "Compare terms, funding progress, collateral, and repayment state.",
     };
   }
 
   if (screen === "create") {
     return {
-      title: "Create Loan",
-      description: "Borrower creates a loan request and its linked proto-market.",
+      title: "Borrow",
+      description: "Open a fixed-rate credit request with a linked repayment market.",
     };
   }
 
   if (screen === "exchange") {
     return {
-      title: "Exchange",
-      description: "YES/NO markets for every loan, order books, trades, and limit order entry.",
+      title: "Risk markets",
+      description: "Trade YES or NO exposure for every active credit line.",
     };
   }
 
   if (screen === "portfolio") {
     return {
       title: "Portfolio",
-      description: "Wallet-specific positions, reservations, balances, claims, and open orders.",
+      description: "Balances, lender positions, claims, reservations, and open orders.",
     };
   }
 
   return {
-    title: "Protocol Overview",
-    description: "One operating surface for borrowers, lenders, and YES/NO traders.",
+    title: "Overview",
+    description: "Capital, credit lines, and repayment risk across the protocol.",
   };
 }

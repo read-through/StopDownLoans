@@ -13,7 +13,7 @@ export function CreateLoanScreen(props: {
     <section className="createScreenGrid" id="create" aria-label="Create loan">
       <section className="panel screenPanel">
         <PanelHeader
-          title="Create Loan"
+          title="New credit request"
           action={props.walletAccount === null ? "Connect wallet" : "Borrower flow"}
           icon={<CircleDollarSign size={17} />}
         />
@@ -24,10 +24,10 @@ export function CreateLoanScreen(props: {
         />
       </section>
       <section className="panel screenPanel">
-        <PanelHeader title="Creation Path" action="MVP" icon={<ArrowRight size={17} />} />
+        <PanelHeader title="What happens next" action="Lifecycle" icon={<ArrowRight size={17} />} />
         <div className="flowList" aria-label="Loan creation path">
           <FlowStep title="Create loan" text="Borrower chooses principal, interest, activation deadline, and repayment deadline." />
-          <FlowStep title="Deposit borrower collateral" text="Collateral is tracked on the loan and activates the linked proto-market later." />
+          <FlowStep title="Deposit borrower collateral" text="Collateral backs a repayment market that remains inactive until the credit line is funded." />
           <FlowStep title="Funding" text="Lenders fund the loan line and receive transferable lender positions." />
           <FlowStep title="Activation" text="After the withdraw freeze, the loan releases principal and the linked market becomes tradable." />
         </div>

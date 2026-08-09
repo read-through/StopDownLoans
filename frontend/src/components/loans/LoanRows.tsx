@@ -36,21 +36,21 @@ export function LoanRows(props: {
           onClick={() => props.onSelectLoan(loan.loanId)}
           type="button"
         >
-          <span>#{loan.loanId}</span>
-          <span>{loan.borrower}</span>
-          <span>{loan.principal}</span>
-          <span>{loan.rate}</span>
-          <span>
+          <span data-label="Loan">#{loan.loanId}</span>
+          <span data-label="Borrower" title={loan.borrower}>{shortHex(loan.borrower)}</span>
+          <span data-label="Principal">{loan.principal}</span>
+          <span data-label="Rate">{loan.rate}</span>
+          <span data-label="Funding">
             <Progress label="Loan funding" value={loan.fundedPct} />
             <span className="fundingRemainder">{loan.remainingFunding} left</span>
           </span>
-          <span>
+          <span data-label="Market">
             <span className={loan.marketIndexed ? "marketLinkPill marketIndexedPill" : "marketLinkPill"}>
               {loan.marketIndexed ? "Indexed" : "Pending"}
             </span>
           </span>
-          <span>{loan.nextDeadline}</span>
-          <span>
+          <span data-label="Deadline">{loan.nextDeadline}</span>
+          <span data-label="Status">
             <StateBadge state={loan.state} />
           </span>
         </button>

@@ -7,6 +7,13 @@ export function MarketFilterControl(props: {
   onChange: (value: MarketFilter) => void;
 }) {
   const filters: MarketFilter[] = ["All", "Proto", "Active", "Resolved", "Cancelled"];
+  const labels: Record<MarketFilter, string> = {
+    All: "All",
+    Proto: "Pending",
+    Active: "Active",
+    Resolved: "Resolved",
+    Cancelled: "Cancelled",
+  };
 
   return (
     <div className="filterBar" aria-label="Market state filter">
@@ -17,7 +24,7 @@ export function MarketFilterControl(props: {
           onClick={() => props.onChange(filter)}
           type="button"
         >
-          <span>{filter}</span>
+          <span>{labels[filter]}</span>
           <strong>{countMarketsForFilter(props.markets, filter)}</strong>
         </button>
       ))}

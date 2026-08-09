@@ -1872,3 +1872,1190 @@ a {
     display: none;
   }
 }
+
+/* Product visual system. Kept after the legacy base to make the migration boundary explicit. */
+:root {
+  --canvas: #f3f5f2;
+  --surface: #ffffff;
+  --ink: #101713;
+  --muted: #667169;
+  --line: #dce2dc;
+  --line-strong: #c8d0c9;
+  --forest: #123d2c;
+  --green: #13875d;
+  --green-soft: #e4f4ec;
+  --coral: #d95a45;
+  --coral-soft: #fbeae6;
+  --blue: #356cd6;
+  --blue-soft: #eaf0fc;
+  --amber: #b87919;
+  --amber-soft: #fbf1dd;
+  color: var(--ink);
+  background: var(--canvas);
+}
+
+body {
+  color: var(--ink);
+  background: var(--canvas);
+}
+
+button,
+a,
+input,
+select {
+  transition:
+    color 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease,
+    transform 150ms ease,
+    box-shadow 150ms ease;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid rgb(53 108 214 / 24%);
+  outline-offset: 2px;
+}
+
+.appShell {
+  grid-template-columns: 236px minmax(0, 1fr);
+  background: var(--canvas);
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  gap: 34px;
+  padding: 24px 18px;
+  color: #eef7f1;
+  background: #111a15;
+  border-right: 0;
+}
+
+.brand {
+  gap: 11px;
+  padding: 0 7px;
+}
+
+.brandMark {
+  width: 38px;
+  height: 38px;
+  color: #112219;
+  background: #7ee1b2;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.brandName {
+  color: #ffffff;
+  font-size: 18px;
+  line-height: 1.1;
+}
+
+.brandSub {
+  margin-top: 3px;
+  color: #91a49a;
+  font-size: 11px;
+}
+
+.navList {
+  gap: 4px;
+}
+
+.navItem {
+  min-height: 44px;
+  padding: 0 12px;
+  color: #9fb0a6;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.navItem:hover {
+  color: #ffffff;
+  background: rgb(255 255 255 / 6%);
+}
+
+.navItem.active {
+  color: #ffffff;
+  background: #244d39;
+  box-shadow: inset 3px 0 0 #7ee1b2;
+}
+
+.navItem svg {
+  color: #86a091;
+}
+
+.navItem.active svg {
+  color: #7ee1b2;
+}
+
+.networkBox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+  padding: 16px 8px 0;
+  color: #a7b7ad;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 0;
+}
+
+.networkBox svg {
+  color: #7ee1b2;
+}
+
+.networkLabel {
+  color: #74877c;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.networkValue {
+  margin-top: 2px;
+  color: #eef7f1;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.workspace {
+  width: 100%;
+  max-width: 1680px;
+  gap: 26px;
+  margin: 0 auto;
+  padding: 28px 34px 48px;
+}
+
+.topbar {
+  min-height: 72px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.topbar h1 {
+  font-size: 28px;
+  font-weight: 760;
+}
+
+.topbar p {
+  max-width: 720px;
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.topbarActions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.refreshMeta {
+  margin: 0 2px 0 0;
+  color: #7b867f;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.topbarIconButton {
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.topbarIconButton:hover {
+  color: var(--forest);
+  border-color: var(--line-strong);
+  transform: translateY(-1px);
+}
+
+.walletButton,
+.primaryButton,
+.ghostButton {
+  min-height: 40px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.walletButton,
+.primaryButton {
+  color: #ffffff;
+  background: var(--forest);
+}
+
+.walletButton:hover,
+.primaryButton:hover:not(:disabled) {
+  background: #19523b;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgb(18 61 44 / 16%);
+}
+
+.ghostButton {
+  color: var(--forest);
+  background: #e9efea;
+}
+
+.ghostButton:hover:not(:disabled) {
+  background: #dde8e0;
+}
+
+.warningWalletButton {
+  background: #9d3f32;
+}
+
+.healthBadge,
+.feedBadge {
+  border-radius: 5px;
+  font-weight: 750;
+}
+
+.screenStack {
+  gap: 26px;
+}
+
+.overviewLead {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
+  gap: clamp(28px, 5vw, 84px);
+  align-items: center;
+  min-height: 370px;
+  padding: 22px 0 34px;
+  border-bottom: 1px solid var(--line);
+}
+
+.overviewLeadCopy {
+  display: grid;
+  gap: 18px;
+  align-content: center;
+  max-width: 720px;
+}
+
+.overviewLeadCopy > * {
+  animation: surfaceEnter 420ms both;
+}
+
+.overviewLeadCopy > *:nth-child(2) {
+  animation-delay: 45ms;
+}
+
+.overviewLeadCopy > *:nth-child(3) {
+  animation-delay: 90ms;
+}
+
+.overviewLeadCopy > *:nth-child(4) {
+  animation-delay: 135ms;
+}
+
+.eyebrow {
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.overviewLeadCopy h2 {
+  max-width: 700px;
+  margin: 0;
+  font-size: clamp(38px, 4.4vw, 66px);
+  line-height: 1.02;
+  font-weight: 760;
+  letter-spacing: 0;
+}
+
+.overviewLeadCopy p {
+  max-width: 640px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.55;
+}
+
+.overviewLeadActions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 4px;
+}
+
+.textLink,
+.instrumentLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--forest);
+  font-size: 13px;
+  font-weight: 760;
+}
+
+.textLink:hover,
+.instrumentLink:hover {
+  color: var(--green);
+}
+
+.riskInstrument {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+  padding: 24px;
+  color: #eef7f1;
+  background: #111a15;
+  border: 1px solid #24372c;
+  border-radius: 8px;
+  box-shadow: 0 24px 70px rgb(17 26 21 / 14%);
+  animation: surfaceEnter 480ms 100ms both;
+}
+
+.riskInstrumentHeader,
+.riskQuoteRow,
+.riskScaleLabels {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.riskInstrumentHeader > div {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.riskInstrumentHeader span,
+.riskQuoteRow span,
+.riskScaleLabels {
+  color: #8da096;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.riskInstrumentHeader strong {
+  overflow: hidden;
+  font-size: 17px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.liveIndicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #b9c8bf !important;
+}
+
+.liveIndicator i {
+  width: 7px;
+  height: 7px;
+  background: #54d59a;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px rgb(84 213 154 / 12%);
+  animation: livePulse 2.4s ease-in-out infinite;
+}
+
+.riskQuoteRow > div {
+  display: grid;
+  gap: 5px;
+}
+
+.riskQuoteRow strong {
+  font-size: 18px;
+}
+
+.riskScale {
+  display: grid;
+  gap: 10px;
+}
+
+.riskScaleTrack {
+  position: relative;
+  height: 8px;
+  background: #2b3730;
+  border-radius: 4px;
+}
+
+.riskSpread {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  min-width: 4px;
+  background: #7ee1b2;
+}
+
+.riskBid,
+.riskAsk {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  border: 3px solid #111a15;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.riskBid {
+  background: var(--coral);
+}
+
+.riskAsk {
+  background: #7ee1b2;
+}
+
+.instrumentLink {
+  width: max-content;
+  color: #ffffff;
+}
+
+.statusGrid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.statPanel {
+  min-height: 86px;
+  padding: 14px 22px;
+  background: transparent;
+  border: 0;
+  border-right: 1px solid var(--line);
+  border-radius: 0;
+}
+
+.statPanel:first-child {
+  padding-left: 0;
+}
+
+.statPanel:last-child {
+  border-right: 0;
+}
+
+.statPanel svg {
+  color: var(--green);
+}
+
+.statValue {
+  font-size: 23px;
+}
+
+.roleRail {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(180px, 1fr)) minmax(240px, 1.2fr);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.roleRail > a,
+.selectedContext {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  min-height: 86px;
+  padding: 16px 20px;
+  border-right: 1px solid var(--line);
+}
+
+.roleRail > a:first-child {
+  padding-left: 0;
+}
+
+.roleRail > a:hover {
+  color: var(--green);
+  background: rgb(255 255 255 / 54%);
+}
+
+.roleRail > a svg:first-child {
+  color: var(--green);
+}
+
+.roleRail > a span,
+.selectedContext {
+  min-width: 0;
+}
+
+.roleRail strong,
+.roleRail small,
+.selectedContext span {
+  display: block;
+}
+
+.roleRail strong {
+  font-size: 14px;
+}
+
+.roleRail small,
+.selectedContext span {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.selectedContext {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  border-right: 0;
+}
+
+.selectedContext span {
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.selectedContext strong {
+  overflow: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.panel {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.panelHeader {
+  min-height: 58px;
+  padding: 0 0 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.panelHeader h2 {
+  font-size: 20px;
+}
+
+.panelStatusChip {
+  color: var(--muted);
+  min-height: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+
+.filterBar,
+.loanFilterBar {
+  margin: 18px 0 12px;
+  padding: 3px;
+  background: #e9ede9;
+  border-radius: 6px;
+}
+
+.filterButton,
+.loanFilterButton {
+  border-radius: 4px;
+}
+
+.activeFilter,
+.activeLoanFilter {
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgb(17 26 21 / 8%);
+}
+
+.table,
+.marketGrid {
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+}
+
+.marketGrid {
+  overflow: visible;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+
+.tableRow,
+.marketCard,
+.openOrderItem,
+.loanPositionItem,
+.walletRequiredState {
+  border-color: var(--line);
+}
+
+.loanTableRow:hover,
+.marketCard:hover {
+  background: #f7faf8;
+}
+
+.marketCard {
+  border-radius: 7px;
+}
+
+.marketCard .quoteGrid {
+  gap: 0;
+  border-top: 1px solid var(--line);
+}
+
+.marketCard .quote {
+  padding: 12px 10px 0;
+  background: transparent;
+  border-right: 1px solid var(--line);
+  border-radius: 0;
+}
+
+.marketCard .quote:first-child {
+  padding-left: 0;
+}
+
+.marketCard .quote:last-child {
+  padding-right: 0;
+  border-right: 0;
+}
+
+.selectedLoanRow,
+.selectedMarket {
+  background: var(--green-soft);
+  box-shadow: inset 3px 0 0 var(--green);
+}
+
+.stateBadge,
+.marketLinkPill,
+.orderPill {
+  border-radius: 4px;
+}
+
+.createScreenGrid {
+  grid-template-columns: minmax(0, 1.3fr) minmax(300px, 0.7fr);
+  gap: 44px;
+}
+
+.createScreenGrid > .screenPanel:first-child,
+.entityDetailScreen,
+#portfolio {
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.createScreenGrid > .screenPanel:first-child .createLoanForm {
+  margin: 0;
+  padding: 2px 0 0;
+  background: transparent;
+  border: 0;
+}
+
+.entityDetailScreen > .panelHeader {
+  margin-bottom: 8px;
+}
+
+.entityDetailScreen > .backButton {
+  min-height: 30px;
+  margin: 0 0 2px;
+  padding: 0;
+  background: transparent;
+}
+
+.entityDetailScreen > .backButton:hover {
+  color: var(--green);
+  background: transparent;
+}
+
+.loanDetail,
+.marketDetail {
+  margin-top: 0;
+  padding-top: 16px;
+  border-top-color: var(--line);
+}
+
+.loanLifecyclePanel,
+.marketLifecyclePanel {
+  grid-template-columns: minmax(220px, 0.7fr) minmax(0, 1.3fr);
+  gap: 28px;
+  padding: 18px 0;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+}
+
+.loanLifecycleLead span,
+.marketLifecycleLead span {
+  color: var(--green);
+}
+
+.loanLifecycleSteps,
+.marketLifecycleSteps {
+  gap: 0;
+}
+
+.loanLifecycleStep,
+.marketLifecycleStep {
+  min-height: 82px;
+  padding: 8px 14px;
+  background: transparent;
+  border: 0;
+  border-right: 1px solid var(--line);
+  border-radius: 0;
+}
+
+.loanLifecycleStep:first-child,
+.marketLifecycleStep:first-child {
+  padding-left: 0;
+}
+
+.loanLifecycleStep:last-child,
+.marketLifecycleStep:last-child {
+  padding-right: 0;
+  border-right: 0;
+}
+
+.loanLifecycleStep svg,
+.marketLifecycleStep svg {
+  color: var(--green);
+}
+
+.loanDetailGrid,
+.loanTimeline,
+.marketLoanContext {
+  gap: 0;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.loanDetailGrid .detailMetric,
+.loanTimeline .detailMetric,
+.marketLoanContext .detailMetric {
+  min-height: 66px;
+  padding: 10px 14px;
+  background: transparent;
+  border-right: 1px solid var(--line);
+  border-radius: 0;
+}
+
+.loanDetailGrid .detailMetric:first-child,
+.loanTimeline .detailMetric:first-child,
+.marketLoanContext .detailMetric:first-child {
+  padding-left: 0;
+}
+
+.loanDetailGrid .detailMetric:last-child,
+.loanTimeline .detailMetric:last-child,
+.marketLoanContext .detailMetric:last-child {
+  padding-right: 0;
+  border-right: 0;
+}
+
+.createScreenGrid > .screenPanel:last-child {
+  padding: 24px 0;
+}
+
+.loanCreateGrid input,
+.ticketGrid input,
+.ticketGrid select {
+  min-height: 42px;
+  color: var(--ink);
+  background: var(--surface);
+  border-color: var(--line-strong);
+  border-radius: 5px;
+}
+
+.loanCreateGrid input:focus,
+.ticketGrid input:focus,
+.ticketGrid select:focus {
+  border-color: var(--blue);
+}
+
+.orderTicket,
+.loanFundingForm {
+  padding: 18px;
+  background: #f8faf8;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+}
+
+.ticketNote {
+  background: var(--surface);
+  border-color: var(--line);
+  border-radius: 5px;
+}
+
+.errorState,
+.dangerButton {
+  color: #923426;
+}
+
+.dangerButton {
+  background: var(--coral-soft);
+}
+
+.segmentedControl {
+  background: #e8ede9;
+  border-color: var(--line);
+  border-radius: 6px;
+}
+
+.segmentButton,
+.activeSegment {
+  border-radius: 4px;
+}
+
+.bookGrid {
+  gap: 1px;
+  overflow: hidden;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+}
+
+.bookSide,
+.recentTrades {
+  border: 0;
+  border-radius: 0;
+}
+
+.bookSideHeader,
+.bookLevel,
+.bookEmpty,
+.tradeRow {
+  background: var(--surface);
+}
+
+.bidPrice {
+  color: var(--green);
+}
+
+.askPrice {
+  color: var(--coral);
+}
+
+.walletDialog {
+  border-radius: 8px;
+  box-shadow: 0 30px 90px rgb(8 16 11 / 24%);
+}
+
+.walletOption {
+  border-radius: 6px;
+}
+
+@keyframes surfaceEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes livePulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 4px rgb(84 213 154 / 10%);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgb(84 213 154 / 3%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 1180px) {
+  .overviewLead {
+    grid-template-columns: minmax(0, 1fr) minmax(330px, 0.8fr);
+    gap: 34px;
+  }
+
+  .roleRail {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .selectedContext {
+    grid-column: 1 / -1;
+    min-height: 62px;
+    border-top: 1px solid var(--line);
+  }
+}
+
+@media (max-width: 960px) {
+  .appShell {
+    display: block;
+    padding-bottom: 72px;
+  }
+
+  .sidebar {
+    position: static;
+    display: flex;
+    height: auto;
+    padding: 14px 20px;
+    border-bottom: 1px solid #26362d;
+  }
+
+  .networkBox {
+    display: none;
+  }
+
+  .navList {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 40;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+    padding: 7px 8px calc(7px + env(safe-area-inset-bottom));
+    background: #111a15;
+    border-top: 1px solid #26362d;
+  }
+
+  .navItem {
+    flex-direction: column;
+    gap: 4px;
+    min-height: 48px;
+    padding: 6px 2px;
+    font-size: 10px;
+  }
+
+  .navItem.active {
+    box-shadow: inset 0 2px 0 #7ee1b2;
+  }
+
+  .workspace {
+    padding: 22px;
+  }
+
+  .overviewLead,
+  .createScreenGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .overviewLead {
+    min-height: 0;
+  }
+
+  .riskInstrument {
+    max-width: 640px;
+  }
+}
+
+@media (max-width: 680px) {
+  .workspace {
+    gap: 20px;
+    padding: 18px 16px 30px;
+  }
+
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+    padding-bottom: 16px;
+  }
+
+  .topbarActions {
+    display: flex;
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .topbarActions .healthBadge {
+    width: auto;
+  }
+
+  .topbarActions .walletButton {
+    width: auto;
+    margin-left: auto;
+  }
+
+  .refreshMeta {
+    display: none;
+  }
+
+  .overviewLead {
+    gap: 26px;
+    padding-top: 8px;
+  }
+
+  .overviewLeadCopy h2 {
+    font-size: 38px;
+  }
+
+  .overviewLeadCopy p {
+    font-size: 15px;
+  }
+
+  .overviewLeadActions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .overviewLeadActions .primaryButton {
+    width: 100%;
+  }
+
+  .riskInstrument {
+    gap: 20px;
+    padding: 20px;
+  }
+
+  .riskQuoteRow {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .riskQuoteRow strong {
+    font-size: 14px;
+  }
+
+  .statusGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .statPanel,
+  .statPanel:first-child {
+    min-height: 78px;
+    padding: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .statPanel:nth-child(2) {
+    border-right: 0;
+  }
+
+  .statPanel:nth-child(n + 3) {
+    border-bottom: 0;
+  }
+
+  .statValue {
+    font-size: 19px;
+  }
+
+  .roleRail {
+    grid-template-columns: 1fr;
+  }
+
+  .roleRail > a,
+  .roleRail > a:first-child,
+  .selectedContext {
+    min-height: 70px;
+    padding: 12px 4px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .selectedContext {
+    grid-column: 1;
+    border-bottom: 0;
+  }
+
+  .createScreenGrid > .screenPanel:first-child,
+  .entityDetailScreen,
+  #portfolio {
+    padding: 18px;
+  }
+
+  .bookGrid,
+  .ticketGrid,
+  .loanCreateGrid,
+  .loanDetailGrid,
+  .marketLoanContext,
+  .walletReadinessPanel,
+  .walletBalancePanel {
+    grid-template-columns: 1fr;
+  }
+
+  .entityListScreen .table {
+    --loan-table-min-width: 0px;
+    overflow: visible;
+    background: transparent;
+    border: 0;
+  }
+
+  .entityListScreen .tableMessage {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .entityListScreen .tableHead {
+    display: none;
+  }
+
+  .loanTableRow {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 18px;
+    width: 100%;
+    min-height: 0;
+    margin-bottom: 10px;
+    padding: 16px;
+    text-align: left;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 7px;
+  }
+
+  .loanTableRow > span {
+    display: grid;
+    gap: 5px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .loanTableRow > span::before {
+    content: attr(data-label);
+    color: var(--muted);
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .loanTableRow > span:nth-child(5),
+  .loanTableRow > span:nth-child(7) {
+    grid-column: 1 / -1;
+  }
+
+  .loanLifecyclePanel,
+  .marketLifecyclePanel {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .loanLifecycleStep,
+  .marketLifecycleStep,
+  .loanLifecycleStep:first-child,
+  .marketLifecycleStep:first-child {
+    min-height: 0;
+    padding: 10px 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .loanLifecycleStep:last-child,
+  .marketLifecycleStep:last-child {
+    border-bottom: 0;
+  }
+
+  .loanDetailGrid .detailMetric,
+  .loanTimeline .detailMetric,
+  .marketLoanContext .detailMetric,
+  .loanDetailGrid .detailMetric:first-child,
+  .loanTimeline .detailMetric:first-child,
+  .marketLoanContext .detailMetric:first-child {
+    padding: 10px 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+}

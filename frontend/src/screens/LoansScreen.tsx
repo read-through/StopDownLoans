@@ -39,12 +39,12 @@ export function LoansScreen(props: {
     return (
       <section className="panel screenPanel entityDetailScreen" id="loans" aria-label="Selected loan">
         <PanelHeader
-          title="Loan Detail"
-          action={props.selectedLoanDetail === null ? "Choose loan" : `Loan #${props.selectedLoanDetail.loanId}`}
+          title="Credit line"
+          action={props.selectedLoanDetail === null ? "Choose a line" : `Loan #${props.selectedLoanDetail.loanId}`}
           icon={<BadgeDollarSign size={17} />}
         />
         <button className="ghostButton backButton" onClick={props.onBackToList} type="button">
-          Back to all loans
+          Back to credit lines
         </button>
         <LoanDetailPanel
           loan={props.selectedLoanDetail}
@@ -68,7 +68,7 @@ export function LoansScreen(props: {
   return (
     <section className="panel screenPanel entityListScreen" id="loans" aria-label="All loans">
       <PanelHeader
-        title="All Loans"
+        title="Available credit lines"
         action={`${props.filteredLoanOpportunities.length} shown`}
         icon={<RefreshCcw size={17} />}
       />

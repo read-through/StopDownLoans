@@ -51,12 +51,12 @@ export function ExchangeScreen(props: {
     return (
       <section className="panel screenPanel entityDetailScreen" id="exchange" aria-label="Selected market">
         <PanelHeader
-          title="Market Detail"
-          action={props.selectedMarket === null ? "Choose market" : "Trade"}
+          title="Repayment market"
+          action={props.selectedMarket === null ? "Choose a market" : "Trade"}
           icon={<ArrowRight size={17} />}
         />
         <button className="ghostButton backButton" onClick={props.onBackToList} type="button">
-          Back to all markets
+          Back to markets
         </button>
         <MarketDetail
           market={props.selectedMarket}
@@ -90,7 +90,7 @@ export function ExchangeScreen(props: {
   return (
     <section className="panel screenPanel entityListScreen" id="exchange" aria-label="All markets">
       <PanelHeader
-        title="All Markets"
+        title="Repayment markets"
         action={props.marketsStatus === "loading" ? "Loading" : `${props.filteredPredictionMarkets.length} shown`}
         icon={<ArrowRight size={17} />}
       />

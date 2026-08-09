@@ -3,6 +3,7 @@ import {
   BarChart3,
   CircleDollarSign,
   LineChart,
+  Radio,
   RefreshCcw,
   Wallet,
 } from "lucide-react";
@@ -27,7 +28,7 @@ export function App() {
           <div className="brandMark">SD</div>
           <div>
             <div className="brandName">StopDown</div>
-            <div className="brandSub">Prediction-backed lending</div>
+            <div className="brandSub">Credit risk markets</div>
           </div>
         </div>
 
@@ -38,15 +39,15 @@ export function App() {
           </a>
           <a className={c.activeScreen === "create" ? "navItem active" : "navItem"} href="#create">
             <CircleDollarSign size={18} />
-            Create Loan
+            Borrow
           </a>
           <a className={c.activeScreen === "loans" ? "navItem active" : "navItem"} href="#loans">
             <BadgeDollarSign size={18} />
-            Loans
+            Credit lines
           </a>
           <a className={c.activeScreen === "exchange" ? "navItem active" : "navItem"} href="#exchange">
             <LineChart size={18} />
-            Exchange
+            Markets
           </a>
           <a className={c.activeScreen === "portfolio" ? "navItem active" : "navItem"} href="#portfolio">
             <Wallet size={18} />
@@ -55,8 +56,11 @@ export function App() {
         </nav>
 
         <div className="networkBox">
-          <div className="networkLabel">Settlement chain</div>
-          <div className="networkValue">ARC Testnet</div>
+          <Radio size={15} />
+          <div>
+            <div className="networkLabel">Settlement</div>
+            <div className="networkValue">ARC Testnet</div>
+          </div>
         </div>
       </aside>
 
@@ -64,10 +68,7 @@ export function App() {
         <header className="topbar">
           <div>
             <h1>{c.screenCopy.title}</h1>
-            <p>
-              {c.screenCopy.description}
-              <span className="refreshMeta">Last refresh {c.formatTopbarTime(c.lastRefreshAt)}</span>
-            </p>
+            <p>{c.screenCopy.description}</p>
           </div>
           <div className="topbarActions">
             <HealthBadge
@@ -77,9 +78,15 @@ export function App() {
               status={c.healthStatus}
               error={c.healthError}
             />
-            <button className="ghostButton compactIconButton" onClick={c.refreshAll} type="button">
+            <span className="refreshMeta">Updated {c.formatTopbarTime(c.lastRefreshAt)}</span>
+            <button
+              aria-label="Refresh data"
+              className="iconButton topbarIconButton"
+              onClick={c.refreshAll}
+              title="Refresh data"
+              type="button"
+            >
               <RefreshCcw size={17} />
-              Refresh
             </button>
             <button
               className={c.walletAccount !== null && !c.walletOnExpectedChain ? "walletButton warningWalletButton" : "walletButton"}

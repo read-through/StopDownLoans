@@ -119,8 +119,8 @@ export function CreateLoanForm(props: {
     <section className="createLoanForm" aria-label="Create loan request">
       <div className="ticketHeader">
         <div>
-          <h3>Create loan</h3>
-          <p>Borrower creates one loan and its proto-market in the loan contract.</p>
+          <h3>Loan terms</h3>
+          <p>The request creates one credit line and a linked repayment market that activates after funding.</p>
         </div>
       </div>
       <div className="loanCreateGrid">
