@@ -28,15 +28,15 @@ The repository contains a `render.yaml` Blueprint for a public ARC testnet demo:
 
 ## First Demo Preparation
 
-The hosted database starts empty. Register the active reviewer market before submitting orders:
+The Blueprint's `initialDeployHook` registers the active reviewer market after the first successful
+service deployment. Confirm that `/v1/markets` returns the market below before submitting orders.
+The hook uses the same idempotent command shown here, so it is safe to rerun from a Render shell:
 
-```powershell
-$env:DATABASE_URL='<Render external database URL for one-time setup>'
-npm.cmd run market-config:upsert -- --outcome-token 0x06c08af6a3ad503560f3010105f1ec32052c7f2f --market-id 0x1489a4e8bf6c349a62c1892e03c1206051f11bac3bdf1adaba8aaa6800322ea1 --default-tick-units 1000 --edge-tick-units 100 --lower-edge-price-units 100000 --upper-edge-price-units 900000 --min-order-outcome-amount 1
+```sh
+node dist/backend/scripts/market-config.js --outcome-token 0x06c08af6a3ad503560f3010105f1ec32052c7f2f --market-id 0x1489a4e8bf6c349a62c1892e03c1206051f11bac3bdf1adaba8aaa6800322ea1 --default-tick-units 1000 --edge-tick-units 100 --lower-edge-price-units 100000 --upper-edge-price-units 900000 --min-order-outcome-amount 1
 ```
 
-If the free database is configured with no public access, use Render's database shell instead of
-temporarily opening its IP allow list.
+No public database access is required for the hook or for a manual rerun from the service shell.
 
 ## Free-Tier Limits
 
