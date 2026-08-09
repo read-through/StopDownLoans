@@ -132,6 +132,7 @@ export type ApiHealthDto = {
   chainId: number;
   contracts: {
     loanPositionToken: string;
+    outcomeToken: string;
     outcomeExchange: string;
     usdc: string;
   };

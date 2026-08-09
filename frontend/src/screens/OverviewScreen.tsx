@@ -4,6 +4,19 @@ import { DemoPathPanel } from "../components/shared/DemoPathPanel";
 import { OverviewPreview } from "../components/shared/OverviewPreview";
 import { RoleAction } from "../components/shared/RoleAction";
 
+const productFacts = [
+  { label: "Credit request", value: "P principal + fixed interest" },
+  { label: "Borrower collateral", value: "repayment * collateralBps" },
+  { label: "Market payout", value: "winning YES or NO redeems 1 USDC" },
+  { label: "Lender recovery", value: "repayment and NO recovery share one pool" },
+];
+
+const reviewerPaths = [
+  "Local protocol proof: demo:happy-path",
+  "UI fallback: demo:reviewer",
+  "ARC evidence: deployed loan, market, and CLOB settlement tx",
+];
+
 export function OverviewScreen(props: {
   dashboardStats: Array<{ label: string; value: string; icon: typeof Activity }>;
   selectedLoanDetail: LoanDetail | null;
@@ -11,6 +24,32 @@ export function OverviewScreen(props: {
 }) {
   return (
     <section className="screenStack" id="overview" aria-label="Protocol overview">
+      <section className="productOrientation" aria-label="Product orientation">
+        <div className="orientationCopy">
+          <span>Final submission focus</span>
+          <h2>DeFi credit markets backed by repayment prediction shares</h2>
+          <p>
+            Each loan creates one YES/NO market for whether repayment arrives on time. Borrowers get
+            YES exposure, lenders get fixed-rate positions plus NO-backed recovery, and traders price
+            repayment risk through the orderbook.
+          </p>
+        </div>
+        <div className="orientationFacts" aria-label="Protocol economics">
+          {productFacts.map((fact) => (
+            <div className="orientationFact" key={fact.label}>
+              <span>{fact.label}</span>
+              <strong>{fact.value}</strong>
+            </div>
+          ))}
+        </div>
+        <div className="reviewerPathList" aria-label="Reviewer verification paths">
+          <span>Reviewer paths</span>
+          {reviewerPaths.map((path) => (
+            <div key={path}>{path}</div>
+          ))}
+        </div>
+      </section>
+
       <section className="statusGrid" aria-label="Protocol status">
         {props.dashboardStats.map((stat) => {
           const Icon = stat.icon;

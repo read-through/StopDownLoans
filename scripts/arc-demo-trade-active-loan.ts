@@ -71,7 +71,7 @@ const loanId = readUintEnv("LOAN_ID");
 const loanPositionToken = await viem.getContractAt("LoanPositionToken", loanPositionTokenAddress);
 const outcomeToken = await viem.getContractAt("OutcomeToken", outcomeTokenAddress);
 const outcomeExchange = await viem.getContractAt("OutcomeExchange", outcomeExchangeAddress);
-const usdc = await viem.getContractAt("MockUSDC", await loanPositionToken.read.usdc() as Address);
+const usdc = await viem.getContractAt("IArcUsdc", await loanPositionToken.read.usdc() as Address);
 
 const loan = await loanPositionToken.read.getLoanView([loanId]) as LoanView;
 if (loan.state !== 2) {

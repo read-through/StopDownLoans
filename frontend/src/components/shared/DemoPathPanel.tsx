@@ -10,7 +10,7 @@ const demoSteps = [
   {
     title: "UI walkthrough",
     text: "Use the demo API and mock wallet to inspect borrower, lender, trader, and portfolio screens.",
-    command: "npm.cmd run demo:frontend",
+    command: "npm.cmd run demo:reviewer",
     icon: MonitorPlay,
   },
   {

@@ -209,6 +209,105 @@ a {
   padding: 0 12px;
 }
 
+.dialogBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgb(18 27 22 / 52%);
+}
+
+.walletDialog {
+  width: min(460px, 100%);
+  padding: 22px;
+  background: #ffffff;
+  border: 1px solid #d8ded5;
+  border-radius: 8px;
+  box-shadow: 0 18px 60px rgb(10 25 17 / 18%);
+}
+
+.walletDialogHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.walletDialogHeader h2 {
+  margin: 0;
+  font-size: 21px;
+}
+
+.walletDialogHeader p {
+  margin: 6px 0 0;
+  color: #64716a;
+  font-size: 14px;
+}
+
+.iconButton {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  color: #435048;
+  background: #eef2ed;
+  border-radius: 7px;
+}
+
+.walletOptions {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.walletOption {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  min-height: 68px;
+  padding: 12px 14px;
+  color: #17211b;
+  text-align: left;
+  background: #f6f8f5;
+  border: 1px solid #d8ded5;
+  border-radius: 8px;
+}
+
+.walletOption:hover:not(:disabled) {
+  border-color: #6b8977;
+  background: #edf3ef;
+}
+
+.walletOption:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.walletOption span {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.walletOption small {
+  color: #64716a;
+  line-height: 1.35;
+}
+
+.walletDialogError {
+  margin-top: 12px;
+  padding: 10px 12px;
+  color: #7c241e;
+  background: #f9e9e7;
+  border: 1px solid #e7bcb7;
+  border-radius: 7px;
+  font-size: 13px;
+}
+
 .healthBadge {
   display: inline-flex;
   align-items: center;
@@ -260,6 +359,99 @@ a {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
+}
+
+.productOrientation {
+  display: grid;
+  grid-template-columns: minmax(280px, 1.05fr) minmax(260px, 0.95fr);
+  gap: 18px;
+  align-items: stretch;
+  min-width: 0;
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid #dce2d8;
+  border-radius: 8px;
+}
+
+.orientationCopy {
+  display: grid;
+  align-content: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.orientationCopy span,
+.reviewerPathList span {
+  color: #6841c5;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.orientationCopy h2 {
+  max-width: 680px;
+  margin: 0;
+  font-size: 34px;
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+
+.orientationCopy p {
+  max-width: 720px;
+  margin: 0;
+  color: #53615a;
+  line-height: 1.5;
+}
+
+.orientationFacts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.orientationFact {
+  display: grid;
+  gap: 8px;
+  align-content: center;
+  min-height: 88px;
+  min-width: 0;
+  padding: 14px;
+  background: #f7faf6;
+  border: 1px solid #e1e7dd;
+  border-radius: 7px;
+}
+
+.orientationFact span {
+  color: #64716a;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.orientationFact strong {
+  color: #10201c;
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+.reviewerPathList {
+  display: flex;
+  grid-column: 1 / -1;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  padding-top: 2px;
+}
+
+.reviewerPathList div {
+  min-height: 30px;
+  padding: 6px 10px;
+  color: #26332d;
+  background: #eef3ed;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .overviewPreviewGrid {
@@ -1572,6 +1764,7 @@ a {
   .loansScreenGrid,
   .marketLifecyclePanel,
   .overviewPreviewGrid,
+  .productOrientation,
   .roleStrip,
   .marketGrid,
   .statusGrid {
@@ -1647,6 +1840,7 @@ a {
 
   .quoteGrid,
   .demoPathStep,
+  .orientationFacts,
   .loanReadinessStrip,
   .loanDetailGrid,
   .loanLifecycleSteps,
@@ -1667,6 +1861,10 @@ a {
 
   .demoPathIntro h2 {
     font-size: 24px;
+  }
+
+  .orientationCopy h2 {
+    font-size: 26px;
   }
 
   .demoStepNumber,

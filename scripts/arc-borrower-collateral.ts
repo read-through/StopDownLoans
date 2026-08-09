@@ -27,7 +27,7 @@ const loanView = await loanPositionToken.read.getLoanView([loanId]) as LoanView;
 
 assertEqualAddress("loan borrower", loanView.borrower, borrowerAddress);
 
-const approveTx = await (await viem.getContractAt("MockUSDC", await loanPositionToken.read.usdc() as Address))
+const approveTx = await (await viem.getContractAt("IArcUsdc", await loanPositionToken.read.usdc() as Address))
   .write.approve([outcomeTokenAddress, loanView.borrowerCollateralAmount]);
 console.log(`USDC approve tx: ${approveTx}`);
 await publicClient.waitForTransactionReceipt({ hash: approveTx });

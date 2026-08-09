@@ -35,6 +35,19 @@ export function LoanDetailPanel(props: {
     return <div className="loanDetail emptyState compactState">Select a loan to inspect funding terms.</div>;
   }
 
+  const fundingOpen =
+    props.loan.state === "Funding" &&
+    BigInt(props.loan.fundedAmountRaw) < BigInt(props.loan.principalRaw);
+  const collateralOpen =
+    (props.loan.state === "Funding" || props.loan.state === "Funded") &&
+    BigInt(props.loan.borrowerCollateralDepositedAmountRaw) <
+      BigInt(props.loan.borrowerCollateralAmountRaw);
+  const activationOpen = props.loan.state === "Funded";
+  const paymentOpen =
+    props.loan.state === "Active" ||
+    props.loan.state === "Repaid" ||
+    props.loan.state === "Defaulted";
+
   return (
     <section className="loanDetail" aria-label="Selected loan details">
       <div className="detailHeader">
@@ -84,39 +97,47 @@ export function LoanDetailPanel(props: {
           <span>Linked market is not indexed in the CLOB config yet.</span>
         )}
       </div>
-      <LoanFundingForm
-        loan={props.loan}
-        walletAccount={props.walletAccount}
-        walletOnExpectedChain={props.walletOnExpectedChain}
-        walletBalances={props.walletBalances}
-        walletBalancesStatus={props.walletBalancesStatus}
-        walletBalancesError={props.walletBalancesError}
-        onLoanFunded={props.onLoanFunded}
-      />
-      <BorrowerCollateralForm
-        loan={props.loan}
-        walletAccount={props.walletAccount}
-        walletOnExpectedChain={props.walletOnExpectedChain}
-        walletBalances={props.walletBalances}
-        walletBalancesStatus={props.walletBalancesStatus}
-        walletBalancesError={props.walletBalancesError}
-        onBorrowerCollateralDeposited={props.onBorrowerCollateralDeposited}
-      />
-      <LoanActivationAction
-        loan={props.loan}
-        walletAccount={props.walletAccount}
-        walletOnExpectedChain={props.walletOnExpectedChain}
-        onLoanActivated={props.onLoanActivated}
-      />
-      <LoanPaymentAction
-        loan={props.loan}
-        walletAccount={props.walletAccount}
-        walletOnExpectedChain={props.walletOnExpectedChain}
-        walletBalances={props.walletBalances}
-        walletBalancesStatus={props.walletBalancesStatus}
-        walletBalancesError={props.walletBalancesError}
-        onLoanPaymentChanged={props.onLoanPaymentChanged}
-      />
+      {fundingOpen && (
+        <LoanFundingForm
+          loan={props.loan}
+          walletAccount={props.walletAccount}
+          walletOnExpectedChain={props.walletOnExpectedChain}
+          walletBalances={props.walletBalances}
+          walletBalancesStatus={props.walletBalancesStatus}
+          walletBalancesError={props.walletBalancesError}
+          onLoanFunded={props.onLoanFunded}
+        />
+      )}
+      {collateralOpen && (
+        <BorrowerCollateralForm
+          loan={props.loan}
+          walletAccount={props.walletAccount}
+          walletOnExpectedChain={props.walletOnExpectedChain}
+          walletBalances={props.walletBalances}
+          walletBalancesStatus={props.walletBalancesStatus}
+          walletBalancesError={props.walletBalancesError}
+          onBorrowerCollateralDeposited={props.onBorrowerCollateralDeposited}
+        />
+      )}
+      {activationOpen && (
+        <LoanActivationAction
+          loan={props.loan}
+          walletAccount={props.walletAccount}
+          walletOnExpectedChain={props.walletOnExpectedChain}
+          onLoanActivated={props.onLoanActivated}
+        />
+      )}
+      {paymentOpen && (
+        <LoanPaymentAction
+          loan={props.loan}
+          walletAccount={props.walletAccount}
+          walletOnExpectedChain={props.walletOnExpectedChain}
+          walletBalances={props.walletBalances}
+          walletBalancesStatus={props.walletBalancesStatus}
+          walletBalancesError={props.walletBalancesError}
+          onLoanPaymentChanged={props.onLoanPaymentChanged}
+        />
+      )}
     </section>
   );
 }

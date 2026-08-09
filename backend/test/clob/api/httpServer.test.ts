@@ -38,6 +38,7 @@ describe("createClobHttpServer", () => {
         chainId: 5042002,
         contracts: {
           loanPositionToken: "0x0000000000000000000000000000000000000003",
+          outcomeToken: "0x0000000000000000000000000000000000000006",
           outcomeExchange: "0x0000000000000000000000000000000000000001",
           usdc: "0x0000000000000000000000000000000000000002",
         },
@@ -105,7 +106,7 @@ describe("createClobHttpServer", () => {
       });
 
       assert.equal(response.status, 204);
-      assert.equal(response.headers.get("access-control-allow-origin"), "*");
+      assert.equal(response.headers.get("access-control-allow-origin"), "http://127.0.0.1:5173");
       assert.equal(response.headers.get("access-control-allow-methods"), "GET,POST,OPTIONS");
     } finally {
       await close();
@@ -165,7 +166,7 @@ describe("createClobHttpServer", () => {
       const body = await response.json();
 
       assert.equal(response.status, 200);
-      assert.equal(response.headers.get("access-control-allow-origin"), "*");
+      assert.equal(response.headers.get("access-control-allow-origin"), null);
       assert.deepEqual(calls, [requestBody]);
       assert.equal(body.orderHash, "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
       assert.equal(body.rested, true);
@@ -608,6 +609,103 @@ describe("createClobHttpServer", () => {
       await close();
     }
   });
+
+  it("exposes public Circle config and routes social token setup without exposing the API key", async () => {
+    const calls: string[] = [];
+    const server = createClobHttpServer({
+      config: testConfig(),
+      circleWalletConfig: {
+        apiKey: "circle-secret",
+        appId: "circle-app",
+        googleClientId: "google-client",
+        googleRedirectUri: "https://stopdown.example/callback",
+        apiBaseUrl: "https://api.circle.test",
+        socialRateLimit: 5,
+        socialRateWindowMs: 60_000,
+        actionRateLimit: 30,
+        actionRateWindowMs: 60_000,
+        trustProxy: false,
+      },
+      dbClient: {} as never,
+      circleWalletServices: {
+        consumeRateLimit: async () => {
+          calls.push("limit");
+          return { allowed: true, limit: 5, remaining: 4, resetAt: new Date() };
+        },
+        requestSocialDeviceToken: async (config, deviceId) => {
+          calls.push(`${config.apiKey}:${deviceId}`);
+          return { deviceToken: "device-token", deviceEncryptionKey: "device-key" };
+        },
+        initializeArcEoaWallet: async (_config, userToken) => {
+          calls.push(`initialize:${userToken}`);
+          return { challengeId: "challenge-id" };
+        },
+        listArcEoaWallets: async (_config, userToken) => {
+          calls.push(`wallets:${userToken}`);
+          return [
+            {
+              id: "wallet-id",
+              address: "0x0000000000000000000000000000000000000004",
+              blockchain: "ARC-TESTNET",
+              accountType: "EOA",
+              state: "LIVE",
+            },
+          ];
+        },
+      },
+    });
+    const { baseUrl, close } = await listen(server);
+
+    try {
+      const configResponse = await fetch(`${baseUrl}/v1/wallet/circle/config`);
+      const publicConfig = await configResponse.json();
+      assert.equal(configResponse.status, 200);
+      assert.deepEqual(publicConfig, {
+        enabled: true,
+        appId: "circle-app",
+        googleClientId: "google-client",
+        googleRedirectUri: "https://stopdown.example/callback",
+      });
+      assert.equal(JSON.stringify(publicConfig).includes("circle-secret"), false);
+
+      const tokenResponse = await fetch(`${baseUrl}/v1/wallet/circle/social/token`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ deviceId: "browser-device" }),
+      });
+      assert.equal(tokenResponse.status, 200);
+      assert.deepEqual(await tokenResponse.json(), {
+        deviceToken: "device-token",
+        deviceEncryptionKey: "device-key",
+      });
+      assert.deepEqual(calls, ["limit", "circle-secret:browser-device"]);
+
+      const userToken = "circle-user-token-long-enough";
+      const initializeResponse = await fetch(`${baseUrl}/v1/wallet/circle/initialize`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ userToken }),
+      });
+      assert.equal(initializeResponse.status, 200);
+      assert.deepEqual(await initializeResponse.json(), { challengeId: "challenge-id" });
+
+      const walletsResponse = await fetch(`${baseUrl}/v1/wallet/circle/wallets`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ userToken }),
+      });
+      assert.equal(walletsResponse.status, 200);
+      assert.equal((await walletsResponse.json()).wallets[0].accountType, "EOA");
+      assert.deepEqual(calls, [
+        "limit",
+        "circle-secret:browser-device",
+        `initialize:${userToken}`,
+        `wallets:${userToken}`,
+      ]);
+    } finally {
+      await close();
+    }
+  });
 });
 
 function testConfig() {
@@ -616,8 +714,10 @@ function testConfig() {
     arcRpcUrl: "https://rpc.example",
     chainId: 5042002,
     loanPositionToken: "0x0000000000000000000000000000000000000003" as const,
+    outcomeToken: "0x0000000000000000000000000000000000000006" as const,
     outcomeExchange: "0x0000000000000000000000000000000000000001" as const,
     usdc: "0x0000000000000000000000000000000000000002" as const,
+    corsAllowedOrigins: ["http://127.0.0.1:5173"],
     expiredOrderSweepIntervalMs: 5000,
     expiredOrderSweepLimit: 100,
     reconciliationIntervalMs: 3000,

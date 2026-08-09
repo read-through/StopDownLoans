@@ -10,17 +10,20 @@ The current codebase contains:
 - PostgreSQL loan snapshots for loan/market list reads, so the frontend does not scan ARC RPC on every list request;
 - a Vite/React frontend for borrower, lender, and YES/NO trading flows against the local or ARC-backed stack.
 
-For a short hackathon reviewer guide, see `docs/mid-submission.md`. For the final-submission MVP
-roadmap and current progress estimate, see `docs/final-mvp-roadmap.md`. For intentional MVP
-shortcuts and cleanup items, see `docs/known-limitations.md`. Current ARC testnet deployment
-addresses are recorded in `docs/arc-testnet-deployment.md`. For running the live ARC testnet stack
-with a settlement executor wallet, see `docs/arc-testnet-runbook.md`. For user wallet, executor
-wallet, mock signer, Circle, and market-maker paths, see `docs/wallet-path.md` and
-`docs/circle-integration-strategy.md`. For the final reviewer demo sequence, see
-`docs/final-demo-guide.md`. For the current reproducible product walkthrough, see
-`docs/happy-path.md`. For a click-by-click mock UI checklist for manual testers, see
-`docs/manual-testing.md`. For the production/deployment plan, see
-`docs/production-deployment-plan.md`.
+For the hackathon submission checklist and 3-minute video script, see
+`docs/hackathon-submission.md`. For a short hackathon reviewer guide, see
+`docs/mid-submission.md`. For the final-submission MVP roadmap and current progress estimate, see
+`docs/final-mvp-roadmap.md`. For intentional MVP shortcuts and cleanup items, see
+`docs/known-limitations.md`. Current ARC testnet deployment addresses are recorded in
+`docs/arc-testnet-deployment.md`. For running the live ARC testnet stack with a settlement executor
+wallet, see `docs/arc-testnet-runbook.md`. For user wallet, executor wallet, mock signer, Circle,
+and market-maker paths, see `docs/wallet-path.md` and `docs/circle-integration-strategy.md`. The
+ARC App Kit funding command is documented in `docs/arc-app-kit.md`. For the
+final reviewer demo sequence, see `docs/final-demo-guide.md`. For the current reproducible product
+walkthrough, see `docs/happy-path.md`. For a click-by-click mock UI checklist for manual testers,
+see `docs/manual-testing.md`. For the production/deployment plan, see
+`docs/production-deployment-plan.md`. For the public Render demo deployment, see
+`docs/render-deployment.md`.
 
 ## Product Flow
 
@@ -120,7 +123,7 @@ Demo modes:
 | ARC testnet | Production-like deployment and wallet flow. | Yes, on ARC testnet. |
 
 ```powershell
-npm.cmd install
+corepack npm ci
 npm.cmd run build:frontend
 npm.cmd run typecheck:backend
 npm.cmd run test:backend
@@ -181,7 +184,16 @@ on `DATABASE_URL`.
 ### 1. Install dependencies
 
 ```powershell
-npm.cmd install
+corepack npm ci
+```
+
+The repository pins npm through `packageManager` and commits a cross-platform lockfile. Use
+Corepack here so Windows development and the Node 22 production image resolve the same graph.
+
+Before publishing, run the complete contracts/backend/frontend/Docker preflight:
+
+```powershell
+corepack npm run release:check
 ```
 
 ### 2. Configure environment
@@ -627,12 +639,13 @@ npm.cmd run demo:local:clob-trade
 - Matching is centralized in the backend.
 - Settlement is non-custodial and performed by `OutcomeExchange`.
 - The backend does not store or control user private keys.
-- Circle User-Controlled Wallets are planned as an optional recommended path for retail users, not
-  as a dependency of the matching engine. Market makers can keep using any EIP-712-capable signer.
+- Circle User-Controlled Wallet Social Login is implemented as an optional retail path. It creates
+  an ARC Testnet EOA, executes protocol transactions through user-approved challenges, and signs the
+  same EIP-712 orders as injected wallets. Market makers can keep using any compatible signer.
 - Circle is treated as a wallet and gas UX layer, not as CLOB core infrastructure; see
   `docs/circle-integration-strategy.md`.
-- ARC kits remain a planned integration point for frontend/onboarding/deployment ergonomics; the
-  current MVP already uses ARC as the settlement chain and ARC USDC as the protocol asset.
+- ARC App Kit is integrated through an estimate-first ARC USDC funding command; it remains outside
+  lending accounting and CLOB matching.
 - Market config reads are public. Admin/authenticated market-config write endpoints are intentionally not exposed yet; admin auth is still a separate design decision.
 
 ## Useful Specs

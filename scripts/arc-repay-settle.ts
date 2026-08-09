@@ -23,7 +23,7 @@ console.log(`Payer signer: ${payerAddress}`);
 
 const loanPositionToken = await viem.getContractAt("LoanPositionToken", loanPositionTokenAddress);
 const loanView = await loanPositionToken.read.getLoanView([loanId]) as LoanView;
-const usdc = await viem.getContractAt("MockUSDC", await loanPositionToken.read.usdc() as Address);
+const usdc = await viem.getContractAt("IArcUsdc", await loanPositionToken.read.usdc() as Address);
 
 const approveTx = await usdc.write.approve([loanPositionTokenAddress, loanView.repaymentAmount]);
 console.log(`USDC approve tx: ${approveTx}`);

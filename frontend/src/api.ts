@@ -23,6 +23,7 @@ export type ApiHealth = {
   chainId: number;
   contracts: {
     loanPositionToken: string;
+    outcomeToken: string;
     outcomeExchange: string;
     usdc: string;
   };
@@ -224,7 +225,10 @@ export type ApiOrdersResponse = {
   nextCursor: string | null;
 };
 
-export const clobApiUrl = import.meta.env.VITE_CLOB_API_URL ?? "http://127.0.0.1:3000";
+export const clobApiUrl =
+  import.meta.env.VITE_CLOB_SAME_ORIGIN === "true"
+    ? window.location.origin
+    : import.meta.env.VITE_CLOB_API_URL ?? "http://127.0.0.1:3000";
 
 type ApiErrorBody = {
   error?: {

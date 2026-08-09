@@ -132,6 +132,14 @@ const expectedTableColumns: Record<string, string[]> = {
     "synced_at",
     "updated_at",
   ],
+  rate_limit_windows: [
+    "scope",
+    "subject_hash",
+    "window_started_at",
+    "request_count",
+    "expires_at",
+    "updated_at",
+  ],
 };
 
 const expectedIndexes = [
@@ -152,6 +160,7 @@ const expectedIndexes = [
   "market_config_events_unprocessed_idx",
   "loan_snapshots_market_idx",
   "loan_snapshots_state_idx",
+  "rate_limit_windows_expiry_idx",
 ];
 
 describe("CLOB migration schema contract", () => {
@@ -176,7 +185,7 @@ describe("CLOB migration schema contract", () => {
 });
 
 async function readAllMigrationSql(): Promise<string> {
-  const files = ["001_init_clob.sql", "002_loan_snapshots.sql"];
+  const files = ["001_init_clob.sql", "002_loan_snapshots.sql", "003_rate_limits.sql"];
   const contents = await Promise.all(files.map((file) => readFile(path.join(migrationsDir, file), "utf8")));
   return contents.join("\n");
 }

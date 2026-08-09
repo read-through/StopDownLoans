@@ -16,7 +16,7 @@ It separates three things that should not be confused:
 Use this first because it is deterministic and does not depend on public ARC RPC limits.
 
 ```powershell
-npm.cmd install
+corepack npm ci
 npm.cmd run db:up
 npm.cmd run db:migrate
 npm.cmd run demo:happy-path
@@ -28,6 +28,9 @@ Expected result:
 - default loan path completes;
 - local CLOB trade path completes;
 - script prints `StopDown local happy path completed.`
+
+Before publishing the final commit, run `corepack npm run release:check`. It fails on the first
+contract, backend, build, production dependency, Docker, or Git whitespace error.
 
 This proves:
 
@@ -148,18 +151,39 @@ For final submission, the safest primary demo is:
 The live browser-wallet path should be shown if available, but should not be the only proof path
 until RPC limits and wallet setup are made reviewer-safe.
 
+## Recording Checklist
+
+The final 3-minute demo should show the strongest verified path, not every internal feature.
+
+Required shots:
+
+1. README or submission pack showing the product thesis.
+2. Product flow diagram or a short verbal explanation of the loan-linked YES/NO market.
+3. `npm.cmd run demo:happy-path` completing successfully.
+4. Frontend overview screen.
+5. Create Loan screen showing principal, interest, collateral ratio, and deadlines.
+6. Single loan detail screen showing funding, collateral, activation, repayment/default actions.
+7. Exchange market detail screen showing the loan-linked YES/NO market and orderbook.
+8. ARC deployment evidence with current contract addresses and settlement tx.
+9. Circle Social Login implementation plus honest Gas Station and production limitations.
+
+Avoid:
+
+- spending time on internal folder structure;
+- showing old ARC loans as the primary evidence;
+- implying the mock UI path changes live ARC state;
+- presenting Circle as credential-verified before the hosted OAuth walkthrough succeeds.
+
 ## What Still Needs Work Before Final Submission
 
 - Improve frontend clarity and visual quality.
-- Make the final demo path visible from README top section.
-- Add a production/deployment plan.
-- Decide whether Circle remains a documented placeholder or gets one concrete implemented flow.
+- Add final video or presentation URL to `docs/hackathon-submission.md`.
 - Add one final walkthrough record: screenshots, short video, or terminal transcript.
 
 ## What Must Not Be Claimed
 
 - Do not claim the mock UI fallback proves live ARC settlement.
-- Do not claim Circle wallets are implemented until they are actually wired into the frontend.
+- Do not claim Circle Gas Station or hosted OAuth verification is complete.
 - Do not claim production readiness before hosted backend, managed DB, secrets, monitoring, and
   security review exist.
 - Do not claim public ARC RPC is sufficient for production-like reliability without evidence.

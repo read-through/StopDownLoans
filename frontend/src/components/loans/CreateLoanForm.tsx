@@ -10,7 +10,7 @@ import {
   toDatetimeLocalInput,
 } from "../../lib/parsing";
 import type { WalletAccount } from "../../wallet";
-import { getInjectedWalletProvider } from "../../wallet";
+import { getWalletProvider } from "../../wallet";
 import { DetailMetric } from "../shared/DetailMetric";
 
 export function CreateLoanForm(props: {
@@ -83,10 +83,10 @@ export function CreateLoanForm(props: {
       return;
     }
 
-    const provider = getInjectedWalletProvider();
+    const provider = getWalletProvider(props.walletAccount);
     if (provider === null) {
       setStatus("error");
-      setError("No injected wallet provider found.");
+      setError("No connected wallet provider found.");
       return;
     }
 

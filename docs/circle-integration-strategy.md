@@ -1,7 +1,7 @@
 # Circle Integration Strategy
 
-This document defines where Circle belongs in StopDown Loans and what is intentionally left out of
-the current MVP implementation.
+This document defines the implemented Circle boundary in StopDown Loans and what remains outside
+the current MVP.
 
 ## Decision
 
@@ -29,7 +29,7 @@ wallets at the same time.
 
 ## User-Controlled Wallet Path
 
-Circle User-Controlled Wallets are the preferred future path for non-power users.
+Circle User-Controlled Wallets are the recommended optional path for non-power users.
 
 Expected behavior:
 
@@ -82,18 +82,23 @@ Future alternatives:
 - Gas sponsorship must not hide contract approvals, order signing, or repayment obligations from the
   user.
 
-## Implementation Placeholder
+## Implementation Status
 
 Current status:
 
 - implemented: injected-wallet path;
 - implemented: injected-wallet ARC chain registration fallback through `wallet_addEthereumChain`;
+- implemented: Circle Social Login bootstrap and ARC Testnet EOA initialization;
+- implemented: backend-only Circle API key handling and PostgreSQL login rate limiting;
+- implemented: user-approved contract execution challenges restricted to deployed protocol contracts;
+- implemented: EIP-712 `Order` and `CancelOrder` signing through the same CLOB order format;
+- implemented: Circle challenge-to-transaction polling; UI completion waits for ARC `CONFIRMED` or `COMPLETE`;
 - implemented: backend executor key path;
 - implemented: centralized demo mock signer for no-wallet UI review;
-- documented: Circle User-Controlled Wallet target;
+- implemented: ARC App Kit estimate-first USDC send command for funding an ARC Testnet wallet;
 - documented: Circle gas UX target;
 - documented: ARC App Kit target for USDC onboarding/fund flows;
-- not implemented: Circle frontend onboarding/signing;
+- not yet verified: end-to-end Google OAuth and transaction execution with real Circle credentials;
 - not implemented: Circle gas sponsorship;
 - not implemented: managed executor custody.
 
@@ -101,12 +106,18 @@ Current status:
 
 ARC App Kit belongs in onboarding and fund movement, not in CLOB matching.
 
+Implemented flow:
+
+- estimate and explicitly send USDC to an ARC Testnet wallet with `npm.cmd run arc:app-kit:send`;
+
 Useful future flows:
 
 - bridge USDC to ARC before a borrower posts collateral;
 - bridge or send USDC before a lender funds a loan;
 - show unified USDC readiness before a trader places a BUY order;
 - add developer-fee-aware fund flows only outside the signed order settlement core.
+
+See [ARC App Kit USDC Send](./arc-app-kit.md) for the isolated reviewer/operator command.
 
 Do not use App Kit to change the lending contract accounting or CLOB order format. The protocol
 still settles with ARC USDC and EIP-712 orders.
@@ -118,12 +129,5 @@ References:
 - Circle User-Controlled Wallet typed-data signing: https://developers.circle.com/api-reference/wallets/user-controlled-wallets/sign-user-typed-data
 - Circle Paymaster overview: https://developers.circle.com/paymaster
 
-Before implementing Circle in code, decide one concrete product flow:
-
-- borrower onboarding;
-- lender onboarding;
-- retail trader onboarding;
-- gas sponsorship;
-- executor custody.
-
-Do not implement all of them at once.
+The implemented user-controlled provider serves borrower, lender, and retail trader actions. Gas
+sponsorship and managed executor custody remain separate future decisions.

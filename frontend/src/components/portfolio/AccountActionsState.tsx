@@ -3,7 +3,7 @@ import { cancelOrder, type ApiCancelOrderResponse, type ApiOrder, type ApiLoanPo
 import type { WalletBalances } from "../../chainReads";
 import { buildUnsignedCancel, signCancelOrder } from "../../orderSigning";
 import type { WalletAccount } from "../../wallet";
-import { getInjectedWalletProvider } from "../../wallet";
+import { getWalletProvider } from "../../wallet";
 import { errorMessage, formatUsdc, shortHex, formatPriceUnits } from "../../lib/format";
 import { LoanPositionsPanel } from "./LoanPositionsPanel";
 import { ReservationsPanel } from "./ReservationsPanel";
@@ -66,9 +66,9 @@ export function AccountActionsState(props: {
     />
   );
   const cancelOpenOrder = (order: ApiOrder) => {
-    const provider = getInjectedWalletProvider();
+    const provider = getWalletProvider(props.account);
     if (provider === null) {
-      setCancelError("No injected wallet provider found.");
+      setCancelError("No connected wallet provider found.");
       return;
     }
 

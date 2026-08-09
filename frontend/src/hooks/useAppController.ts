@@ -42,14 +42,16 @@ import type {
 } from "../types";
 import {
   getConnectedWalletAccount,
-  getInjectedWalletProvider,
+  getWalletProvider,
   hasInjectedWallet,
   requestWalletAccount,
   subscribeWalletAccountsChanged,
   switchWalletChain,
   type WalletAccount,
+  type EthereumProvider,
   type WalletStatus,
 } from "../wallet";
+import type { CircleConnectedWallet } from "../circle-wallet/types";
 
 export function useAppController() {
   const [activeRoute, setActiveRoute] = useState(() => getRouteFromHash());
@@ -577,11 +579,11 @@ export function useAppController() {
       return;
     }
 
-    const provider = getInjectedWalletProvider();
+    const provider = getWalletProvider(walletAccount);
     if (provider === null) {
       setWalletBalances(null);
       setWalletBalancesStatus("error");
-      setWalletBalancesError("No injected wallet provider found.");
+      setWalletBalancesError("No connected wallet provider found.");
       return;
     }
 
@@ -665,6 +667,19 @@ export function useAppController() {
         setWalletStatus("error");
         setWalletError(error instanceof Error ? error.message : "Failed to connect wallet");
       });
+  };
+
+  const connectCircleWallet = (wallet: CircleConnectedWallet, provider: EthereumProvider) => {
+    setWalletAccount({
+      kind: "circle",
+      address: wallet.address,
+      chainId: expectedArcChainIdHex,
+      walletId: wallet.id,
+      provider,
+    });
+    setWalletStatus("connected");
+    setWalletError(null);
+    setAccountRefreshNonce((value) => value + 1);
   };
 
   const switchWalletToArc = () => {
@@ -857,6 +872,7 @@ export function useAppController() {
     walletError,
     walletOnExpectedChain,
     connectWallet: handleWalletAction,
+    connectCircleWallet,
     refreshAll,
     dashboardStats,
     selectedLoanDetail,

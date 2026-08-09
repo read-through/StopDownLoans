@@ -1,7 +1,6 @@
-export type WalletAccount = {
-  address: string;
-  chainId: string | null;
-};
+export type WalletAccount =
+  | { kind: "injected"; address: string; chainId: string | null }
+  | { kind: "circle"; address: string; chainId: string; walletId: string; provider: EthereumProvider };
 
 export type WalletStatus = "checking" | "unavailable" | "disconnected" | "connecting" | "connected" | "error";
 
@@ -35,6 +34,10 @@ export function hasInjectedWallet(): boolean {
 
 export function getInjectedWalletProvider(): EthereumProvider | null {
   return window.ethereum ?? null;
+}
+
+export function getWalletProvider(account: WalletAccount): EthereumProvider | null {
+  return account.kind === "circle" ? account.provider : getInjectedWalletProvider();
 }
 
 export async function getConnectedWalletAccount(): Promise<WalletAccount | null> {
@@ -110,6 +113,7 @@ async function accountFromAccounts(
   }
 
   return {
+    kind: "injected",
     address,
     chainId: await requestChainId(provider),
   };

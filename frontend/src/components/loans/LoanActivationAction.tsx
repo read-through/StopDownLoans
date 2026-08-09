@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { activateLoan } from "../../chainWrites";
 import type { LoanDetail } from "../../types";
 import type { WalletAccount } from "../../wallet";
-import { getInjectedWalletProvider } from "../../wallet";
+import { getWalletProvider } from "../../wallet";
 import { errorMessage, shortHex } from "../../lib/format";
 import { getLoanActivationPreflightError } from "../../lib/preflight";
 import { ArrowRight } from "lucide-react";
@@ -34,10 +34,10 @@ export function LoanActivationAction(props: {
       return;
     }
 
-    const provider = getInjectedWalletProvider();
+    const provider = getWalletProvider(props.walletAccount);
     if (provider === null) {
       setStatus("error");
-      setError("No injected wallet provider found.");
+      setError("No connected wallet provider found.");
       return;
     }
 

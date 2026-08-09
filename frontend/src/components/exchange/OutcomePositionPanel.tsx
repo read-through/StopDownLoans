@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import type { WalletBalances } from "../../chainReads";
 import { mergeOutcomePositions, redeemOutcome } from "../../chainWrites";
 import type { Outcome, PredictionMarket } from "../../types";
-import type { WalletAccount } from "../../wallet";
-import { getInjectedWalletProvider } from "../../wallet";
+import type { EthereumProvider, WalletAccount } from "../../wallet";
+import { getWalletProvider } from "../../wallet";
 import { errorMessage, formatUsdc, shortHex } from "../../lib/format";
 import { parseUsdcInput } from "../../lib/parsing";
 import {
@@ -60,17 +60,17 @@ export function OutcomePositionPanel(props: {
 
   const runOutcomeAction = (
     nextStatus: "merging" | "redeeming",
-    action: (provider: NonNullable<ReturnType<typeof getInjectedWalletProvider>>, account: WalletAccount) => Promise<string>,
+    action: (provider: EthereumProvider, account: WalletAccount) => Promise<string>,
     fallbackMessage: string
   ) => {
     if (props.walletAccount === null) {
       return;
     }
 
-    const provider = getInjectedWalletProvider();
+    const provider = getWalletProvider(props.walletAccount);
     if (provider === null) {
       setStatus("error");
-      setError("No injected wallet provider found.");
+      setError("No connected wallet provider found.");
       return;
     }
 

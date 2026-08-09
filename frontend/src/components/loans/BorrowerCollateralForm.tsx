@@ -3,7 +3,7 @@ import type { WalletBalances } from "../../chainReads";
 import { approveUsdcOutcomeToken, depositBorrowerCollateral } from "../../chainWrites";
 import type { LoanDetail } from "../../types";
 import type { WalletAccount } from "../../wallet";
-import { getInjectedWalletProvider } from "../../wallet";
+import { getWalletProvider } from "../../wallet";
 import { errorMessage, formatUsdc, shortHex } from "../../lib/format";
 import { parseUsdcInput } from "../../lib/parsing";
 import { getBorrowerCollateralPreflightError } from "../../lib/preflight";
@@ -62,10 +62,10 @@ export function BorrowerCollateralForm(props: {
       return;
     }
 
-    const provider = getInjectedWalletProvider();
+    const provider = getWalletProvider(props.walletAccount);
     if (provider === null) {
       setStatus("error");
-      setError("No injected wallet provider found.");
+      setError("No connected wallet provider found.");
       return;
     }
 
@@ -94,10 +94,10 @@ export function BorrowerCollateralForm(props: {
       return;
     }
 
-    const provider = getInjectedWalletProvider();
+    const provider = getWalletProvider(props.walletAccount);
     if (provider === null) {
       setStatus("error");
-      setError("No injected wallet provider found.");
+      setError("No connected wallet provider found.");
       return;
     }
 

@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { ApiLoanPosition } from "../../api";
 import { claimLoanPosition } from "../../chainWrites";
 import type { WalletAccount } from "../../wallet";
-import { getInjectedWalletProvider } from "../../wallet";
+import { getWalletProvider } from "../../wallet";
 import { errorMessage, formatUsdc, shortHex } from "../../lib/format";
 
 export function LoanPositionsPanel(props: {
@@ -21,9 +21,9 @@ export function LoanPositionsPanel(props: {
   const [claimError, setClaimError] = useState<string | null>(null);
 
   const claimPosition = (position: ApiLoanPosition) => {
-    const provider = getInjectedWalletProvider();
+    const provider = getWalletProvider(props.account);
     if (provider === null) {
-      setClaimError("No injected wallet provider found.");
+      setClaimError("No connected wallet provider found.");
       return;
     }
 

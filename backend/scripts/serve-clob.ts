@@ -1,4 +1,4 @@
-import { closePool } from "../src/clob/db/client.js";
+import { closePool, getPool } from "../src/clob/db/client.js";
 import { BookFeedPublisher } from "../src/clob/api/bookFeedPublisher.js";
 import { createClobHttpServer } from "../src/clob/api/httpServer.js";
 import { attachClobWebSocketFeed } from "../src/clob/api/webSocketFeed.js";
@@ -18,6 +18,11 @@ import {
   sweepMarketConfigEvents,
 } from "../src/clob/marketConfigEventLoop.js";
 import { loadDotEnv } from "./load-env.js";
+import {
+  deleteExpiredRateLimitWindows,
+  loadRateLimitCleanupConfig,
+  startRateLimitCleanupLoop,
+} from "../src/platform/rateLimit.js";
 
 await loadDotEnv();
 
@@ -28,6 +33,7 @@ if (!Number.isSafeInteger(port) || port <= 0 || port > 65535) {
 }
 
 const config = loadClobBackendConfig();
+const rateLimitCleanupConfig = loadRateLimitCleanupConfig();
 const backgroundLoopsEnabled = process.env.CLOB_BACKGROUND_LOOPS !== "false";
 const publicClient = createArcPublicClient({
   rpcUrl: config.arcRpcUrl,
@@ -110,6 +116,18 @@ const stopMarketConfigEventSweep = backgroundLoopsEnabled
       },
     })
   : () => {};
+const stopRateLimitCleanup = backgroundLoopsEnabled
+  ? startRateLimitCleanupLoop({
+      intervalMs: rateLimitCleanupConfig.intervalMs,
+      cleanup: () =>
+        deleteExpiredRateLimitWindows(getPool(), {
+          limit: rateLimitCleanupConfig.batchLimit,
+        }),
+      onError: (error) => {
+        console.error("Rate-limit cleanup failed:", error);
+      },
+    })
+  : () => {};
 const walletClient =
   config.executorPrivateKey === null
     ? null
@@ -156,6 +174,7 @@ const stopLendingKeeper =
 const server = createClobHttpServer({
   config,
   bookFeedPublisher,
+  staticDir: process.env.FRONTEND_STATIC_DIR,
 });
 const webSocketFeed = attachClobWebSocketFeed(server, {
   publisher: bookFeedPublisher,
@@ -174,6 +193,7 @@ async function shutdown(): Promise<void> {
   stopSubmittedReceiptSweep();
   stopLoanSnapshotSync();
   stopMarketConfigEventSweep();
+  stopRateLimitCleanup();
   stopExecutor();
   stopLendingKeeper();
   await webSocketFeed.close();

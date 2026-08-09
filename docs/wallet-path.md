@@ -48,9 +48,10 @@ For the current ARC testnet runbook, the executor address is:
 0x147a9B1454e4aC1c23d75cD476B5969a568E94f3
 ```
 
-## Retail Wallet Target
+## Retail Circle Wallet
 
-Circle User-Controlled Wallets are the planned recommended path for retail borrowers, lenders, and traders.
+Circle User-Controlled Wallets are the implemented recommended optional path for retail borrowers,
+lenders, and traders.
 
 Reason:
 
@@ -58,7 +59,7 @@ Reason:
 - embedded wallet UX is better for non-power users;
 - the backend can remain wallet-agnostic because it only needs signatures and transaction hashes.
 
-Circle integration target:
+Circle integration behavior:
 
 - use Circle wallet as a frontend/onboarding option;
 - request the same EIP-712 order signatures used by injected wallets;
@@ -66,7 +67,8 @@ Circle integration target:
 - optionally add Circle gas UX after chain/account support is confirmed;
 - keep market maker and bot flows open to any compatible signer.
 
-This is not yet implemented in the frontend. The current frontend only talks to injected EVM providers or the explicit demo mock signer.
+This is implemented through a unified EIP-1193-compatible frontend provider. Circle credentials and
+Google OAuth redirect configuration are still required to verify it on a hosted deployment.
 
 ## Market Maker Path
 
@@ -125,7 +127,7 @@ Before testing a real ARC frontend flow:
 
 The following wallet-related work remains:
 
-- add Circle User-Controlled Wallet frontend integration;
+- verify Circle User-Controlled Wallet Social Login and one ARC transaction on the public demo;
 - add ARC App Kit onboarding/fund-flow integration where it improves USDC bridging, sending, or
   unified-balance readiness;
 - add a documented real-wallet browser walkthrough with screenshots or recording;

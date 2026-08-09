@@ -26,6 +26,7 @@ const now = new Date("2026-01-01T00:00:00.000Z");
 const config = createSmokeConfig({
   databaseUrl,
   loanPositionToken,
+  outcomeToken,
   outcomeExchange,
   usdc,
 });
@@ -117,6 +118,7 @@ try {
 function createSmokeConfig(params: {
   databaseUrl: string;
   loanPositionToken: Hex;
+  outcomeToken: Hex;
   outcomeExchange: Hex;
   usdc: Hex;
 }): ClobBackendConfig {
@@ -125,8 +127,10 @@ function createSmokeConfig(params: {
     arcRpcUrl: "http://127.0.0.1:8545",
     chainId: 5042002,
     loanPositionToken: params.loanPositionToken,
+    outcomeToken: params.outcomeToken,
     outcomeExchange: params.outcomeExchange,
     usdc: params.usdc,
+    corsAllowedOrigins: ["http://127.0.0.1:5173"],
     expiredOrderSweepIntervalMs: 5000,
     expiredOrderSweepLimit: 100,
     reconciliationIntervalMs: 3000,

@@ -35,13 +35,13 @@ Important transaction hashes:
 For reviewers without an injected ARC wallet, the repo includes a local UI demo path:
 
 ```powershell
-npm.cmd install
+corepack npm ci
 npm.cmd run demo:api
 npm.cmd run demo:frontend
 ```
 
 This opens a fixture-backed reviewer API plus a mock-wallet frontend flow. The mock signer is only a reviewer/demo helper and is centralized under `mocks/`; it is not a custody model and is not intended for production.
 
-Circle User-Controlled Wallets are planned as the recommended retail wallet path for borrowers, lenders, and traders. Circle Gas Station / Paymaster is the planned gas UX layer after ARC/account support is verified. The backend remains wallet-agnostic: users sign EIP-712 orders and transactions from their own wallet, and market makers can use any compatible signer. ARC kits are planned for onboarding/frontend/deployment ergonomics where they reduce product friction; the current MVP already uses ARC as the settlement chain and ARC USDC as the protocol asset.
+Circle User-Controlled Wallet Social Login is implemented as an optional retail path for borrowers, lenders, and traders. It creates an ARC Testnet EOA, executes protocol calls through user-approved Circle challenges, and signs the same EIP-712 orders as injected wallets; StopDown never receives the user key. Circle Gas Station / Paymaster remains future gas UX work. Market makers can use any compatible signer. ARC App Kit is integrated through an estimate-first ARC USDC funding command and remains outside matching.
 
-Known placeholders: the reviewer API uses local fixtures instead of indexed live ARC state, the production backend is not hosted, the browser UI has not yet been exercised end-to-end with a real ARC wallet, keeper/oracle operations are not productionized, and security/auth/rate-limiting/governance are intentionally outside this MVP.
+Known placeholders: the reviewer API fallback uses local fixtures, the production backend is not hosted, Circle Social Login still needs a real hosted-credential walkthrough, keeper/oracle operations are not productionized, and full security/auth/governance hardening is outside this MVP. PostgreSQL-backed login rate limiting is implemented, but it is not a substitute for a full abuse-control review.

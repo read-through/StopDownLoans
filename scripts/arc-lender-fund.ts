@@ -32,7 +32,7 @@ if (remainingPrincipal <= 0n) {
   throw new Error(`Loan ${loanId.toString()} has no remaining principal to fund.`);
 }
 
-const usdc = await viem.getContractAt("MockUSDC", await loanPositionToken.read.usdc() as Address);
+const usdc = await viem.getContractAt("IArcUsdc", await loanPositionToken.read.usdc() as Address);
 const approveTx = await usdc.write.approve([loanPositionTokenAddress, remainingPrincipal]);
 console.log(`USDC approve tx: ${approveTx}`);
 await publicClient.waitForTransactionReceipt({ hash: approveTx });

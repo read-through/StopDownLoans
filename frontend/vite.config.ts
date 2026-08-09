@@ -1,10 +1,17 @@
 import { fileURLToPath } from "node:url";
-import { defineConfig, type Plugin } from "vite";
+import { defineConfig, normalizePath, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig(({ mode }) => ({
   root: "frontend",
   plugins: [react(), demoEntrypoint(mode)],
+  resolve: {
+    alias: {
+      jsonwebtoken: normalizePath(
+        fileURLToPath(new URL("./src/circle-wallet/jsonwebtoken-browser.ts", import.meta.url)),
+      ),
+    },
+  },
   server: {
     port: 5173,
   },

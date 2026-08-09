@@ -15,8 +15,8 @@ import {
   getPairWithdrawPreflightError,
 } from "../../lib/preflight";
 import type { PredictionMarket } from "../../types";
-import type { WalletAccount } from "../../wallet";
-import { getInjectedWalletProvider } from "../../wallet";
+import type { EthereumProvider, WalletAccount } from "../../wallet";
+import { getWalletProvider } from "../../wallet";
 
 export function PairCollateralPanel(props: {
   market: PredictionMarket;
@@ -88,17 +88,17 @@ export function PairCollateralPanel(props: {
 
   const runPairAction = (
     nextStatus: "approving" | "depositing" | "minting" | "withdrawing",
-    action: (provider: ReturnType<typeof getInjectedWalletProvider>, account: WalletAccount) => Promise<string>,
+    action: (provider: EthereumProvider, account: WalletAccount) => Promise<string>,
     fallbackMessage: string
   ) => {
     if (props.walletAccount === null) {
       return;
     }
 
-    const provider = getInjectedWalletProvider();
+    const provider = getWalletProvider(props.walletAccount);
     if (provider === null) {
       setStatus("error");
-      setError("No injected wallet provider found.");
+      setError("No connected wallet provider found.");
       return;
     }
 

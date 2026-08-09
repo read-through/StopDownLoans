@@ -6,8 +6,10 @@ export type ClobBackendConfig = {
   arcRpcUrl: string;
   chainId: number;
   loanPositionToken: Hex;
+  outcomeToken: Hex;
   outcomeExchange: Hex;
   usdc: Hex;
+  corsAllowedOrigins: string[];
   expiredOrderSweepIntervalMs: number;
   expiredOrderSweepLimit: number;
   reconciliationIntervalMs: number;
@@ -38,8 +40,12 @@ export function loadClobBackendConfig(env: NodeJS.ProcessEnv = process.env): Clo
       requireEnv(env, "LOAN_POSITION_TOKEN_ADDRESS"),
       "LOAN_POSITION_TOKEN_ADDRESS"
     ),
+    outcomeToken: parseAddress(requireEnv(env, "OUTCOME_TOKEN_ADDRESS"), "OUTCOME_TOKEN_ADDRESS"),
     outcomeExchange: parseAddress(requireEnv(env, "OUTCOME_EXCHANGE_ADDRESS"), "OUTCOME_EXCHANGE_ADDRESS"),
     usdc: parseAddress(requireEnv(env, "USDC_ADDRESS"), "USDC_ADDRESS"),
+    corsAllowedOrigins: parseOrigins(
+      env.CORS_ALLOWED_ORIGINS ?? "http://127.0.0.1:5173,http://localhost:5173",
+    ),
     expiredOrderSweepIntervalMs: parsePositiveInteger(
       env.EXPIRED_ORDER_SWEEP_INTERVAL_MS ?? "5000",
       "EXPIRED_ORDER_SWEEP_INTERVAL_MS"
@@ -108,6 +114,20 @@ export function loadClobBackendConfig(env: NodeJS.ProcessEnv = process.env): Clo
       "MARKET_CONFIG_EVENT_SWEEP_LIMIT"
     ),
   };
+}
+
+function parseOrigins(value: string): string[] {
+  return value
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter((origin) => origin !== "")
+    .map((origin) => {
+      try {
+        return new URL(origin).origin;
+      } catch {
+        throw new Error("CORS_ALLOWED_ORIGINS must contain comma-separated absolute origins.");
+      }
+    });
 }
 
 function requireEnv(env: NodeJS.ProcessEnv, key: string): string {

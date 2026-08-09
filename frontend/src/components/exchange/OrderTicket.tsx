@@ -9,7 +9,7 @@ import {
 } from "../../orderSigning";
 import type { Outcome, PredictionMarket } from "../../types";
 import type { WalletAccount } from "../../wallet";
-import { getInjectedWalletProvider } from "../../wallet";
+import { getWalletProvider } from "../../wallet";
 import { errorMessage,
   formatOrderSubmitOutcome,
   formatUsdc, shortHex } from "../../lib/format";
@@ -104,10 +104,10 @@ export function OrderTicket(props: {
       return;
     }
 
-    const provider = getInjectedWalletProvider();
+    const provider = getWalletProvider(props.walletAccount);
     if (provider === null) {
       setApprovalStatus("error");
-      setApprovalError("No injected wallet provider found.");
+      setApprovalError("No connected wallet provider found.");
       return;
     }
 
@@ -143,10 +143,10 @@ export function OrderTicket(props: {
       return;
     }
 
-    const provider = getInjectedWalletProvider();
+    const provider = getWalletProvider(props.walletAccount);
     if (provider === null) {
       setStatus("error");
-      setError("No injected wallet provider found.");
+      setError("No connected wallet provider found.");
       return;
     }
 

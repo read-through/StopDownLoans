@@ -41,7 +41,7 @@ npm.cmd run arc:set-exchange-operator
 Start Docker Desktop first. PostgreSQL runs through Docker Compose.
 
 ```powershell
-npm.cmd install
+corepack npm ci
 npm.cmd run db:up
 npm.cmd run db:migrate
 npm.cmd run db:check

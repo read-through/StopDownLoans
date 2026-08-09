@@ -23,6 +23,19 @@ import {
   getTradesView,
 } from "./readServices.js";
 import { cancelOrderRequest, submitOrderRequest, type ClobWriteServiceConfig } from "./writeServices.js";
+import { tryServeStaticAsset } from "./staticAssets.js";
+import { loadCircleWalletConfig, type CircleWalletConfig } from "../../circle-wallet/config.js";
+import {
+  createCircleContractExecutionResponse,
+  createCircleSocialTokenResponse,
+  createCircleTypedDataResponse,
+  getCircleWalletConfigResponse,
+  getCircleContractExecutionStatusResponse,
+  initializeCircleWalletResponse,
+  listCircleWalletsResponse,
+  type CircleWalletHttpServices,
+} from "../../circle-wallet/http.js";
+import { PlatformHttpError } from "../../platform/httpError.js";
 
 type ClobHttpReadServices = {
   getBookView: typeof getBookView;
@@ -49,6 +62,9 @@ export type ClobHttpServerOptions = {
   publicClient?: PublicClient;
   readServices?: Partial<ClobHttpReadServices>;
   writeServices?: Partial<ClobHttpWriteServices>;
+  staticDir?: string;
+  circleWalletConfig?: CircleWalletConfig | null;
+  circleWalletServices?: Partial<CircleWalletHttpServices>;
 };
 
 export function createClobHttpServer(options: ClobHttpServerOptions = {}): Server {
@@ -70,13 +86,22 @@ export function createClobHttpServer(options: ClobHttpServerOptions = {}): Serve
     now,
     bookFeedPublisher: options.bookFeedPublisher,
   };
+  const circleWalletConfig =
+    options.circleWalletConfig === undefined ? loadCircleWalletConfig() : options.circleWalletConfig;
 
   return createServer(async (request, response) => {
-    applyCorsHeaders(response);
+    applyCorsHeaders(request, response, config.corsAllowedOrigins);
 
     if (request.method === "OPTIONS") {
       response.writeHead(204);
       response.end();
+      return;
+    }
+
+    if (
+      options.staticDir !== undefined &&
+      (await tryServeStaticAsset(request, response, options.staticDir))
+    ) {
       return;
     }
 
@@ -109,6 +134,8 @@ export function createClobHttpServer(options: ClobHttpServerOptions = {}): Serve
             cancelOrderRequest,
             ...options.writeServices,
           },
+          circleWalletConfig,
+          circleWalletServices: options.circleWalletServices,
         }
       );
       sendJson(response, 200, result);
@@ -118,8 +145,16 @@ export function createClobHttpServer(options: ClobHttpServerOptions = {}): Serve
   });
 }
 
-function applyCorsHeaders(response: ServerResponse): void {
-  response.setHeader("access-control-allow-origin", "*");
+function applyCorsHeaders(
+  request: IncomingMessage,
+  response: ServerResponse,
+  allowedOrigins: readonly string[],
+): void {
+  const origin = request.headers.origin;
+  if (origin !== undefined && allowedOrigins.includes(origin)) {
+    response.setHeader("access-control-allow-origin", origin);
+    response.setHeader("vary", "Origin");
+  }
   response.setHeader("access-control-allow-methods", "GET,POST,OPTIONS");
   response.setHeader("access-control-allow-headers", "content-type");
 }
@@ -137,6 +172,8 @@ async function routeRequest(
     config: ClobBackendConfig;
     read: ClobHttpReadServices;
     write: ClobHttpWriteServices;
+    circleWalletConfig: CircleWalletConfig | null;
+    circleWalletServices?: Partial<CircleWalletHttpServices>;
   }
 ): Promise<unknown> {
   const url = new URL(request.url ?? "/", "http://localhost");
@@ -144,6 +181,123 @@ async function routeRequest(
 
   if (request.method === "GET" && path.length === 2 && path[0] === "v1" && path[1] === "health") {
     return getHealthDto(services.config, context.publicClient, getDbClient(), now());
+  }
+
+  if (
+    request.method === "GET" &&
+    path.length === 4 &&
+    path[0] === "v1" &&
+    path[1] === "wallet" &&
+    path[2] === "circle" &&
+    path[3] === "config"
+  ) {
+    return getCircleWalletConfigResponse(services.circleWalletConfig);
+  }
+
+  if (
+    request.method === "POST" &&
+    path.length === 5 &&
+    path[0] === "v1" &&
+    path[1] === "wallet" &&
+    path[2] === "circle" &&
+    path[3] === "social" &&
+    path[4] === "token"
+  ) {
+    return createCircleSocialTokenResponse({
+      config: services.circleWalletConfig,
+      request,
+      body: await readJsonBody(request),
+      dbClient: getDbClient(),
+      services: services.circleWalletServices,
+    });
+  }
+
+  if (
+    request.method === "POST" &&
+    path.length === 4 &&
+    path[0] === "v1" &&
+    path[1] === "wallet" &&
+    path[2] === "circle" &&
+    path[3] === "initialize"
+  ) {
+    return initializeCircleWalletResponse({
+      config: services.circleWalletConfig,
+      body: await readJsonBody(request),
+      services: services.circleWalletServices,
+    });
+  }
+
+  if (
+    request.method === "POST" &&
+    path.length === 4 &&
+    path[0] === "v1" &&
+    path[1] === "wallet" &&
+    path[2] === "circle" &&
+    path[3] === "wallets"
+  ) {
+    return listCircleWalletsResponse({
+      config: services.circleWalletConfig,
+      body: await readJsonBody(request),
+      services: services.circleWalletServices,
+    });
+  }
+
+  if (
+    request.method === "POST" &&
+    path.length === 5 &&
+    path[0] === "v1" &&
+    path[1] === "wallet" &&
+    path[2] === "circle" &&
+    path[3] === "contract-execution" &&
+    path[4] === "challenge"
+  ) {
+    return createCircleContractExecutionResponse({
+      config: services.circleWalletConfig,
+      body: await readJsonBody(request),
+      allowedContracts: [
+        services.config.usdc,
+        services.config.loanPositionToken,
+        services.config.outcomeToken,
+        services.config.outcomeExchange,
+      ],
+      dbClient: getDbClient(),
+      services: services.circleWalletServices,
+    });
+  }
+
+  if (
+    request.method === "POST" &&
+    path.length === 5 &&
+    path[0] === "v1" &&
+    path[1] === "wallet" &&
+    path[2] === "circle" &&
+    path[3] === "typed-data" &&
+    path[4] === "challenge"
+  ) {
+    return createCircleTypedDataResponse({
+      config: services.circleWalletConfig,
+      body: await readJsonBody(request),
+      expectedChainId: services.config.chainId,
+      expectedVerifyingContract: services.config.outcomeExchange,
+      dbClient: getDbClient(),
+      services: services.circleWalletServices,
+    });
+  }
+
+  if (
+    request.method === "POST" &&
+    path.length === 5 &&
+    path[0] === "v1" &&
+    path[1] === "wallet" &&
+    path[2] === "circle" &&
+    path[3] === "contract-execution" &&
+    path[4] === "status"
+  ) {
+    return getCircleContractExecutionStatusResponse({
+      config: services.circleWalletConfig,
+      body: await readJsonBody(request),
+      services: services.circleWalletServices,
+    });
   }
 
   if (request.method === "GET" && path.length === 2 && path[0] === "v1" && path[1] === "loans") {
@@ -278,6 +432,7 @@ async function getHealthDto(
     chainId: config.chainId,
     contracts: {
       loanPositionToken: config.loanPositionToken,
+      outcomeToken: config.outcomeToken,
       outcomeExchange: config.outcomeExchange,
       usdc: config.usdc,
     },
@@ -455,6 +610,12 @@ function sendJson(response: ServerResponse, statusCode: number, body: unknown): 
 }
 
 function sendError(response: ServerResponse, error: unknown): void {
+  if (error instanceof PlatformHttpError) {
+    sendJson(response, error.statusCode, {
+      error: { code: error.code, message: error.message },
+    });
+    return;
+  }
   if (isRpcRateLimitError(error)) {
     sendJson(response, 429, {
       error: {

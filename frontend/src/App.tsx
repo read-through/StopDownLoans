@@ -13,9 +13,12 @@ import { ExchangeScreen } from "./screens/ExchangeScreen";
 import { LoansScreen } from "./screens/LoansScreen";
 import { OverviewScreen } from "./screens/OverviewScreen";
 import { PortfolioScreen } from "./screens/PortfolioScreen";
+import { useState } from "react";
+import { WalletConnectDialog } from "./components/wallet/WalletConnectDialog";
 
 export function App() {
   const c = useAppController();
+  const [walletDialogOpen, setWalletDialogOpen] = useState(false);
 
   return (
     <main className="appShell">
@@ -80,7 +83,13 @@ export function App() {
             </button>
             <button
               className={c.walletAccount !== null && !c.walletOnExpectedChain ? "walletButton warningWalletButton" : "walletButton"}
-              onClick={c.connectWallet}
+              onClick={() => {
+                if (c.walletAccount?.kind === "injected" && !c.walletOnExpectedChain) {
+                  c.connectWallet();
+                } else {
+                  setWalletDialogOpen(true);
+                }
+              }}
               title={c.walletError ?? undefined}
               type="button"
             >
@@ -246,6 +255,16 @@ export function App() {
           />
         )}
       </section>
+      {walletDialogOpen && (
+        <WalletConnectDialog
+          onClose={() => setWalletDialogOpen(false)}
+          onInjectedWallet={() => {
+            setWalletDialogOpen(false);
+            c.connectWallet();
+          }}
+          onCircleWallet={c.connectCircleWallet}
+        />
+      )}
     </main>
   );
 }

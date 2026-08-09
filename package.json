@@ -1,10 +1,11 @@
 {
   "name": "stopdown-loans",
   "version": "0.1.0",
+  "packageManager": "npm@10.9.8",
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "hardhat compile -- mocks/contracts/MockUSDC.sol mocks/contracts/MockOutcomeToken.sol contracts/OutcomeToken.sol contracts/LoanPositionToken.sol contracts/OutcomeExchange.sol",
+    "build": "hardhat compile -- mocks/contracts/MockUSDC.sol mocks/contracts/MockOutcomeToken.sol contracts/interfaces/IArcUsdc.sol contracts/OutcomeToken.sol contracts/LoanPositionToken.sol contracts/OutcomeExchange.sol",
     "db:up": "docker-compose up -d postgres",
     "db:down": "docker-compose down",
     "db:logs": "docker-compose logs -f postgres",
@@ -26,13 +27,17 @@
     "arc:borrower-redeem-yes": "hardhat run scripts/arc-borrower-redeem-yes.ts --network arcTestnet",
     "arc:set-exchange-operator": "hardhat run scripts/set-arc-exchange-operator.ts --network arcTestnet",
     "arc:live-check": "tsx backend/scripts/arc-live-check.ts",
+    "arc:app-kit:send": "tsx scripts/arc-app-kit-send.ts",
     "demo:local:repaid": "hardhat run scripts/demo-local-repaid.ts",
     "demo:local:default": "hardhat run scripts/demo-local-default.ts",
     "demo:local:clob-trade": "hardhat run scripts/demo-local-clob-trade.ts",
     "demo:happy-path": "tsx scripts/demo-happy-path.ts",
     "arc:postdeploy-check": "tsx backend/scripts/arc-postdeploy-check.ts",
+    "build:backend": "tsc -p backend/tsconfig.build.json",
+    "start:backend": "node dist/backend/scripts/start-production.js",
     "dev:frontend": "vite --config frontend/vite.config.ts --host 127.0.0.1",
     "build:frontend": "tsc -p frontend/tsconfig.json && vite build --config frontend/vite.config.ts",
+    "release:check": "tsx scripts/release-check.ts",
     "preview:frontend": "vite preview --config frontend/vite.config.ts --host 127.0.0.1",
     "demo:api": "tsx mocks/backend/serve-demo-api.ts",
     "demo:frontend": "vite --config frontend/vite.config.ts --host 127.0.0.1 --mode demo",
@@ -50,6 +55,8 @@
     "typecheck:backend": "tsc -p backend/tsconfig.json"
   },
   "devDependencies": {
+    "@circle-fin/adapter-viem-v2": "^1.15.0",
+    "@circle-fin/app-kit": "^1.12.0",
     "@nomicfoundation/hardhat-toolbox-viem": "latest",
     "@types/node": "latest",
     "@types/pg": "^8.20.0",
@@ -58,16 +65,26 @@
     "@types/ws": "^8.18.1",
     "hardhat": "latest",
     "tsx": "^4.23.1",
-    "typescript": "latest"
+    "typescript": "5.9.3"
   },
   "dependencies": {
+    "@circle-fin/w3s-pw-web-sdk": "^1.1.11",
     "@openzeppelin/contracts": "^5.6.1",
     "@vitejs/plugin-react": "^6.0.4",
     "lucide-react": "^1.25.0",
     "pg": "^8.22.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "viem": "^2.55.2",
     "vite": "^8.1.5",
     "ws": "^8.21.1"
+  },
+  "overrides": {
+    "@circle-fin/w3s-pw-web-sdk": {
+      "firebase": "12.17.1",
+      "uuid": "11.1.1"
+    },
+    "nanoid": "3.3.18",
+    "postcss": "8.5.26"
   }
 }

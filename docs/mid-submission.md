@@ -105,7 +105,7 @@ fixture-backed, while protocol behavior is verified through contracts/scripts or
 Recommended local UI reviewer path:
 
 ```powershell
-npm.cmd install
+corepack npm ci
 npm.cmd run build:frontend
 npm.cmd run typecheck:backend
 npm.cmd run test:backend
@@ -179,18 +179,16 @@ book reads, and WebSocket subscription.
   includes ARC testnet deployment and verification scripts. Current deployed addresses are recorded
   in `docs/arc-testnet-deployment.md`.
 - ARC USDC is treated as the collateral, funding, repayment, and settlement asset.
-- The currently implemented frontend wallet path is injected EVM provider plus `eth_sendTransaction` and
-  `eth_signTypedData_v4`; see `docs/wallet-path.md`.
-- Circle User-Controlled Wallets are the planned recommended wallet path for retail borrowers,
-  lenders, and traders. This keeps private keys outside the StopDown backend while still allowing
-  embedded wallet UX.
+- The frontend supports injected EVM wallets and Circle User-Controlled Wallet Social Login through
+  one provider boundary; see `docs/wallet-path.md`.
+- Circle creates an ARC Testnet EOA and executes user-approved contract and EIP-712 signing
+  challenges without exposing private keys to StopDown.
 - Circle is intentionally scoped as a wallet/gas UX layer, not as CLOB core infrastructure. The
   signed order format and backend matching flow stay wallet-agnostic.
 - Power users and market makers are not forced into Circle Wallets. Any EIP-712-capable wallet or
   bot signer can submit signed orders, because the backend matching engine is wallet-agnostic.
-- ARC kits remain a planned integration layer around the frontend/onboarding and deployment
-  experience. The current MVP already uses ARC as the settlement chain; deeper kit usage should be
-  added where it reduces product friction rather than inside the matching core.
+- ARC App Kit provides an estimate-first USDC funding command outside the matching core; deeper
+  retail kit usage remains optional.
 - The local mock signer is not a custody model. It is a public demo key for UI checks only.
 
 ## ARC Testnet Evidence
