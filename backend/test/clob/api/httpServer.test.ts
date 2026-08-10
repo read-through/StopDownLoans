@@ -473,7 +473,7 @@ describe("createClobHttpServer", () => {
                 feeBps: "50",
                 feeRecipient: "0x0000000000000000000000000000000000000005",
                 collateralBps: "10000",
-                borrowerCollateralAmount: "1050000000",
+                borrowerCollateralAmount: "1000000000",
                 borrowerCollateralDepositedAmount: "250000000",
                 marketId: "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
               },

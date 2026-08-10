@@ -242,7 +242,7 @@ contract LoanPositionToken is ERC1155, ERC1155Holder {
 
     function getBorrowerCollateralAmount(uint256 loanId) public view returns (uint256) {
         Loan storage loan = loans[loanId];
-        return (loan.repaymentAmount * loanCollateralBps[loanId]) / 10_000;
+        return (loan.principal * loanCollateralBps[loanId]) / 10_000;
     }
 
     function getLoanView(uint256 loanId) external view returns (LoanView memory) {

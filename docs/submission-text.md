@@ -8,21 +8,25 @@ The local backend smoke path also runs against Docker PostgreSQL: migrations, sc
 read endpoints, best bid/ask, book reads, and WebSocket subscription all pass through
 `npm.cmd run smoke:backend:local`.
 
-ARC is used as the settlement chain. The contracts are deployed on ARC testnet:
+ARC is used as the settlement chain. The following addresses are from the historical deployment and
+must not be used by the current build after the principal-based collateral change:
 
 - `LoanPositionToken`: `0x4f8e2d32ad62835353b70f2fa091979d513a43ac`
 - `OutcomeToken`: `0x06c08af6a3ad503560f3010105f1ec32052c7f2f`
 - `OutcomeExchange`: `0xddba15b2ddadec73f06fab4011b37c100efe6c30`
 - ARC USDC: `0x3600000000000000000000000000000000000000`
 
-The current contracts were redeployed after the borrower-controlled `collateralBps` source change.
-A fresh current-deployment ARC walkthrough created `LOAN_ID=3` with principal `1 USDC`,
-repayment `1.05 USDC`, and borrower collateral `1.05 USDC`. The linked market is
+That historical walkthrough created `LOAN_ID=3` before the collateral-ratio base changed from
+repayment amount to principal. The linked market is
 `0x1489a4e8bf6c349a62c1892e03c1206051f11bac3bdf1adaba8aaa6800322ea1`. That loan was created,
 collateralized, funded, and activated on ARC. On a clean reviewer database, the backend CLOB
 admitted/matched signed orders into `trade_id=1`; the executor submitted settlement tx
 `0x532c31c774c0cd96b1c5aa0e5f3f606a26631dd60f28b2cd625dbf83f3d1f15c`, which was reconciled as
 `CONFIRMED`.
+
+The current backend requires runtime bytecode hashes for all three configured contracts and refuses
+to start against this historical deployment. A corrected ARC redeployment is required before the
+public demo.
 
 Important transaction hashes:
 

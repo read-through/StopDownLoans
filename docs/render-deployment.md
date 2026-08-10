@@ -7,7 +7,8 @@ The repository contains a `render.yaml` Blueprint for a public ARC testnet demo:
 - one managed PostgreSQL database;
 - migrations and safe reconciliation cursor bootstrap before the HTTP server opens;
 - mocks disabled;
-- current ARC testnet contract addresses compiled into the frontend and supplied to the backend.
+- freshly deployed ARC contract addresses compiled into the frontend and supplied to the backend,
+  plus runtime bytecode hashes required by production startup.
 
 ## Deploy
 
@@ -34,7 +35,7 @@ service deployment. Confirm that `/v1/markets` returns the market below before s
 The hook uses the idempotent command below. A paid Render service can rerun it from its shell:
 
 ```sh
-node dist/backend/scripts/market-config.js --outcome-token 0x06c08af6a3ad503560f3010105f1ec32052c7f2f --market-id 0x1489a4e8bf6c349a62c1892e03c1206051f11bac3bdf1adaba8aaa6800322ea1 --default-tick-units 1000 --edge-tick-units 100 --lower-edge-price-units 100000 --upper-edge-price-units 900000 --min-order-outcome-amount 1
+node dist/backend/scripts/market-config.js --outcome-token <CURRENT_OUTCOME_TOKEN> --market-id <CURRENT_MARKET_ID> --default-tick-units 1000 --edge-tick-units 100 --lower-edge-price-units 100000 --upper-edge-price-units 900000 --min-order-outcome-amount 1
 ```
 
 The Free tier does not provide a service shell or one-off jobs. On Free, confirm that the initial

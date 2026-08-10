@@ -1,5 +1,9 @@
 # ARC Testnet Runbook
 
+> **Historical addresses below are not compatible with the current principal-based collateral
+> build. Do not start the backend with them.** Redeploy first, then replace every address and add the
+> three runtime bytecode hashes printed by `npm.cmd run deploy:arc-testnet`.
+
 This runbook is for running the MVP against the deployed ARC testnet contracts without frontend/backend mocks.
 
 Wallet behavior is specified in `docs/wallet-path.md`. This runbook uses the live injected-wallet
@@ -7,9 +11,9 @@ path for users and the backend executor wallet for settlement.
 
 ## Contracts
 
-- `LoanPositionToken`: `0x4f8e2d32ad62835353b70f2fa091979d513a43ac`
-- `OutcomeToken`: `0x06c08af6a3ad503560f3010105f1ec32052c7f2f`
-- `OutcomeExchange`: `0xddba15b2ddadec73f06fab4011b37c100efe6c30`
+- `LoanPositionToken`: `<CURRENT_LOAN_POSITION_TOKEN>`
+- `OutcomeToken`: `<CURRENT_OUTCOME_TOKEN>`
+- `OutcomeExchange`: `<CURRENT_OUTCOME_EXCHANGE>`
 - ARC USDC: `0x3600000000000000000000000000000000000000`
 
 ## Local Environment
@@ -20,9 +24,12 @@ The local `.env` file is intentionally ignored by git. It must contain:
 DATABASE_URL=postgres://stopdown:stopdown@localhost:55432/stopdown
 ARC_RPC_URL=https://rpc.testnet.arc.network
 ARC_CHAIN_ID=5042002
-LOAN_POSITION_TOKEN_ADDRESS=0x4f8e2d32ad62835353b70f2fa091979d513a43ac
-OUTCOME_TOKEN_ADDRESS=0x06c08af6a3ad503560f3010105f1ec32052c7f2f
-OUTCOME_EXCHANGE_ADDRESS=0xddba15b2ddadec73f06fab4011b37c100efe6c30
+LOAN_POSITION_TOKEN_ADDRESS=<CURRENT_LOAN_POSITION_TOKEN>
+OUTCOME_TOKEN_ADDRESS=<CURRENT_OUTCOME_TOKEN>
+OUTCOME_EXCHANGE_ADDRESS=<CURRENT_OUTCOME_EXCHANGE>
+LOAN_POSITION_TOKEN_BYTECODE_HASH=<DEPLOY_OUTPUT_HASH>
+OUTCOME_TOKEN_BYTECODE_HASH=<DEPLOY_OUTPUT_HASH>
+OUTCOME_EXCHANGE_BYTECODE_HASH=<DEPLOY_OUTPUT_HASH>
 USDC_ADDRESS=0x3600000000000000000000000000000000000000
 EXECUTOR_PRIVATE_KEY=0x...
 ```
@@ -86,7 +93,7 @@ Register a current-deployment active ARC market in the local CLOB database after
 activating a fresh loan:
 
 ```powershell
-npm.cmd run market-config:upsert -- --outcome-token 0x06c08af6a3ad503560f3010105f1ec32052c7f2f --market-id <MARKET_ID> --default-tick-units 1000 --edge-tick-units 100 --lower-edge-price-units 100000 --upper-edge-price-units 900000 --min-order-outcome-amount 1
+npm.cmd run market-config:upsert -- --outcome-token <CURRENT_OUTCOME_TOKEN> --market-id <MARKET_ID> --default-tick-units 1000 --edge-tick-units 100 --lower-edge-price-units 100000 --upper-edge-price-units 900000 --min-order-outcome-amount 1
 ```
 
 Run the backend with settlement/keeper loops:
@@ -137,7 +144,7 @@ real browser wallet to sign and submit orders through the frontend.
 Open:
 
 ```text
-http://127.0.0.1:5173/#exchange/0x06c08af6a3ad503560f3010105f1ec32052c7f2f:<MARKET_ID>
+http://127.0.0.1:5173/#exchange/<CURRENT_OUTCOME_TOKEN>:<MARKET_ID>
 ```
 
 ## API-only Mode

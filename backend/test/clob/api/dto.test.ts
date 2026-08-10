@@ -257,7 +257,7 @@ describe("api dto serializers", () => {
         feeBps: 50n,
         feeRecipient: "0x0000000000000000000000000000000000000005",
         collateralBps: 10_000n,
-        borrowerCollateralAmount: 1_050_000_000n,
+        borrowerCollateralAmount: 1_000_000_000n,
         borrowerCollateralDepositedAmount: 250_000_000n,
         marketId: "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         syncedAt: new Date("2026-07-21T12:00:00.000Z"),
@@ -280,7 +280,7 @@ describe("api dto serializers", () => {
         feeBps: "50",
         feeRecipient: "0x0000000000000000000000000000000000000005",
         collateralBps: "10000",
-        borrowerCollateralAmount: "1050000000",
+        borrowerCollateralAmount: "1000000000",
         borrowerCollateralDepositedAmount: "250000000",
         marketId: "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       }

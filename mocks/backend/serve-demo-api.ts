@@ -217,8 +217,8 @@ function loansDto(): unknown {
         feeBps: "50",
         feeRecipient: "0x0000000000000000000000000000000000002001",
         collateralBps: "10000",
-        borrowerCollateralAmount: "1050000000",
-        borrowerCollateralDepositedAmount: "1050000000",
+        borrowerCollateralAmount: "1000000000",
+        borrowerCollateralDepositedAmount: "1000000000",
         marketId,
       },
       {

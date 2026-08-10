@@ -1,5 +1,5 @@
 import { network } from "hardhat";
-import { getAddress, type Address } from "viem";
+import { getAddress, keccak256, type Address, type Hex } from "viem";
 
 const ARC_TESTNET_USDC = "0x3600000000000000000000000000000000000000";
 
@@ -46,18 +46,28 @@ console.log("LoanPositionToken outcome token configured");
 await outcomeExchange.write.setOperator([deployerAddress, true]);
 console.log("Deployer authorized as OutcomeExchange operator");
 
+const bytecodeHashes = {
+  loanPositionToken: await runtimeBytecodeHash(loanPositionToken.address),
+  outcomeToken: await runtimeBytecodeHash(outcomeToken.address),
+  outcomeExchange: await runtimeBytecodeHash(outcomeExchange.address),
+};
+
 printEnv({
   loanPositionToken: loanPositionToken.address,
   outcomeToken: outcomeToken.address,
   outcomeExchange: outcomeExchange.address,
   collateralToken,
-});
+}, bytecodeHashes);
 
 function printEnv(addresses: {
   loanPositionToken: Address;
   outcomeToken: Address;
   outcomeExchange: Address;
   collateralToken: Address;
+}, bytecodeHashes: {
+  loanPositionToken: Hex;
+  outcomeToken: Hex;
+  outcomeExchange: Hex;
 }): void {
   console.log("");
   console.log("Backend env:");
@@ -67,6 +77,9 @@ function printEnv(addresses: {
   console.log(`OUTCOME_TOKEN_ADDRESS=${addresses.outcomeToken}`);
   console.log(`USDC_ADDRESS=${addresses.collateralToken}`);
   console.log(`OUTCOME_EXCHANGE_ADDRESS=${addresses.outcomeExchange}`);
+  console.log(`LOAN_POSITION_TOKEN_BYTECODE_HASH=${bytecodeHashes.loanPositionToken}`);
+  console.log(`OUTCOME_TOKEN_BYTECODE_HASH=${bytecodeHashes.outcomeToken}`);
+  console.log(`OUTCOME_EXCHANGE_BYTECODE_HASH=${bytecodeHashes.outcomeExchange}`);
   console.log("");
   console.log("Frontend env:");
   console.log(`VITE_ARC_CHAIN_ID=5042002`);
@@ -76,4 +89,12 @@ function printEnv(addresses: {
   console.log(`VITE_OUTCOME_TOKEN_ADDRESS=${addresses.outcomeToken}`);
   console.log(`VITE_OUTCOME_EXCHANGE_ADDRESS=${addresses.outcomeExchange}`);
   console.log(`VITE_USDC_ADDRESS=${addresses.collateralToken}`);
+}
+
+async function runtimeBytecodeHash(address: Address): Promise<Hex> {
+  const bytecode = await publicClient.getBytecode({ address });
+  if (bytecode === undefined || bytecode === "0x") {
+    throw new Error(`Deployment at ${address} has no runtime bytecode.`);
+  }
+  return keccak256(bytecode);
 }

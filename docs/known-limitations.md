@@ -4,6 +4,9 @@ This document separates intentional MVP shortcuts from finished protocol behavio
 
 ## Must Fix After Mid-Submission
 
+- Current published ARC contract addresses predate the principal-based collateral-ratio fix and
+  require redeployment before the final public demo.
+
 | Priority | Area | Current shortcut | Why it exists | Better target |
 | --- | --- | --- | --- | --- |
 | 10 | Real wallet frontend walkthrough | ARC contracts, a demo loan, activation, direct on-chain YES trade, and the Circle provider code are verified, but a hosted Social Login path still needs real credentials. | OAuth and Circle application configuration are deployment-specific. | Repeat create/fund/activate/trade from the public UI with a Circle or injected ARC wallet. |

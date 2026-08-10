@@ -53,7 +53,8 @@ and gives borrowers a path to sell YES exposure after posting collateral.
 
 Implemented:
 
-- Solidity contracts are deployed on ARC testnet.
+- Solidity contracts and their historical settlement evidence exist on ARC testnet; the
+  principal-based collateral build requires a fresh deployment before the final public demo.
 - ARC USDC is the lending, collateral, repayment, outcome redemption, and exchange settlement asset.
 - The frontend includes an injected-wallet ARC chain registration fallback through
   `wallet_addEthereumChain`.
@@ -136,7 +137,7 @@ turns each loan into a repayment prediction market, so risk can be traded, insur
 ### 0:25-0:55 - Concrete Example
 
 Borrower requests `1,000 USDC`, chooses `5%` interest and `100%` collateral ratio. Required repayment
-is `1,050 USDC`, so borrower posts `1,050 USDC` as loan-linked collateral. When the loan activates,
+is `1,050 USDC`, while borrower posts `1,000 USDC` because collateral ratio is based on principal. When the loan activates,
 borrower receives YES shares and the loan contract receives NO shares.
 
 ### 0:55-1:25 - Why It Is Useful

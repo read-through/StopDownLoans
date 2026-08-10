@@ -3,31 +3,34 @@
 This document is the source of truth for moving StopDown Loans from mid-submission state to a
 final-submission MVP with a working demo.
 
-Current overall progress: **97%**.
+Current overall progress: **88%**.
 
 ## Progress Bar
 
 ```text
-[#########.] 97%
+[#########.] 88%
 ```
 
 ## Area Status
 
 | Area | Current progress | Status | What blocks completion |
 | --- | ---: | --- | --- |
-| Smart contracts | 95% | Lending, outcome token, and exchange settlement contracts are tested locally and deployed on ARC. Current ARC loan/trade evidence exists. | Optional live repay/default evidence and final source freeze. |
+| Smart contracts | 90% | Lending, outcome token, and exchange settlement contracts pass locally with principal-based collateral. Historical ARC evidence exists. | Redeploy the corrected bytecode and verify its hashes. |
 | Backend / CLOB / keeper | 96% | Orderbook, matching, persistence, WebSocket feed, executor settlement, reconciliation, retry handling, PostgreSQL rate limits, reviewer DB reset, and production-container smoke verification exist. | Hosted run with production credentials and monitoring evidence. |
 | Frontend | 93% | Role/detail/list screens, pagination, injected wallet, Circle user-controlled wallet provider, and lifecycle-specific loan actions exist and pass production-bundle runtime checks. | Real Circle OAuth walkthrough and external-browser pass on the hosted URL. |
-| Demo launch | 97% | Full local repaid/default/CLOB happy path passes, reviewer fallback exists, and the production image serves the UI/API against PostgreSQL. | Public URL plus final recording or presentation link. |
+| Demo launch | 86% | Full local repaid/default/CLOB happy path passes, reviewer fallback exists, and the production image builds. | Corrected ARC deployment, configured public URL, and wallet-to-trade verification. |
 | Production/deployment story | 90% | A production Docker image, same-origin frontend/API/WebSocket server, Render Blueprint, managed PostgreSQL plan, safe reconciliation bootstrap, and local container smoke test are implemented. | Public deployment and external browser verification. |
-| ARC integration | 96% | ARC is the settlement chain, ARC USDC is the protocol asset, current contracts are deployed, live loan/trade evidence exists, frontend can add ARC to wallets, and the ARC App Kit USDC send flow has a verified estimate-first CLI. | Public demo verification and optional retail App Kit UI. |
+| ARC integration | 82% | ARC is the settlement chain, ARC USDC is the protocol asset, historical live evidence exists, frontend can add ARC to wallets, and the ARC App Kit USDC send flow has a verified estimate-first CLI. | Redeploy corrected contracts, record bytecode hashes, and repeat the public demo. |
 | Circle integration | 88% | Social Login, ARC EOA creation, protocol transaction challenges, status polling, and EIP-712 order/cancel signing are implemented outside the matching core. | Verify the full path with real Circle/Google credentials; gas sponsorship remains optional. |
-| Docs / final materials | 96% | README, specs, runbooks, final roadmap, hackathon submission pack, final demo guide, production plan, current ARC evidence, and one-command release preflight are synchronized. | Final video/presentation and live URL fields. |
+| Docs / final materials | 94% | README, specs, runbooks, final roadmap, hackathon submission pack, final demo guide, production plan, historical ARC evidence, and one-command release preflight are synchronized. | Insert corrected deployment evidence, final presentation link, and live URL. |
 
-## What Moved From 85% To 97%
+## Verified Work And Current Regression Gate
 
-- Current contracts were redeployed on ARC after borrower-controlled `collateralBps`.
-- A fresh ARC loan was created, collateralized, funded, activated, and traded.
+- The previous ARC deployment proved the borrower-controlled `collateralBps` path, but a new
+  deployment is required after changing its base from repayment amount to principal.
+- A historical ARC loan was created, collateralized, funded, activated, and traded before the
+  principal-based collateral correction.
+- Production startup now verifies runtime bytecode hashes and refuses stale contract addresses.
 - Backend CLOB settlement on ARC was confirmed through `trade_id=1` on a clean reviewer database.
 - Fixed backend executor signing so public ARC RPC receives raw signed transactions instead of `eth_sendTransaction`.
 - Added a regression test for that executor signing path.
@@ -77,7 +80,7 @@ Current overall progress: **97%**.
    - Fund, trade, and inspect portfolio/readiness screens.
 
 3. Finish ARC integration story.
-   - Keep current deployment addresses and active demo market visible.
+   - Publish only corrected deployment addresses and the corresponding active demo market.
    - Use the frontend ARC chain-add fallback in the browser-wallet walkthrough.
    - Keep the implemented ARC App Kit estimate-first fund-flow command in the reviewer walkthrough.
    - Keep ARC framed as settlement infrastructure and USDC-native wallet/onboarding infrastructure.

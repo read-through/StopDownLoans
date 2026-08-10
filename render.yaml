@@ -17,15 +17,6 @@ services:
     dockerContext: .
     healthCheckPath: /v1/health
     autoDeployTrigger: commit
-    initialDeployHook: >-
-      node dist/backend/scripts/market-config.js
-      --outcome-token 0x06c08af6a3ad503560f3010105f1ec32052c7f2f
-      --market-id 0x1489a4e8bf6c349a62c1892e03c1206051f11bac3bdf1adaba8aaa6800322ea1
-      --default-tick-units 1000
-      --edge-tick-units 100
-      --lower-edge-price-units 100000
-      --upper-edge-price-units 900000
-      --min-order-outcome-amount 1
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -36,11 +27,17 @@ services:
       - key: ARC_CHAIN_ID
         value: "5042002"
       - key: LOAN_POSITION_TOKEN_ADDRESS
-        value: 0x4f8e2d32ad62835353b70f2fa091979d513a43ac
+        sync: false
       - key: OUTCOME_TOKEN_ADDRESS
-        value: 0x06c08af6a3ad503560f3010105f1ec32052c7f2f
+        sync: false
       - key: OUTCOME_EXCHANGE_ADDRESS
-        value: 0xddba15b2ddadec73f06fab4011b37c100efe6c30
+        sync: false
+      - key: LOAN_POSITION_TOKEN_BYTECODE_HASH
+        sync: false
+      - key: OUTCOME_TOKEN_BYTECODE_HASH
+        sync: false
+      - key: OUTCOME_EXCHANGE_BYTECODE_HASH
+        sync: false
       - key: USDC_ADDRESS
         value: 0x3600000000000000000000000000000000000000
       - key: EXECUTOR_PRIVATE_KEY
@@ -92,10 +89,10 @@ services:
       - key: PUBLIC_ARC_EXPLORER_URL
         value: https://testnet.arcscan.app
       - key: PUBLIC_LOAN_POSITION_ADDRESS
-        value: 0x4f8e2d32ad62835353b70f2fa091979d513a43ac
+        sync: false
       - key: PUBLIC_OUTCOME_ADDRESS
-        value: 0x06c08af6a3ad503560f3010105f1ec32052c7f2f
+        sync: false
       - key: PUBLIC_EXCHANGE_ADDRESS
-        value: 0xddba15b2ddadec73f06fab4011b37c100efe6c30
+        sync: false
       - key: PUBLIC_USDC_ADDRESS
         value: 0x3600000000000000000000000000000000000000

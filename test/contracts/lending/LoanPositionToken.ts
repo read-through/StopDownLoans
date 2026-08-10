@@ -89,7 +89,7 @@ describe("LoanPositionToken", function () {
     assert.equal((await loanPositions.read.loanFeeRecipient([1n])).toLowerCase(), owner.account.address.toLowerCase());
     assert.equal(await loanPositions.read.loanCollateralBps([1n]), 10_000n);
     assert.equal(marketId, repeatedMarketId);
-    assert.equal(await loanPositions.read.getBorrowerCollateralAmount([1n]), repaymentAmount);
+    assert.equal(await loanPositions.read.getBorrowerCollateralAmount([1n]), principal);
     assert.equal(loanView.borrower.toLowerCase(), borrower.account.address.toLowerCase());
     assert.equal(loanView.principal, principal);
     assert.equal(loanView.repaymentAmount, repaymentAmount);
@@ -105,7 +105,7 @@ describe("LoanPositionToken", function () {
     assert.equal(loanView.feeBps, 0n);
     assert.equal(loanView.feeRecipient.toLowerCase(), owner.account.address.toLowerCase());
     assert.equal(loanView.collateralBps, 10_000n);
-    assert.equal(loanView.borrowerCollateralAmount, repaymentAmount);
+    assert.equal(loanView.borrowerCollateralAmount, principal);
     assert.equal(loanView.marketId, marketId);
     assert.equal(await loanPositions.read.nextLoanId(), 2n);
   });
@@ -170,7 +170,7 @@ describe("LoanPositionToken", function () {
     ], { account: borrower.account });
 
     assert.equal(await loanPositions.read.loanCollateralBps([1n]), 12_000n);
-    assert.equal(await loanPositions.read.getBorrowerCollateralAmount([1n]), usdc(1260n));
+    assert.equal(await loanPositions.read.getBorrowerCollateralAmount([1n]), usdc(1200n));
   });
 
   it("creates a proto market through the configured outcome token", async function () {
@@ -196,7 +196,7 @@ describe("LoanPositionToken", function () {
 
     assert.equal(await outcomeToken.read.lastLoanId(), 1n);
     assert.equal((await outcomeToken.read.lastBorrower()).toLowerCase(), borrower.account.address.toLowerCase());
-    assert.equal(await outcomeToken.read.lastBorrowerCollateralAmount(), usdc(1050n));
+    assert.equal(await outcomeToken.read.lastBorrowerCollateralAmount(), usdc(1000n));
     assert.equal(await outcomeToken.read.lastMarketId(), marketId);
     assert.equal((await outcomeToken.read.lastCaller()).toLowerCase(), loanPositions.address.toLowerCase());
   });
@@ -576,7 +576,7 @@ describe("LoanPositionToken", function () {
       await networkHelpers.loadFixture(deployLoanPositionToken);
     const now = await networkHelpers.time.latest();
     const principal = usdc(1000n);
-    const repaymentAmount = usdc(1050n);
+    const borrowerCollateralAmount = principal;
     const loanWithdrawFreezeDeadline = BigInt(now + networkHelpers.time.duration.days(3));
     const activationDeadline = BigInt(now + networkHelpers.time.duration.days(7));
     const repaymentDeadline = BigInt(now + networkHelpers.time.duration.days(37));
@@ -599,17 +599,17 @@ describe("LoanPositionToken", function () {
     const marketId = await loanPositions.read.getMarketId([1n]);
     const noTokenId = await outcomeToken.read.getNoTokenId([marketId]);
 
-    await token.write.mint([borrower.account.address, repaymentAmount]);
+    await token.write.mint([borrower.account.address, borrowerCollateralAmount]);
     await token.write.mint([lenderA.account.address, principal]);
-    await token.write.approve([outcomeToken.address, repaymentAmount], { account: borrower.account });
+    await token.write.approve([outcomeToken.address, borrowerCollateralAmount], { account: borrower.account });
     await token.write.approve([loanPositions.address, principal], { account: lenderA.account });
 
-    await outcomeToken.write.depositBorrowerCollateral([marketId, repaymentAmount], { account: borrower.account });
+    await outcomeToken.write.depositBorrowerCollateral([marketId, borrowerCollateralAmount], { account: borrower.account });
     await loanPositions.write.fund([1n, principal], { account: lenderA.account });
     await networkHelpers.time.increaseTo(loanWithdrawFreezeDeadline);
     await loanPositions.write.activate([1n]);
 
-    assert.equal(await outcomeToken.read.balanceOf([loanPositions.address, noTokenId]), repaymentAmount);
+    assert.equal(await outcomeToken.read.balanceOf([loanPositions.address, noTokenId]), borrowerCollateralAmount);
 
     await networkHelpers.time.increaseTo(repaymentDeadline + 1n);
     await loanPositions.write.markDefaulted([1n]);
@@ -617,13 +617,13 @@ describe("LoanPositionToken", function () {
 
     const loan = await loanPositions.read.loans([1n]);
 
-    assert.equal(loan[7], repaymentAmount);
+    assert.equal(loan[7], borrowerCollateralAmount);
     assert.equal(await outcomeToken.read.balanceOf([loanPositions.address, noTokenId]), 0n);
-    assert.equal(await token.read.balanceOf([loanPositions.address]), repaymentAmount);
+    assert.equal(await token.read.balanceOf([loanPositions.address]), borrowerCollateralAmount);
 
     await loanPositions.write.claim([1n], { account: lenderA.account });
 
-    assert.equal(await token.read.balanceOf([lenderA.account.address]), repaymentAmount);
+    assert.equal(await token.read.balanceOf([lenderA.account.address]), borrowerCollateralAmount);
   });
 
   it("runs the full repaid happy path with real outcome collateral redemption", async function () {
@@ -633,6 +633,7 @@ describe("LoanPositionToken", function () {
     const principal = usdc(1000n);
     const interest = usdc(50n);
     const repaymentAmount = principal + interest;
+    const borrowerCollateralAmount = principal;
     const loanWithdrawFreezeDeadline = BigInt(now + networkHelpers.time.duration.days(3));
     const activationDeadline = BigInt(now + networkHelpers.time.duration.days(7));
     const repaymentDeadline = BigInt(now + networkHelpers.time.duration.days(37));
@@ -657,10 +658,10 @@ describe("LoanPositionToken", function () {
 
     await token.write.mint([borrower.account.address, repaymentAmount + interest]);
     await token.write.mint([lenderA.account.address, principal]);
-    await token.write.approve([outcomeToken.address, repaymentAmount], { account: borrower.account });
+    await token.write.approve([outcomeToken.address, borrowerCollateralAmount], { account: borrower.account });
     await token.write.approve([loanPositions.address, principal], { account: lenderA.account });
 
-    await outcomeToken.write.depositBorrowerCollateral([marketId, repaymentAmount], { account: borrower.account });
+    await outcomeToken.write.depositBorrowerCollateral([marketId, borrowerCollateralAmount], { account: borrower.account });
     await loanPositions.write.fund([1n, principal], { account: lenderA.account });
     await networkHelpers.time.increaseTo(loanWithdrawFreezeDeadline);
     await loanPositions.write.activate([1n]);
@@ -669,7 +670,7 @@ describe("LoanPositionToken", function () {
     await loanPositions.write.depositToLoan([1n, repaymentAmount], { account: borrower.account });
     await loanPositions.write.settleRepaid([1n]);
     await loanPositions.write.claim([1n], { account: lenderA.account });
-    await outcomeToken.write.redeem([marketId, 1, repaymentAmount], { account: borrower.account });
+    await outcomeToken.write.redeem([marketId, 1, borrowerCollateralAmount], { account: borrower.account });
 
     const loan = await loanPositions.read.loans([1n]);
 

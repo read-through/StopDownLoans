@@ -14,12 +14,18 @@ import { ExchangeScreen } from "./screens/ExchangeScreen";
 import { LoansScreen } from "./screens/LoansScreen";
 import { OverviewScreen } from "./screens/OverviewScreen";
 import { PortfolioScreen } from "./screens/PortfolioScreen";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { WalletConnectDialog } from "./components/wallet/WalletConnectDialog";
 
 export function App() {
   const c = useAppController();
   const [walletDialogOpen, setWalletDialogOpen] = useState(false);
+
+  useEffect(() => {
+    if (c.walletAccount !== null) {
+      setWalletDialogOpen(false);
+    }
+  }, [c.walletAccount]);
 
   return (
     <main className="appShell">
@@ -264,9 +270,10 @@ export function App() {
       </section>
       {walletDialogOpen && (
         <WalletConnectDialog
+          injectedError={c.walletError}
+          injectedStatus={c.walletStatus}
           onClose={() => setWalletDialogOpen(false)}
           onInjectedWallet={() => {
-            setWalletDialogOpen(false);
             c.connectWallet();
           }}
           onCircleWallet={c.connectCircleWallet}

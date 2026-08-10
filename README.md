@@ -14,7 +14,7 @@ For the hackathon submission checklist and 3-minute video script, see
 `docs/hackathon-submission.md`. For a short hackathon reviewer guide, see
 `docs/mid-submission.md`. For the final-submission MVP roadmap and current progress estimate, see
 `docs/final-mvp-roadmap.md`. For intentional MVP shortcuts and cleanup items, see
-`docs/known-limitations.md`. Current ARC testnet deployment addresses are recorded in
+`docs/known-limitations.md`. Historical ARC testnet deployment addresses are recorded in
 `docs/arc-testnet-deployment.md`. For running the live ARC testnet stack with a settlement executor
 wallet, see `docs/arc-testnet-runbook.md`. For injected user wallets, the executor wallet, Circle,
 and market-maker paths, see `docs/wallet-path.md` and `docs/circle-integration-strategy.md`. The
@@ -84,7 +84,7 @@ Example:
 - Borrower wants `$1,000` principal.
 - Borrower chooses `5%` interest and `100%` collateral ratio.
 - Required repayment is `$1,050`.
-- Borrower commits `$1,050` collateral behind the loan because `collateralBps = 10,000`.
+- Borrower commits `$1,000` collateral because `collateralBps = 10,000` is applied to principal.
 - Lenders fund `$1,000` and receive lender positions representing their share of repayment/recovery.
 - The YES/NO market represents the question: "Will the required `$1,050` repayment arrive before the deadline?"
 - Independent market participants can also deposit pair collateral: `$1` mints `1 YES + 1 NO` after activation.
@@ -136,9 +136,9 @@ without requiring a live ARC deployment or funded wallets. It uses fixture-backe
 does not provide wallet actions or persist real protocol/orderbook state. Use the live ARC stack with
 an injected or Circle wallet for transaction and signature testing.
 
-Current ARC testnet deployment addresses are recorded in `docs/arc-testnet-deployment.md`. The
-contracts were redeployed after the borrower-controlled `collateralBps` source change, and
-deployment wiring verification passes. Fresh current-deployment evidence is recorded there:
+Historical ARC testnet deployment addresses are recorded in `docs/arc-testnet-deployment.md`. They
+prove the earlier borrower-controlled `collateralBps` path, but a new deployment is required after
+changing the collateral-ratio base from repayment amount to principal. The earlier evidence remains:
 `LOAN_ID=3` is the current clean reviewer loan: it was created, collateralized, funded, activated,
 and traded through the backend CLOB executor/reconciliation path.
 
@@ -210,6 +210,9 @@ Required values:
 - `ARC_RPC_URL`: ARC RPC endpoint;
 - `ARC_CHAIN_ID`: ARC chain id;
 - `OUTCOME_EXCHANGE_ADDRESS`: deployed `OutcomeExchange`;
+- `LOAN_POSITION_TOKEN_BYTECODE_HASH`, `OUTCOME_TOKEN_BYTECODE_HASH`,
+  `OUTCOME_EXCHANGE_BYTECODE_HASH`: runtime hashes printed by the deploy script. Production startup
+  fails before migrations or indexing when an address points to different bytecode;
 - `USDC_ADDRESS`: deployed USDC token;
 - `EXECUTOR_PRIVATE_KEY`: optional backend operator key. If empty, API and background readers run,
   but settlement and lending lifecycle transactions are not submitted.
@@ -324,7 +327,8 @@ Required frontend values:
 Vite also loads root `.env` for `VITE_*` keys, so keeping one aligned root `.env` is enough for
 local full-stack work.
 
-For the current ARC testnet deployment, copy the reviewer env template:
+After deploying the current ARC testnet bytecode, copy the reviewer env template and replace its
+address placeholders with deploy-script output:
 
 ```powershell
 Copy-Item frontend\.env.arc-testnet.example frontend\.env.local

@@ -11,7 +11,7 @@ import {
 } from "../../circle-wallet/api";
 import type { CircleConnectedWallet, CircleWalletSession } from "../../circle-wallet/types";
 import { createCircleWalletProvider } from "../../circle-wallet/provider";
-import type { EthereumProvider } from "../../wallet";
+import type { EthereumProvider, WalletStatus } from "../../wallet";
 
 type LoginResult = CircleWalletSession & { refreshToken?: string };
 type CircleSdk = W3SSdk;
@@ -26,6 +26,8 @@ type Bootstrap = {
 const bootstrapKey = "stopdown.circle.oauth-bootstrap";
 
 export function WalletConnectDialog(props: {
+  injectedError: string | null;
+  injectedStatus: WalletStatus;
   onClose: () => void;
   onInjectedWallet: () => void;
   onCircleWallet: (wallet: CircleConnectedWallet, provider: EthereumProvider) => void;
@@ -160,15 +162,24 @@ export function WalletConnectDialog(props: {
           </button>
         </header>
         <div className="walletOptions">
-          <button className="walletOption" type="button" onClick={props.onInjectedWallet} disabled={busy}>
+          <button
+            className="walletOption"
+            type="button"
+            onClick={props.onInjectedWallet}
+            disabled={busy || props.injectedStatus === "connecting"}
+          >
             <Wallet size={20} />
-            <span><strong>Browser wallet</strong><small>MetaMask, Rabby, or another injected EVM wallet</small></span>
+            <span>
+              <strong>Browser wallet</strong>
+              <small>{props.injectedStatus === "connecting" ? "Waiting for wallet approval" : "MetaMask, Rabby, or another injected EVM wallet"}</small>
+            </span>
           </button>
           <button className="walletOption" type="button" onClick={startGoogleLogin} disabled={!circleEnabled || busy}>
             <CircleUserRound size={20} />
             <span><strong>Continue with Google</strong><small>{busy ? "Circle confirmation in progress" : status}</small></span>
           </button>
         </div>
+        {props.injectedError !== null && <div className="walletDialogError">{props.injectedError}</div>}
         {error !== null && <div className="walletDialogError">{error}</div>}
       </section>
     </div>

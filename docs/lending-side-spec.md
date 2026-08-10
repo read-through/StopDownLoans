@@ -366,15 +366,17 @@ This preserves payout accounting when a position is split after partial claims.
 
 ## Borrower Collateral Requirement
 
-Borrower collateral amount is determined from the full loan offer created by the borrower.
+Borrower collateral amount is determined from the principal requested by the borrower.
 
 The borrower selects `collateralBps` together with `principal`, `interestBps`, and deadlines.
 
 For each loan:
 
 ```text
-borrowerCollateralAmount = repaymentAmount * loanCollateralBps[loanId] / 10_000
+borrowerCollateralAmount = principal * loanCollateralBps[loanId] / 10_000
 ```
+
+`interestBps` affects `repaymentAmount`, but does not change the collateral-ratio base.
 
 The collateral coefficient is snapshotted at loan creation:
 

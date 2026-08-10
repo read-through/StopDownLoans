@@ -62,8 +62,8 @@ export function CreateLoanForm(props: {
       ? parsedPrincipal.value + (parsedPrincipal.value * parsedInterestBps.value) / 10_000n
       : null;
   const collateralPreview =
-    repaymentPreview !== null && parsedCollateralBps.value !== null
-      ? (repaymentPreview * parsedCollateralBps.value) / 10_000n
+    parsedPrincipal.value !== null && parsedCollateralBps.value !== null
+      ? (parsedPrincipal.value * parsedCollateralBps.value) / 10_000n
       : null;
 
   useEffect(() => {
@@ -133,7 +133,7 @@ export function CreateLoanForm(props: {
           <input value={interestBps} onChange={(event) => setInterestBps(event.target.value)} inputMode="numeric" />
         </label>
         <label>
-          Collateral bps
+          Collateral bps (% of principal)
           <input value={collateralBps} onChange={(event) => setCollateralBps(event.target.value)} inputMode="numeric" />
         </label>
         <label>

@@ -1,5 +1,9 @@
 # ARC Testnet Deployment
 
+> Historical deployment evidence. These addresses use the previous collateral formula where
+> `collateralBps` was applied to repayment amount. After the principal-based formula change, the
+> contracts must be redeployed before this document can be treated as the current demo deployment.
+
 Status note: current contract deployment was refreshed after the source change that moved
 `collateralBps` into borrower-controlled `createLoan(...)` parameters. Fresh current-deployment
 loan, activation, direct settlement, and CLOB-backend settlement evidence is recorded below.

@@ -76,7 +76,7 @@ Concrete example:
 - Borrower requests `$1,000`.
 - Borrower chooses `5%` interest and `100%` collateral ratio.
 - Required repayment is `$1,050`.
-- Borrower commits `$1,050` as loan-linked collateral because `collateralBps = 10,000`.
+- Borrower commits `$1,000` as loan-linked collateral because `collateralBps = 10,000` is applied to principal.
 - Lenders fund `$1,000` and receive transferable lender positions.
 - Traders trade YES/NO shares on whether the `$1,050` repayment will arrive before the deadline.
 - Any pair minter can deposit `$1` and later mint `1 YES + 1 NO`.
@@ -205,7 +205,8 @@ Current demo loan:
 - `LOAN_ID=3`
 - `MARKET_ID=0x1489a4e8bf6c349a62c1892e03c1206051f11bac3bdf1adaba8aaa6800322ea1`
 - Principal: `1 USDC`
-- Required repayment and borrower collateral: `1.05 USDC`
+- Historical deployment values: required repayment and borrower collateral were both `1.05 USDC`
+  under the previous repayment-based collateral formula.
 - State after walkthrough: `Active`
 
 Recorded ARC transactions:
