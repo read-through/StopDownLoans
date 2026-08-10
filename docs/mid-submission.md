@@ -15,8 +15,7 @@ price repayment risk through signed CLOB orders settled on-chain.
   trade persistence, reconciliation, and WebSocket book updates.
 - React frontend has separate screens for overview, loan creation, loan participation, exchange,
   and portfolio/account actions.
-- Demo API can run without live deployment for UI review, using fixture-backed reads and mock
-  responses.
+- Demo API can run without live deployment for UI review, using fixture-backed responses.
 - ARC testnet deployment evidence includes one active demo loan and one direct on-chain YES trade
   recorded in `docs/arc-testnet-deployment.md`.
 
@@ -97,7 +96,7 @@ fixture-backed, while protocol behavior is verified through contracts/scripts or
 
 | Mode | Purpose | State changes? | Command path |
 | --- | --- | --- | --- |
-| UI demo | Inspect product screens without a wallet or live deployment. | UI-only. Fixture-backed reads, mock responses, no persisted protocol state. | `demo:api` + `demo:frontend` |
+| UI demo | Inspect product screens without a wallet or live deployment. | UI-only. Fixture-backed responses, no persisted protocol state. | `demo:api` + `demo:frontend` |
 | Local protocol demo | Verify lending, outcome, and exchange behavior against Hardhat. | Yes, inside local Hardhat execution. | `demo:local:repaid`, `demo:local:default`, `test` |
 | Local CLOB persistence demo | Verify matching plus backend persistence/reconciliation. | Yes, inside Hardhat plus PostgreSQL. | `db:up`, `db:migrate`, `demo:local:clob-trade`, `test:e2e:local` |
 | ARC testnet path | Production-like deployed flow on ARC. | Yes, on ARC testnet. | `deploy:arc-testnet`, ARC scripts, `arc:postdeploy-check` |
@@ -244,7 +243,8 @@ See `docs/known-limitations.md` for the full cleanup list.
 ## Safety Notes
 
 - `.env`, `frontend/.env`, build outputs, caches, logs, and `node_modules` are ignored.
-- `.env.example` contains empty private key fields only.
+- Runtime and task-specific templates contain empty private key fields only; real `.env` files are
+  ignored.
 - Demo/test hashes and addresses are dummy values.
 - The backend never stores user private keys.
 

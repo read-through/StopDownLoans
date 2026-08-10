@@ -4,6 +4,7 @@ node_modules/
 # Environment and secrets
 .env
 .env.*
+config/env/*.env
 !.env.example
 !frontend/.env.example
 !frontend/.env.demo

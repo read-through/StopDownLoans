@@ -170,7 +170,7 @@ production RPC/indexer, monitoring, and security review.
 
 - Do not claim production readiness.
 - Do not claim Circle has been verified with production credentials yet.
-- Do not claim the mock UI path proves live ARC settlement.
+- Do not claim the fixture-backed UI path proves live ARC settlement.
 - Do not claim public ARC RPC is production-grade enough for operations.
 - Do not imply the backend stores user private keys.
 

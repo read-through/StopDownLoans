@@ -86,7 +86,7 @@ For a real browser-wallet test:
 4. Submit an order.
 5. Watch the orderbook, trades, and portfolio state.
 
-## Demo Mock Path
+## Read-Only UI Path
 
 For reviewers without an injected wallet:
 

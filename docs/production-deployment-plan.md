@@ -15,7 +15,7 @@ It is a plan, not a claim that the current repository is production-ready.
 | ARC RPC | Public ARC RPC endpoint | Dedicated or less rate-limited RPC endpoint; production indexer where possible |
 | Keeper | Runs inside backend process | Separate worker process with monitoring and alerting |
 | Exchange executor | Hot local operator key | Managed operator key, HSM, or custody-backed signer if latency and chain support fit |
-| User wallets | Injected EVM wallet or demo mock | User-controlled wallets; Circle User-Controlled Wallets are the preferred retail path |
+| User wallets | Injected EVM wallet or Circle User-Controlled Wallet | User-controlled wallets; Circle User-Controlled Wallets are the preferred retail path |
 | Mocks | `mocks/` demo/test substitutes | Disabled in production-like deployments |
 
 ## Deployment Shape

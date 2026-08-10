@@ -117,7 +117,7 @@ Demo modes:
 
 | Mode | Use it for | Stateful? |
 | --- | --- | --- |
-| UI demo | Reviewer walkthrough of screens without live ARC deployment. | UI-only: fixture-backed reads, mock responses, no persisted protocol state. |
+| UI demo | Reviewer walkthrough of screens without live ARC deployment. | UI-only: fixture-backed responses, no persisted protocol state. |
 | Local protocol demos | Contract-level lending/outcome/exchange behavior. | Yes, inside Hardhat execution. |
 | ARC testnet | Production-like deployment and wallet flow. | Yes, on ARC testnet. |
 
@@ -195,8 +195,9 @@ corepack npm run release:check
 
 ### 2. Configure environment
 
-Copy `.env.example` to `.env`. Backend scripts load `.env` automatically, while already exported
-environment variables take precedence.
+Copy `.env.example` to `.env` for backend runtime configuration. Backend scripts load only this
+ignored root `.env`, while already exported environment variables take precedence. Hardhat ARC and
+App Kit commands load their own ignored files under `config/env/`.
 
 ```powershell
 Copy-Item .env.example .env
@@ -304,8 +305,7 @@ recent `RECONCILIATION_START_BLOCK`.
 
 The frontend talks to the CLOB HTTP/WebSocket API and to an injected browser wallet on ARC.
 
-Copy frontend env values. Root `.env.example` already documents the `VITE_*` keys; for a
-frontend-only local file use:
+Copy the separate frontend environment template:
 
 ```powershell
 Copy-Item frontend\.env.example frontend\.env
@@ -362,18 +362,18 @@ deployment.
 Required deploy env:
 
 ```powershell
-$env:ARC_RPC_URL='https://rpc.testnet.arc.network'
-$env:DEPLOYER_PRIVATE_KEY='0x...'
+Copy-Item config\env\arc-deploy.env.example config\env\arc-deploy.env
+# Then set ARC_RPC_URL and DEPLOYER_PRIVATE_KEY in config\env\arc-deploy.env.
 ```
 
-Hardhat scripts also load the root `.env` file automatically. Keeping `DEPLOYER_PRIVATE_KEY` empty
-in committed examples is intentional; set it only in your local `.env` or shell before deployment.
+Deployment and verification commands load `config/env/arc-deploy.env`, not the backend `.env`.
+Keeping `DEPLOYER_PRIVATE_KEY` empty in the committed template is intentional.
 
 Optional deploy env:
 
 ```powershell
 $env:COLLATERAL_TOKEN_ADDRESS='0x3600000000000000000000000000000000000000'
-$env:OUTCOME_TOKEN_URI=''
+$env:ERC1155_METADATA_URI=''
 ```
 
 Deploy contracts:
@@ -385,6 +385,9 @@ npm.cmd run deploy:arc-testnet
 The deploy script deploys `LoanPositionToken`, `OutcomeToken`, and `OutcomeExchange`, configures the
 loan contract's outcome token once, authorizes the deployer as the first exchange operator, and
 prints backend env values.
+
+`ERC1155_METADATA_URI` is optional and affects only future deployments. An empty value leaves the
+ERC-1155 metadata URI unset without changing mint, transfer, merge, redeem, or settlement behavior.
 
 After deployment, verify the deployed wiring:
 
@@ -439,6 +442,12 @@ collateral; borrower collateral approval/deposit is a separate user action.
 
 Minimal ARC lending demo after `arc:create-demo-loan`:
 
+Create the ignored walkthrough configuration before running the commands:
+
+```powershell
+Copy-Item config\env\arc-demo.env.example config\env\arc-demo.env
+```
+
 ```powershell
 # borrower signer
 $env:DEPLOYER_PRIVATE_KEY='0x...'
@@ -471,6 +480,8 @@ npm.cmd run arc:borrower-redeem-yes
 
 These commands are demo walkthrough helpers. Each command uses `DEPLOYER_PRIVATE_KEY` as the current
 actor key for that step; the backend still never stores user private keys.
+The complete walkthrough variable list is in `config/env/arc-demo.env.example`; the ARC demo npm
+commands load its ignored `arc-demo.env` counterpart directly.
 
 The ARC trade demo signs one borrower SELL order and one temporary-buyer BUY order, then settles
 them through `OutcomeExchange.matchOrders`. It is intentionally direct on-chain settlement; the

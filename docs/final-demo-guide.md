@@ -7,7 +7,7 @@ It separates three things that should not be confused:
 - **local protocol proof**: deterministic scripts that prove lending, outcomes, CLOB matching, and
   settlement behavior;
 - **live ARC path**: production-like run against deployed ARC testnet contracts and real wallets;
-- **mock UI fallback**: reviewer-friendly screen inspection when no injected ARC wallet is available.
+- **read-only UI fallback**: fixture-backed screen inspection when no injected ARC wallet is available.
 
 ## Recommended Reviewer Order
 
@@ -171,7 +171,7 @@ Avoid:
 
 - spending time on internal folder structure;
 - showing old ARC loans as the primary evidence;
-- implying the mock UI path changes live ARC state;
+- implying the fixture-backed UI path changes live ARC state;
 - presenting Circle as credential-verified before the hosted OAuth walkthrough succeeds.
 
 ## What Still Needs Work Before Final Submission
@@ -182,7 +182,7 @@ Avoid:
 
 ## What Must Not Be Claimed
 
-- Do not claim the mock UI fallback proves live ARC settlement.
+- Do not claim the read-only UI fallback proves live ARC settlement.
 - Do not claim Circle Gas Station or hosted OAuth verification is complete.
 - Do not claim production readiness before hosted backend, managed DB, secrets, monitoring, and
   security review exist.

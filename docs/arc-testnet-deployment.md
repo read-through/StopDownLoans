@@ -215,5 +215,6 @@ checks:
 - Required repayment and borrower collateral: `1.05 USDC`
 - Intended use: active reviewer market for frontend and CLOB checks
 
-Local env values were written to ignored `.env` files after deployment. Keep private keys out of git
-and use `.env.example` only as a template.
+Local env values were written to ignored `.env` files after deployment. Keep private keys out of git.
+Use `.env.example` for backend runtime and `config/env/arc-deploy.env.example` for deployment and
+verification variables.

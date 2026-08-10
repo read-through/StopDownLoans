@@ -11,7 +11,7 @@ const publicClient = await viem.getPublicClient();
 const [deployer] = await viem.getWalletClients();
 const deployerAddress = getAddress(deployer.account.address);
 const collateralToken = getAddress(process.env.COLLATERAL_TOKEN_ADDRESS ?? ARC_TESTNET_USDC);
-const outcomeUri = process.env.OUTCOME_TOKEN_URI ?? "";
+const erc1155MetadataUri = process.env.ERC1155_METADATA_URI ?? "";
 const platformFeeBps = 0n;
 
 console.log(`Deploying StopDown contracts to chain ${await publicClient.getChainId()}`);
@@ -23,14 +23,14 @@ const loanPositionToken = await viem.deployContract("LoanPositionToken", [
   deployerAddress,
   platformFeeBps,
   deployerAddress,
-  outcomeUri,
+  erc1155MetadataUri,
 ]);
 console.log(`LoanPositionToken: ${loanPositionToken.address}`);
 
 const outcomeToken = await viem.deployContract("OutcomeToken", [
   loanPositionToken.address,
   collateralToken,
-  outcomeUri,
+  erc1155MetadataUri,
 ]);
 console.log(`OutcomeToken: ${outcomeToken.address}`);
 

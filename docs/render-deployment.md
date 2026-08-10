@@ -14,8 +14,9 @@ The repository contains a `render.yaml` Blueprint for a public ARC testnet demo:
 1. Push the repository to GitHub.
 2. In Render, create a new Blueprint and select this repository.
 3. Render reads `render.yaml` and creates `stopdown-loans` plus `stopdown-db`.
-4. When prompted for `EXECUTOR_PRIVATE_KEY`, enter the funded ARC testnet operator key. Do not add
-   the key to `render.yaml`, `.env.example`, README, or frontend variables.
+4. Open `stopdown-loans -> Environment` and add `EXECUTOR_PRIVATE_KEY` manually. Enter the funded
+   ARC testnet operator key, then choose `Save, rebuild, and deploy`. Do not add the key to
+   `render.yaml`, `.env.example`, README, or frontend variables.
 5. Wait for the database and web service deploys to finish.
 6. Open `https://<render-service-host>/v1/health` and verify:
    - `status == "ok"`;
@@ -30,13 +31,16 @@ The repository contains a `render.yaml` Blueprint for a public ARC testnet demo:
 
 The Blueprint's `initialDeployHook` registers the active reviewer market after the first successful
 service deployment. Confirm that `/v1/markets` returns the market below before submitting orders.
-The hook uses the same idempotent command shown here, so it is safe to rerun from a Render shell:
+The hook uses the idempotent command below. A paid Render service can rerun it from its shell:
 
 ```sh
 node dist/backend/scripts/market-config.js --outcome-token 0x06c08af6a3ad503560f3010105f1ec32052c7f2f --market-id 0x1489a4e8bf6c349a62c1892e03c1206051f11bac3bdf1adaba8aaa6800322ea1 --default-tick-units 1000 --edge-tick-units 100 --lower-edge-price-units 100000 --upper-edge-price-units 900000 --min-order-outcome-amount 1
 ```
 
-No public database access is required for the hook or for a manual rerun from the service shell.
+The Free tier does not provide a service shell or one-off jobs. On Free, confirm that the initial
+hook succeeded in the deploy logs and that `/v1/markets` contains the reviewer market. If the hook
+did not run, fix the deployment and recreate the demo service instead of assuming a manual shell is
+available.
 
 ## Free-Tier Limits
 

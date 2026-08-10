@@ -1,9 +1,9 @@
 import { AppKit, Blockchain, type SendParams } from "@circle-fin/app-kit";
 import { createViemAdapterFromPrivateKey } from "@circle-fin/adapter-viem-v2";
 import { getAddress } from "viem";
-import { loadDotEnv } from "../backend/scripts/load-env.js";
+import { loadEnvFile } from "../backend/scripts/load-env.js";
 
-await loadDotEnv();
+await loadEnvFile("config/env/app-kit.env");
 
 const execute = process.argv.slice(2).includes("--execute");
 const privateKey = requirePrivateKey("APP_KIT_PRIVATE_KEY");

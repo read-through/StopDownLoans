@@ -14,6 +14,9 @@ APP_KIT_RECIPIENT_ADDRESS=0x...
 APP_KIT_AMOUNT=1.00
 ```
 
+Copy `config/env/app-kit.env.example` to the ignored `config/env/app-kit.env` and set the values
+there. The App Kit command loads only that file; it does not read the backend `.env`.
+
 Use a dedicated testnet wallet. The key stays in the local process and is not exposed through Vite
 or the backend HTTP API.
 

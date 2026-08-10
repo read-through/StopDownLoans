@@ -3,7 +3,7 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, it } from "node:test";
-import { loadDotEnv } from "../../scripts/load-env.js";
+import { loadDotEnv, loadEnvFile } from "../../scripts/load-env.js";
 
 describe("loadDotEnv", () => {
   it("loads .env values without overriding existing environment variables", async () => {
@@ -41,6 +41,29 @@ describe("loadDotEnv", () => {
     try {
       await loadDotEnv(tempDir);
     } finally {
+      await rm(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it("loads a named environment file without overriding exported values", async () => {
+    const tempDir = await mkdtemp(path.join(os.tmpdir(), "stopdown-env-"));
+    const previousLoaded = process.env.STOPDOWN_TEST_NAMED;
+    const previousExisting = process.env.STOPDOWN_TEST_EXISTING;
+
+    try {
+      process.env.STOPDOWN_TEST_EXISTING = "from-process";
+      await writeFile(
+        path.join(tempDir, "arc.env"),
+        ["STOPDOWN_TEST_NAMED=from-named-file", "STOPDOWN_TEST_EXISTING=from-file"].join("\n")
+      );
+
+      await loadEnvFile("arc.env", tempDir);
+
+      assert.equal(process.env.STOPDOWN_TEST_NAMED, "from-named-file");
+      assert.equal(process.env.STOPDOWN_TEST_EXISTING, "from-process");
+    } finally {
+      restoreEnv("STOPDOWN_TEST_NAMED", previousLoaded);
+      restoreEnv("STOPDOWN_TEST_EXISTING", previousExisting);
       await rm(tempDir, { recursive: true, force: true });
     }
   });

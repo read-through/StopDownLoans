@@ -2,7 +2,11 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 
 export async function loadDotEnv(projectRoot: string = process.cwd()): Promise<void> {
-  const envPath = path.join(projectRoot, ".env");
+  await loadEnvFile(".env", projectRoot);
+}
+
+export async function loadEnvFile(relativePath: string, projectRoot: string = process.cwd()): Promise<void> {
+  const envPath = path.resolve(projectRoot, relativePath);
   let content: string;
 
   try {

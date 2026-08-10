@@ -16,7 +16,6 @@ services:
     dockerfilePath: ./Dockerfile
     dockerContext: .
     healthCheckPath: /v1/health
-    maxShutdownDelaySeconds: 60
     autoDeployTrigger: commit
     initialDeployHook: >-
       node dist/backend/scripts/market-config.js
