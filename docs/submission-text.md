@@ -10,9 +10,9 @@ read endpoints, best bid/ask, book reads, and WebSocket subscription all pass th
 
 ARC is used as the settlement chain. The current principal-based deployment is:
 
-- `LoanPositionToken`: `0x6cdab73d1acf5a559604b6cd5f91a04426c5c686`
-- `OutcomeToken`: `0x2cf1b7094f0da21b553993484e59ce5176e6177c`
-- `OutcomeExchange`: `0xcf23faf83065bc4c0e11fa0e99ca948600f7d341`
+- `LoanPositionToken`: `0x2a26829b172243b7d108f4bfcdea6d221179e0e7`
+- `OutcomeToken`: `0xf5d790f3caed7933c34a24f75582c3d15994e1ec`
+- `OutcomeExchange`: `0x50ae818b42e6c82693cee5fae27ade7f5d4de43b`
 - ARC USDC: `0x3600000000000000000000000000000000000000`
 
 The deployment verifier passed for contract wiring, owners, operator authorization, and all three

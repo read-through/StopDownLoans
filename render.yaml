@@ -27,17 +27,17 @@ services:
       - key: ARC_CHAIN_ID
         value: "5042002"
       - key: LOAN_POSITION_TOKEN_ADDRESS
-        value: 0x6cdab73d1acf5a559604b6cd5f91a04426c5c686
+        value: 0x2a26829b172243b7d108f4bfcdea6d221179e0e7
       - key: OUTCOME_TOKEN_ADDRESS
-        value: 0x2cf1b7094f0da21b553993484e59ce5176e6177c
+        value: 0xf5d790f3caed7933c34a24f75582c3d15994e1ec
       - key: OUTCOME_EXCHANGE_ADDRESS
-        value: 0xcf23faf83065bc4c0e11fa0e99ca948600f7d341
+        value: 0x50ae818b42e6c82693cee5fae27ade7f5d4de43b
       - key: LOAN_POSITION_TOKEN_BYTECODE_HASH
-        value: 0x09e2a5ad5e062e7857cd5b30980277cffa3d73daf33c07c61c52bd7741bb0387
+        value: 0x14449393f7ce2ef787ca799fb0611830a5073ce0ec6556b704f922882b9f2bff
       - key: OUTCOME_TOKEN_BYTECODE_HASH
-        value: 0x382d7041ea2dab2148eb5fee4cbfd7b42269a937da8afe0783a596f42b051b03
+        value: 0x7107ae972858907ba5ecd3b6dd7cb0b5c2d06d07b8b6c054810245a0c4765fa1
       - key: OUTCOME_EXCHANGE_BYTECODE_HASH
-        value: 0x491ec86a840f4c340660f4c918ff8d7ac068b06992d9deee6cdf69758e037548
+        value: 0xc7a94ebb3e83bccb806ee99054d52cc0e8902592ee79950fb124f8355844bdfe
       - key: USDC_ADDRESS
         value: 0x3600000000000000000000000000000000000000
       - key: EXECUTOR_PRIVATE_KEY
@@ -89,10 +89,10 @@ services:
       - key: PUBLIC_ARC_EXPLORER_URL
         value: https://testnet.arcscan.app
       - key: PUBLIC_LOAN_POSITION_ADDRESS
-        value: 0x6cdab73d1acf5a559604b6cd5f91a04426c5c686
+        value: 0x2a26829b172243b7d108f4bfcdea6d221179e0e7
       - key: PUBLIC_OUTCOME_ADDRESS
-        value: 0x2cf1b7094f0da21b553993484e59ce5176e6177c
+        value: 0xf5d790f3caed7933c34a24f75582c3d15994e1ec
       - key: PUBLIC_EXCHANGE_ADDRESS
-        value: 0xcf23faf83065bc4c0e11fa0e99ca948600f7d341
+        value: 0x50ae818b42e6c82693cee5fae27ade7f5d4de43b
       - key: PUBLIC_USDC_ADDRESS
         value: 0x3600000000000000000000000000000000000000

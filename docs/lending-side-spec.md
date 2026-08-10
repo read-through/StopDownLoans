@@ -93,7 +93,7 @@ The borrower creates the loan directly.
 
 Deadline constraints:
 
-- `loanWithdrawFreezeDeadline > block.timestamp`;
+- `loanWithdrawFreezeDeadline` may be current or past to freeze lender withdrawals immediately;
 - `activationDeadline > block.timestamp`;
 - `loanWithdrawFreezeDeadline <= activationDeadline`;
 - `repaymentDeadline > activationDeadline`.

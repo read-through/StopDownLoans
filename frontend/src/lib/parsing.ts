@@ -43,8 +43,8 @@ export function parseLoanDeadlineInputs(params: {
   }
 
   const now = BigInt(Math.floor(Date.now() / 1000));
-  if (loanWithdrawFreezeDeadline <= now || activationDeadline <= now) {
-    return { value: null, error: "Funding deadlines must be in the future." };
+  if (activationDeadline <= now) {
+    return { value: null, error: "Activation deadline must be in the future." };
   }
   if (loanWithdrawFreezeDeadline > activationDeadline) {
     return { value: null, error: "Withdraw freeze cannot be after activation deadline." };

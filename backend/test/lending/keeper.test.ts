@@ -66,6 +66,24 @@ describe("selectLendingKeeperAction", () => {
     assert.equal(action, "SETTLE_REPAID");
   });
 
+  it("does not settle when the repayment timestamp and credited amount disagree", async () => {
+    const action = await selectLendingKeeperAction({
+      publicClient: fakePublicClient(),
+      loanPositionToken,
+      outcomeToken,
+      nowSeconds: 275n,
+      loan: loanView({
+        state: "ACTIVE",
+        creditedAmount: 1_049n,
+        repaymentAmount: 1_050n,
+        repaymentSatisfiedAt: 250n,
+        repaymentDeadline: 300n,
+      }),
+    });
+
+    assert.equal(action, null);
+  });
+
   it("marks underpaid active loans as defaulted after the repayment deadline", async () => {
     const action = await selectLendingKeeperAction({
       publicClient: fakePublicClient(),

@@ -106,6 +106,7 @@ export async function selectLendingKeeperAction(input: {
 
   if (
     input.loan.state === "ACTIVE" &&
+    input.loan.creditedAmount >= input.loan.repaymentAmount &&
     input.loan.repaymentSatisfiedAt !== 0n &&
     input.loan.repaymentSatisfiedAt <= input.loan.repaymentDeadline
   ) {

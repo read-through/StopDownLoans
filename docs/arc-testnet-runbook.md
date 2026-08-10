@@ -10,9 +10,9 @@ path for users and the backend executor wallet for settlement.
 
 ## Contracts
 
-- `LoanPositionToken`: `0x6cdab73d1acf5a559604b6cd5f91a04426c5c686`
-- `OutcomeToken`: `0x2cf1b7094f0da21b553993484e59ce5176e6177c`
-- `OutcomeExchange`: `0xcf23faf83065bc4c0e11fa0e99ca948600f7d341`
+- `LoanPositionToken`: `0x2a26829b172243b7d108f4bfcdea6d221179e0e7`
+- `OutcomeToken`: `0xf5d790f3caed7933c34a24f75582c3d15994e1ec`
+- `OutcomeExchange`: `0x50ae818b42e6c82693cee5fae27ade7f5d4de43b`
 - ARC USDC: `0x3600000000000000000000000000000000000000`
 
 ## Local Environment
@@ -23,12 +23,12 @@ The local `.env` file is intentionally ignored by git. It must contain:
 DATABASE_URL=postgres://stopdown:stopdown@localhost:55432/stopdown
 ARC_RPC_URL=https://rpc.testnet.arc.network
 ARC_CHAIN_ID=5042002
-LOAN_POSITION_TOKEN_ADDRESS=0x6cdab73d1acf5a559604b6cd5f91a04426c5c686
-OUTCOME_TOKEN_ADDRESS=0x2cf1b7094f0da21b553993484e59ce5176e6177c
-OUTCOME_EXCHANGE_ADDRESS=0xcf23faf83065bc4c0e11fa0e99ca948600f7d341
-LOAN_POSITION_TOKEN_BYTECODE_HASH=0x09e2a5ad5e062e7857cd5b30980277cffa3d73daf33c07c61c52bd7741bb0387
-OUTCOME_TOKEN_BYTECODE_HASH=0x382d7041ea2dab2148eb5fee4cbfd7b42269a937da8afe0783a596f42b051b03
-OUTCOME_EXCHANGE_BYTECODE_HASH=0x491ec86a840f4c340660f4c918ff8d7ac068b06992d9deee6cdf69758e037548
+LOAN_POSITION_TOKEN_ADDRESS=0x2a26829b172243b7d108f4bfcdea6d221179e0e7
+OUTCOME_TOKEN_ADDRESS=0xf5d790f3caed7933c34a24f75582c3d15994e1ec
+OUTCOME_EXCHANGE_ADDRESS=0x50ae818b42e6c82693cee5fae27ade7f5d4de43b
+LOAN_POSITION_TOKEN_BYTECODE_HASH=0x14449393f7ce2ef787ca799fb0611830a5073ce0ec6556b704f922882b9f2bff
+OUTCOME_TOKEN_BYTECODE_HASH=0x7107ae972858907ba5ecd3b6dd7cb0b5c2d06d07b8b6c054810245a0c4765fa1
+OUTCOME_EXCHANGE_BYTECODE_HASH=0xc7a94ebb3e83bccb806ee99054d52cc0e8902592ee79950fb124f8355844bdfe
 USDC_ADDRESS=0x3600000000000000000000000000000000000000
 EXECUTOR_PRIVATE_KEY=0x...
 ```
@@ -92,7 +92,7 @@ Register a current-deployment active ARC market in the local CLOB database after
 activating a fresh loan:
 
 ```powershell
-npm.cmd run market-config:upsert -- --outcome-token 0x2cf1b7094f0da21b553993484e59ce5176e6177c --market-id <MARKET_ID> --default-tick-units 1000 --edge-tick-units 100 --lower-edge-price-units 100000 --upper-edge-price-units 900000 --min-order-outcome-amount 1
+npm.cmd run market-config:upsert -- --outcome-token 0xf5d790f3caed7933c34a24f75582c3d15994e1ec --market-id <MARKET_ID> --default-tick-units 1000 --edge-tick-units 100 --lower-edge-price-units 100000 --upper-edge-price-units 900000 --min-order-outcome-amount 1
 ```
 
 Run the backend with settlement/keeper loops:
@@ -143,7 +143,7 @@ real browser wallet to sign and submit orders through the frontend.
 Open:
 
 ```text
-http://127.0.0.1:5173/#exchange/0x2cf1b7094f0da21b553993484e59ce5176e6177c:<MARKET_ID>
+http://127.0.0.1:5173/#exchange/0xf5d790f3caed7933c34a24f75582c3d15994e1ec:<MARKET_ID>
 ```
 
 ## API-only Mode

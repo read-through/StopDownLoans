@@ -185,7 +185,6 @@ contract LoanPositionToken is ERC1155, ERC1155Holder {
         if (principal == 0) revert ZeroAmount();
         if (collateralBps == 0) revert InvalidAmount();
         if (outcomeToken == address(0)) revert OutcomeTokenNotSet();
-        if (loanWithdrawFreezeDeadline <= block.timestamp) revert InvalidDeadline();
         if (activationDeadline <= block.timestamp) revert InvalidDeadline();
         if (loanWithdrawFreezeDeadline > activationDeadline) revert InvalidDeadline();
         if (repaymentDeadline <= activationDeadline) revert InvalidDeadline();
@@ -394,6 +393,7 @@ contract LoanPositionToken is ERC1155, ERC1155Holder {
     function settleRepaid(uint256 loanId) external {
         Loan storage loan = loans[loanId];
         if (loan.state != LoanState.Active) revert NotActive();
+        if (loan.creditedAmount < loan.repaymentAmount) revert InsufficientRepayment();
         if (loan.repaymentSatisfiedAt == 0) revert InsufficientRepayment();
         if (loan.repaymentSatisfiedAt > loan.repaymentDeadline) revert RepaymentDeadlinePassed();
         if (outcomeToken == address(0)) revert OutcomeTokenNotSet();

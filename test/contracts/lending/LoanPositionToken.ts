@@ -110,6 +110,31 @@ describe("LoanPositionToken", function () {
     assert.equal(await loanPositions.read.nextLoanId(), 2n);
   });
 
+  it("allows an already reached withdraw freeze deadline", async function () {
+    const { token, loanPositions, owner, borrower, lenderA } =
+      await networkHelpers.loadFixture(deployLoanPositionToken);
+    const now = await networkHelpers.time.latest();
+    const principal = usdc(1000n);
+    await setMockOutcomeToken(loanPositions, owner);
+
+    await loanPositions.write.createLoan([
+      principal,
+      500n,
+      10_000n,
+      BigInt(now - 1),
+      BigInt(now + networkHelpers.time.duration.days(7)),
+      BigInt(now + networkHelpers.time.duration.days(37))
+    ], { account: borrower.account });
+
+    await token.write.mint([lenderA.account.address, principal]);
+    await token.write.approve([loanPositions.address, principal], { account: lenderA.account });
+    await loanPositions.write.fund([1n, principal], { account: lenderA.account });
+    await loanPositions.write.activate([1n]);
+
+    const loan = await loanPositions.read.loans([1n]);
+    assert.equal(loan[10], 2);
+  });
+
   it("lets the owner transfer ownership", async function () {
     const { loanPositions, owner, borrower, lenderA } = await networkHelpers.loadFixture(deployLoanPositionToken);
 
@@ -528,6 +553,41 @@ describe("LoanPositionToken", function () {
     const loan = await loanPositions.read.loans([1n]);
 
     assert.equal(loan[7], usdc(500n));
+    assert.equal(loan[10], 2);
+  });
+
+  it("does not count a direct USDC transfer as loan repayment", async function () {
+    const { token, loanPositions, owner, borrower, lenderA, lenderB } =
+      await networkHelpers.loadFixture(deployLoanPositionToken);
+    const now = await networkHelpers.time.latest();
+    const principal = usdc(1000n);
+    const repaymentAmount = usdc(1050n);
+    const loanWithdrawFreezeDeadline = BigInt(now + networkHelpers.time.duration.days(3));
+    await setMockOutcomeToken(loanPositions, owner);
+
+    await loanPositions.write.createLoan([
+      principal,
+      500n,
+      10_000n,
+      loanWithdrawFreezeDeadline,
+      BigInt(now + networkHelpers.time.duration.days(7)),
+      BigInt(now + networkHelpers.time.duration.days(37))
+    ], { account: borrower.account });
+
+    await token.write.mint([lenderA.account.address, principal]);
+    await token.write.approve([loanPositions.address, principal], { account: lenderA.account });
+    await loanPositions.write.fund([1n, principal], { account: lenderA.account });
+    await networkHelpers.time.increaseTo(loanWithdrawFreezeDeadline);
+    await loanPositions.write.activate([1n]);
+
+    await token.write.mint([lenderB.account.address, repaymentAmount]);
+    await token.write.transfer([loanPositions.address, repaymentAmount], { account: lenderB.account });
+
+    await assert.rejects(loanPositions.write.settleRepaid([1n]));
+
+    const loan = await loanPositions.read.loans([1n]);
+    assert.equal(loan[7], 0n);
+    assert.equal(loan[8], 0n);
     assert.equal(loan[10], 2);
   });
 
