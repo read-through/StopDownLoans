@@ -1,4 +1,4 @@
-import { closePool, getPool } from "../src/clob/db/client.js";
+import { closePool, getPool, withTransaction } from "../src/clob/db/client.js";
 import { BookFeedPublisher } from "../src/clob/api/bookFeedPublisher.js";
 import { createClobHttpServer } from "../src/clob/api/httpServer.js";
 import { attachClobWebSocketFeed } from "../src/clob/api/webSocketFeed.js";
@@ -18,6 +18,7 @@ import {
   sweepMarketConfigEvents,
 } from "../src/clob/marketConfigEventLoop.js";
 import { loadDotEnv } from "./load-env.js";
+import { bootstrapReconciliationCursor } from "../src/clob/reconciliationBootstrap.js";
 import {
   deleteExpiredRateLimitWindows,
   loadRateLimitCleanupConfig,
@@ -38,6 +39,16 @@ const backgroundLoopsEnabled = process.env.CLOB_BACKGROUND_LOOPS !== "false";
 const publicClient = createArcPublicClient({
   rpcUrl: config.arcRpcUrl,
 });
+const reconciliationBootstrap = await withTransaction((dbClient) =>
+  bootstrapReconciliationCursor({
+    dbClient,
+    publicClient,
+    confirmationDepth: config.reconciliationConfirmationDepth,
+  })
+);
+console.log(
+  `Reconciliation cursor ${reconciliationBootstrap.status} at block ${reconciliationBootstrap.blockNumber.toString()}`
+);
 const bookFeedPublisher = new BookFeedPublisher();
 const stopExpiredOrderSweep = backgroundLoopsEnabled
   ? startExpiredOrderSweepLoop({

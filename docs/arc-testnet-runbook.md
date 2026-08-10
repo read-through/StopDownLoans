@@ -164,12 +164,13 @@ Invoke-RestMethod http://127.0.0.1:3000/v1/loans?limit=5
 Invoke-RestMethod http://127.0.0.1:3000/v1/markets?limit=5
 ```
 
-Expected after creating and indexing a fresh current-deployment loan:
+Expected for the current reviewer loan:
 
 - health `status = ok`;
 - health `executorEnabled = true` when `EXECUTOR_PRIVATE_KEY` is set and `dev:clob` is used;
-- the new loan appears in `/v1/loans`;
-- its linked market appears in `/v1/markets` with the same current `OutcomeToken` address.
+- loan `#1` appears as `ACTIVE` in `/v1/loans`;
+- market `0x6e8253fd6ce77d36451771ac0e198053588fc1bb3cc48cb9a5cbbe0e838563c7`
+  appears in `/v1/markets` with the current `OutcomeToken` address.
 
 ## Live CLOB Trade Script
 
@@ -177,7 +178,7 @@ The live backend trade walkthrough submits a borrower SELL and a temporary buyer
 running CLOB API:
 
 ```powershell
-$env:LOAN_ID='<CURRENT_REVIEWER_LOAN_ID>'
+$env:LOAN_ID='1'
 $env:CLOB_API_URL='http://127.0.0.1:3000'
 npm.cmd run arc:clob-trade-active-loan
 ```
@@ -190,7 +191,6 @@ separate backend with conservative worker intervals:
 ```powershell
 $env:PORT='3001'
 $env:CLOB_API_URL='http://127.0.0.1:3001'
-$env:RECONCILIATION_START_BLOCK='<CURRENT_ARC_BLOCK_BEFORE_STARTING_BACKEND>'
 $env:RECONCILIATION_INTERVAL_MS='15000'
 $env:MARKET_CONFIG_EVENT_SWEEP_INTERVAL_MS='60000'
 $env:LENDING_KEEPER_INTERVAL_MS='60000'
@@ -201,10 +201,10 @@ $env:LOAN_SNAPSHOT_SYNC_INTERVAL_MS='30000'
 npm.cmd run dev:clob
 ```
 
-For a clean reviewer database, choose `RECONCILIATION_START_BLOCK` at or just before backend
-startup, before submitting the reviewer trade. Starting before old demo trades can make
-reconciliation see historical `OrderFilled` events whose orders are no longer present after
-`db:reset:reviewer`.
+On startup, `dev:clob` and the production launcher both create a reconciliation cursor at the
+current confirmation-safe head when the trading database is empty. If orders or trades exist but
+the cursor is missing, startup fails instead of silently skipping history. This prevents a clean
+reviewer run from scanning ARC from block zero and exhausting public RPC limits.
 
 ## Funding the Executor
 

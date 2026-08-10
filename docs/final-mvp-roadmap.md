@@ -3,31 +3,33 @@
 This document is the source of truth for moving StopDown Loans from mid-submission state to a
 final-submission MVP with a working demo.
 
-Current overall progress: **92%**.
+Current overall progress: **96%**.
 
 ## Progress Bar
 
 ```text
-[#########.] 92%
+[###################-] 96%
 ```
 
 ## Area Status
 
 | Area | Current progress | Status | What blocks completion |
 | --- | ---: | --- | --- |
-| Smart contracts | 96% | Lending, outcome token, and exchange settlement contracts pass locally; the principal-based build is deployed and bytecode-verified on ARC. | Record a fresh loan lifecycle against the current deployment. |
+| Smart contracts | 98% | The principal-based build is deployed and bytecode-verified; a fresh loan was collateralized, funded, keeper-activated, and settled through the CLOB on ARC. | Production security review and operational role separation. |
 | Backend / CLOB / keeper | 96% | Orderbook, matching, persistence, WebSocket feed, executor settlement, reconciliation, retry handling, PostgreSQL rate limits, reviewer DB reset, and production-container smoke verification exist. | Hosted run with production credentials and monitoring evidence. |
 | Frontend | 93% | Role/detail/list screens, pagination, injected wallet, Circle user-controlled wallet provider, and lifecycle-specific loan actions exist and pass production-bundle runtime checks. | Real Circle OAuth walkthrough and external-browser pass on the hosted URL. |
-| Demo launch | 88% | Full local repaid/default/CLOB happy path passes, reviewer fallback exists, the production image builds, and current ARC contracts are verified. | Fresh current-deployment loan/trade, configured public URL, and wallet-to-trade verification. |
+| Demo launch | 94% | Local happy paths pass and the current ARC deployment has a confirmed backend-CLOB trade with indexed API state. | Configured public URL and browser wallet-to-trade verification. |
 | Production/deployment story | 90% | A production Docker image, same-origin frontend/API/WebSocket server, Render Blueprint, managed PostgreSQL plan, safe reconciliation bootstrap, and local container smoke test are implemented. | Public deployment and external browser verification. |
-| ARC integration | 92% | ARC is the settlement chain, ARC USDC is the protocol asset, current contracts pass wiring and bytecode verification, frontend can add ARC to wallets, and the ARC App Kit USDC send flow has a verified estimate-first CLI. | Create a fresh loan and repeat the CLOB/public demo on the current deployment. |
+| ARC integration | 97% | Current contracts pass wiring/bytecode verification and a fresh loan, keeper activation, CLOB settlement, and reconciliation are confirmed on ARC. App Kit has an estimate-first USDC send flow. | Repeat through the hosted browser UI and move beyond the public RPC for production. |
 | Circle integration | 88% | Social Login, ARC EOA creation, protocol transaction challenges, status polling, and EIP-712 order/cancel signing are implemented outside the matching core. | Verify the full path with real Circle/Google credentials; gas sponsorship remains optional. |
-| Docs / final materials | 95% | README, specs, runbooks, final roadmap, hackathon submission pack, final demo guide, production plan, current/historical ARC evidence, and one-command release preflight are synchronized. | Insert fresh lifecycle evidence, final presentation link, and live URL. |
+| Docs / final materials | 97% | README, specs, runbooks, roadmap, submission pack, current/historical ARC evidence, and release preflight are synchronized. | Insert final presentation link and live URL. |
 
 ## Verified Work And Current Regression Gate
 
 - The principal-based build is deployed on ARC and verified by contract wiring, ownership,
   operator authorization, and runtime bytecode hashes.
+- Current `LOAN_ID=1` was collateralized, funded, keeper-activated, and traded through the backend;
+  `trade_id=1` was reconciled as `CONFIRMED` on ARC.
 - A historical ARC loan was created, collateralized, funded, activated, and traded before the
   principal-based collateral correction.
 - Production startup now verifies runtime bytecode hashes and refuses stale contract addresses.

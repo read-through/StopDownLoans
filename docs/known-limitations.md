@@ -4,8 +4,8 @@ This document separates intentional MVP shortcuts from finished protocol behavio
 
 ## Must Fix After Mid-Submission
 
-- A principal-based ARC deployment is verified, but it does not yet have a fresh reviewer loan,
-  active market, or confirmed CLOB trade.
+- The principal-based ARC deployment now has a confirmed loan/CLOB walkthrough, but the same path
+  is not yet verified from the hosted public frontend with a reviewer-controlled wallet.
 
 | Priority | Area | Current shortcut | Why it exists | Better target |
 | --- | --- | --- | --- | --- |

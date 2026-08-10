@@ -18,8 +18,34 @@ Verified runtime bytecode hashes:
 - `OutcomeExchange`: `0x491ec86a840f4c340660f4c918ff8d7ac068b06992d9deee6cdf69758e037548`
 
 `verify:arc-deployment` passed for all contract links, ARC USDC links, owners, initial operator,
-and runtime bytecode hashes. This build calculates borrower collateral from loan principal. A fresh
-loan lifecycle and CLOB trade have not yet been recorded for these addresses.
+and runtime bytecode hashes. This build calculates borrower collateral from loan principal.
+
+### Current Reviewer Loan And CLOB Evidence
+
+- `LOAN_ID`: `1`
+- `MARKET_ID`: `0x6e8253fd6ce77d36451771ac0e198053588fc1bb3cc48cb9a5cbbe0e838563c7`
+- Principal: `1 USDC` (`1000000` base units)
+- Interest: `5%` (`500` bps)
+- Required repayment: `1.05 USDC` (`1050000` base units)
+- Collateral ratio: `100%` of principal
+- Borrower collateral: `1 USDC` (`1000000` base units)
+- Final observed state: `ACTIVE`
+
+Transactions:
+
+| Step | Transaction |
+| --- | --- |
+| Create loan | `0x5f516d82a65f40ad7b647fe003c6356ee11c466e2abbe3be5b1a6df8b00c2992` |
+| Approve borrower collateral | `0x848934bcc48123ea5b6d8524401c635b525230cd5c5b03237f0500380a1a94f7` |
+| Deposit borrower collateral | `0x0e7734100bd39fdc36bb4dcd44a354a6449efeca4876e4e22b4d473f01622629` |
+| Approve lender funding | `0x327cd1e29217debd67ea072087b231ddfd3c8f26e10d92184fd205663beeed54` |
+| Fund loan | `0x1fa0ec3ea27c574caef31c1af43eded3ac264eb670d3dc832269356f7c929ed7` |
+| Keeper activation | `0x2ad59df93a663f7930ff38fd249bfbcf5e011ef70c43eb01f1e5dd18eac0e96c` |
+| CLOB settlement | `0x1ad1d471c2794dbdc4debd340681902ab436fa1a549fe3a1d38a4a51e0187c44` |
+
+The backend accepted a GTC YES sell and a crossing FAK YES buy, created `trade_id=1`, submitted the
+settlement through the authorized executor, and reconciled it as `CONFIRMED`. The confirmed fill was
+`0.2 YES` for `0.12 USDC`; `/v1/markets` reported `120000` confirmed USDC base units of volume.
 
 ## Historical Deployment Evidence
 

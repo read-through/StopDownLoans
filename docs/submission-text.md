@@ -16,8 +16,10 @@ ARC is used as the settlement chain. The current principal-based deployment is:
 - ARC USDC: `0x3600000000000000000000000000000000000000`
 
 The deployment verifier passed for contract wiring, owners, operator authorization, and all three
-runtime bytecode hashes. A fresh loan lifecycle and CLOB trade still need to be recorded against
-these addresses.
+runtime bytecode hashes. Current `LOAN_ID=1` was collateralized, funded, keeper-activated, and traded
+through the backend; `trade_id=1` settled in transaction
+`0x1ad1d471c2794dbdc4debd340681902ab436fa1a549fe3a1d38a4a51e0187c44` and reconciled as
+`CONFIRMED`.
 
 That historical walkthrough created `LOAN_ID=3` before the collateral-ratio base changed from
 repayment amount to principal. The linked market is

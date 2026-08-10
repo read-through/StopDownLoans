@@ -137,9 +137,9 @@ does not provide wallet actions or persist real protocol/orderbook state. Use th
 an injected or Circle wallet for transaction and signature testing.
 
 The current principal-based contracts are deployed and bytecode-verified on ARC testnet; addresses
-and hashes are recorded in `docs/arc-testnet-deployment.md`. Historical `LOAN_ID=3` remains evidence
-of the earlier full create/fund/activate/CLOB-settlement walkthrough, but it belongs to the previous
-deployment. A fresh reviewer loan and trade must be recorded against the current addresses.
+and hashes are recorded in `docs/arc-testnet-deployment.md`. Current `LOAN_ID=1` was collateralized,
+funded, automatically activated by the keeper, and traded through the backend CLOB; `trade_id=1`
+was reconciled as `CONFIRMED`. Historical `LOAN_ID=3` remains evidence from the previous deployment.
 
 The frontend uses hash routes for reviewable deep links:
 

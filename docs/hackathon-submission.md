@@ -67,13 +67,18 @@ Evidence:
 
 - Contracts and transaction hashes: `docs/arc-testnet-deployment.md`.
 - Live ARC runbook: `docs/arc-testnet-runbook.md`.
+- Current reviewer loan: `LOAN_ID=1`.
+- Current reviewer market:
+  `0x6e8253fd6ce77d36451771ac0e198053588fc1bb3cc48cb9a5cbbe0e838563c7`.
+- Current confirmed CLOB settlement:
+  `0x1ad1d471c2794dbdc4debd340681902ab436fa1a549fe3a1d38a4a51e0187c44`.
 - Historical reviewer loan: `LOAN_ID=3`.
 - Historical reviewer market:
   `0x1489a4e8bf6c349a62c1892e03c1206051f11bac3bdf1adaba8aaa6800322ea1`.
 
 Remaining ARC work:
 
-- create, activate, and trade a fresh reviewer loan on the current verified deployment;
+- repeat the current confirmed path from the hosted public frontend with a reviewer wallet;
 - expand the existing App Kit command into optional retail onboarding and unified balance UI;
 - move from public RPC to a production-grade RPC/indexer setup for live UI demos and operations.
 
