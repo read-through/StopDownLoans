@@ -1,22 +1,24 @@
+import { toFunctionSelector } from "viem";
+
 import { frontendContracts } from "./config";
 import type { EthereumProvider, WalletAccount } from "./wallet";
 
-const SET_APPROVAL_FOR_ALL_SELECTOR = "0xa22cb465";
-const ERC20_APPROVE_SELECTOR = "0x095ea7b3";
-const ACTIVATE_LOAN_SELECTOR = "0xb260c42a";
-const CLAIM_POSITION_SELECTOR = "0x379607f5";
-const CREATE_LOAN_SELECTOR = "0xfa01c754";
-const DEPOSIT_BORROWER_COLLATERAL_SELECTOR = "0x79389c85";
-const DEPOSIT_PAIR_COLLATERAL_SELECTOR = "0xec647d6c";
-const DEPOSIT_TO_LOAN_SELECTOR = "0x09748259";
-const FUND_SELECTOR = "0xa65e2cfd";
-const MARK_DEFAULTED_SELECTOR = "0x73216450";
-const MERGE_POSITIONS_SELECTOR = "0xb10c5c17";
-const MINT_ACTIVATED_PAIR_SELECTOR = "0x3bb11289";
-const REDEEM_DEFAULT_COLLATERAL_SELECTOR = "0xa1d81475";
-const REDEEM_OUTCOME_SELECTOR = "0x96844927";
-const SETTLE_REPAID_SELECTOR = "0x94a5ffa4";
-const WITHDRAW_PAIR_DEPOSIT_SELECTOR = "0xe853a6bd";
+const SET_APPROVAL_FOR_ALL_SELECTOR = toFunctionSelector("setApprovalForAll(address,bool)");
+const ERC20_APPROVE_SELECTOR = toFunctionSelector("approve(address,uint256)");
+const ACTIVATE_LOAN_SELECTOR = toFunctionSelector("activate(uint256)");
+const CLAIM_POSITION_SELECTOR = toFunctionSelector("claim(uint256)");
+const CREATE_LOAN_SELECTOR = toFunctionSelector("createLoan(uint256,uint256,uint256,uint256,uint256,uint256)");
+const DEPOSIT_BORROWER_COLLATERAL_SELECTOR = toFunctionSelector("depositBorrowerCollateral(bytes32,uint256)");
+const DEPOSIT_PAIR_COLLATERAL_SELECTOR = toFunctionSelector("depositPairCollateral(bytes32,uint256)");
+const DEPOSIT_TO_LOAN_SELECTOR = toFunctionSelector("depositToLoan(uint256,uint256)");
+const FUND_SELECTOR = toFunctionSelector("fund(uint256,uint256)");
+const MARK_DEFAULTED_SELECTOR = toFunctionSelector("markDefaulted(uint256)");
+const MERGE_POSITIONS_SELECTOR = toFunctionSelector("mergePositions(bytes32,uint256)");
+const MINT_ACTIVATED_PAIR_SELECTOR = toFunctionSelector("mintActivatedPair(bytes32)");
+const REDEEM_DEFAULT_COLLATERAL_SELECTOR = toFunctionSelector("redeemDefaultCollateral(uint256)");
+const REDEEM_OUTCOME_SELECTOR = toFunctionSelector("redeem(bytes32,uint8,uint256)");
+const SETTLE_REPAID_SELECTOR = toFunctionSelector("settleRepaid(uint256)");
+const WITHDRAW_PAIR_DEPOSIT_SELECTOR = toFunctionSelector("withdrawPairDeposit(bytes32,uint256)");
 
 export async function approveUsdcExchange(params: {
   provider: EthereumProvider;
@@ -392,7 +394,7 @@ async function waitForTransactionReceipt(provider: EthereumProvider, txHash: str
 
     if (receipt !== null) {
       if (isFailedReceipt(receipt)) {
-        throw new Error("Approval transaction reverted.");
+        throw new Error(`Transaction reverted: ${txHash}`);
       }
       return;
     }
@@ -400,7 +402,7 @@ async function waitForTransactionReceipt(provider: EthereumProvider, txHash: str
     await delay(1500);
   }
 
-  throw new Error("Approval transaction was not mined in time.");
+  throw new Error(`Transaction was not mined in time: ${txHash}`);
 }
 
 function isFailedReceipt(receipt: unknown): boolean {
