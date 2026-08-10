@@ -223,6 +223,14 @@ export function useAppController() {
   }, [loansRefreshNonce]);
 
   useEffect(() => {
+    const timer = window.setInterval(() => {
+      setLoansRefreshNonce((value) => value + 1);
+    }, 15_000);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
     let cancelled = false;
 
     const refreshWallet = () => {

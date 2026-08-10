@@ -18,9 +18,32 @@ Production-like users connect a wallet through the browser:
 The backend never stores user private keys. It only receives signed orders, public addresses,
 transaction hashes, and indexed on-chain state.
 
-## Current Verified Local Happy Path
+## Browser-Verified Read Path
 
-The local happy path is the fastest full behavior check:
+Start PostgreSQL, the backend, and the frontend in separate terminals:
+
+```powershell
+npm.cmd run db:up
+npm.cmd run db:migrate
+npm.cmd run dev:clob
+npm.cmd run dev:frontend
+```
+
+Then run the real Playwright browser check:
+
+```powershell
+$env:E2E_BASE_URL='http://127.0.0.1:5173'
+$env:E2E_API_URL='http://127.0.0.1:3000'
+npm.cmd run test:e2e:frontend
+```
+
+For a same-origin deployment, only set `E2E_BASE_URL`. The test requires real health, loan, and
+market API responses; verifies that every indexed loan has a matching market; opens the Markets
+screen; and navigates into the real market detail view. It does not mock API responses.
+
+## Scripted Contract and Settlement Paths
+
+The scripted paths remain useful for deterministic contract and settlement coverage:
 
 ```powershell
 npm.cmd run db:up

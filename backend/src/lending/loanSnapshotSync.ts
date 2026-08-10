@@ -6,7 +6,18 @@ import {
 } from "../clob/chain/contracts.js";
 import { withTransaction } from "../clob/db/client.js";
 import { upsertLoanSnapshot } from "../clob/db/loanSnapshots.js";
+import { createMarketConfigIfMissing } from "../clob/db/marketConfigs.js";
 import type { Hex } from "../clob/types.js";
+
+export const DEFAULT_MARKET_CONFIG = {
+  clobEnabled: true,
+  defaultTickUnits: 1_000n,
+  edgeTickUnits: 100n,
+  lowerEdgePriceUnits: 100_000n,
+  upperEdgePriceUnits: 900_000n,
+  minOrderOutcomeAmount: 1n,
+  maxOrderOutcomeAmount: null,
+} as const;
 
 export type LoanSnapshotSyncResult = {
   checkedLoans: bigint[];
@@ -16,6 +27,7 @@ export type LoanSnapshotSyncResult = {
 export async function runLoanSnapshotSyncBatch(input: {
   publicClient: PublicClient;
   loanPositionToken: Hex;
+  outcomeToken: Hex;
   limit: number;
 }): Promise<LoanSnapshotSyncResult> {
   assertPositiveInteger(input.limit, "Loan snapshot sync limit");
@@ -32,6 +44,11 @@ export async function runLoanSnapshotSyncBatch(input: {
     const loan = await getLoanChainView(input.publicClient, input.loanPositionToken, loanId);
     await withTransaction(async (client) => {
       await upsertLoanSnapshot(client, toLoanSnapshotInput(loan));
+      await createMarketConfigIfMissing(client, {
+        outcomeToken: input.outcomeToken,
+        marketId: loan.marketId,
+        ...DEFAULT_MARKET_CONFIG,
+      });
     });
     syncedLoans.push(loanId);
   }

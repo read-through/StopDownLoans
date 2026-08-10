@@ -19,6 +19,8 @@ artifacts/
 cache/
 coverage/
 coverage.json
+playwright-report/
+test-results/
 typechain-types/
 
 # TypeScript

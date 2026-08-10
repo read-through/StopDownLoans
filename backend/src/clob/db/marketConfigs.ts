@@ -171,6 +171,74 @@ export async function upsertMarketConfig(
   return config;
 }
 
+export async function createMarketConfigIfMissing(
+  client: DbClient,
+  input: UpsertMarketConfigInput
+): Promise<MarketConfig | null> {
+  const result = await client.query<MarketConfigRow>(
+    `
+      INSERT INTO market_configs (
+        outcome_token,
+        market_id,
+        clob_enabled,
+        default_tick_units,
+        edge_tick_units,
+        lower_edge_price_units,
+        upper_edge_price_units,
+        min_order_outcome_amount,
+        max_order_outcome_amount
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      ON CONFLICT (outcome_token, market_id) DO NOTHING
+      RETURNING
+        outcome_token,
+        market_id,
+        clob_enabled,
+        default_tick_units,
+        edge_tick_units,
+        lower_edge_price_units,
+        upper_edge_price_units,
+        min_order_outcome_amount,
+        max_order_outcome_amount,
+        created_at,
+        updated_at
+    `,
+    [
+      hexToBuffer(input.outcomeToken),
+      hexToBuffer(input.marketId),
+      input.clobEnabled,
+      input.defaultTickUnits,
+      input.edgeTickUnits,
+      input.lowerEdgePriceUnits,
+      input.upperEdgePriceUnits,
+      input.minOrderOutcomeAmount,
+      input.maxOrderOutcomeAmount,
+    ]
+  );
+
+  if (result.rowCount === 0) {
+    return null;
+  }
+
+  const config = mapMarketConfigRow(result.rows[0]);
+  await insertMarketConfigEvent(client, {
+    outcomeToken: config.outcomeToken,
+    marketId: config.marketId,
+    eventType: "TICK_SIZE_CHANGE",
+    defaultTickUnits: config.defaultTickUnits,
+    edgeTickUnits: config.edgeTickUnits,
+    lowerEdgePriceUnits: config.lowerEdgePriceUnits,
+    upperEdgePriceUnits: config.upperEdgePriceUnits,
+  });
+  await insertMarketConfigEvent(client, {
+    outcomeToken: config.outcomeToken,
+    marketId: config.marketId,
+    eventType: "MARKET_OPENED",
+  });
+
+  return config;
+}
+
 export async function updateMarketTickConfig(
   client: DbClient,
   input: Pick<

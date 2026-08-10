@@ -107,6 +107,7 @@ const stopLoanSnapshotSync = backgroundLoopsEnabled
         runLoanSnapshotSyncBatch({
           publicClient,
           loanPositionToken: config.loanPositionToken,
+          outcomeToken: config.outcomeToken,
           limit: config.loanSnapshotSyncLimit,
         }),
       onError: (error) => {

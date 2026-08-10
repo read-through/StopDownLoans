@@ -558,9 +558,10 @@ Typical path after contracts are deployed and verified:
 1. Put deployed addresses into root `.env` for both backend (`LOAN_POSITION_TOKEN_ADDRESS`,
    `OUTCOME_TOKEN_ADDRESS`, `OUTCOME_EXCHANGE_ADDRESS`, `USDC_ADDRESS`) and frontend (`VITE_*`
    mirrors of the same values plus `VITE_ARC_CHAIN_ID`, `VITE_CLOB_API_URL`, `VITE_CLOB_WS_URL`).
-2. Start Postgres, migrate, and run `dev:clob`.
-3. Upsert a market config for each loan `marketId` that should accept orders.
-4. Start `dev:frontend`, connect an injected wallet on ARC testnet, and exercise create / fund /
+1. Start Postgres, migrate, and run `dev:clob`.
+2. Wait for loan snapshot sync to expose every loan and its automatically registered market through
+   `/v1/loans` and `/v1/markets`.
+3. Start `dev:frontend`, connect an injected wallet on ARC testnet, and exercise create / fund /
    activate / trade / claim flows in the UI.
 
 CLI demo helpers in section 7 remain useful for scripted walkthroughs without the browser.
@@ -579,6 +580,17 @@ Frontend checks:
 ```powershell
 npm.cmd run build:frontend
 ```
+
+Real browser read-path check with local frontend and backend:
+
+```powershell
+$env:E2E_BASE_URL='http://127.0.0.1:5173'
+$env:E2E_API_URL='http://127.0.0.1:3000'
+npm.cmd run test:e2e:frontend
+```
+
+The Playwright test uses real API responses and fails when any indexed loan is missing its linked
+market or when the market detail screen cannot be opened.
 
 Solidity checks:
 

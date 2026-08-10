@@ -28,20 +28,23 @@ The repository contains a `render.yaml` Blueprint for a public ARC testnet demo:
 7. Open `https://<render-service-host>/` and connect an injected EVM wallet configured for ARC
    testnet.
 
-## First Demo Preparation
+## Market Registration
 
-`render.yaml` cannot pre-register a market until a fresh current-deployment loan exists and its
-`marketId` is known. After creating and activating that loan, register it with the idempotent command
-below. A paid Render service can run it from its shell:
+The loan snapshot sync automatically creates a default CLOB market config for every indexed loan.
+The registration is idempotent and does not overwrite an existing operator-managed config. After a
+loan transaction is confirmed, `/v1/loans` and `/v1/markets` should expose the linked records within
+one `LOAN_SNAPSHOT_SYNC_INTERVAL_MS` cycle.
+
+The command below remains an operator override for changing the default market parameters; it is
+not part of the normal loan happy path:
 
 ```sh
 node dist/backend/scripts/market-config.js --outcome-token <CURRENT_OUTCOME_TOKEN> --market-id <CURRENT_MARKET_ID> --default-tick-units 1000 --edge-tick-units 100 --lower-edge-price-units 100000 --upper-edge-price-units 900000 --min-order-outcome-amount 1
 ```
 
-The Free tier does not provide a service shell or one-off jobs. For a Free-tier demo, run the same
-command locally against the Render `DATABASE_URL` only if external database access is explicitly
-enabled, or add an authenticated market-configuration deployment path before the reviewer demo.
-Do not claim the market is registered until `/v1/markets` returns it.
+Do not treat the market as indexed until `/v1/markets` returns the loan's exact `marketId` and linked
+`loanId`. The frontend refreshes index-backed reads every 15 seconds, but PostgreSQL remains the
+source of truth for the CLOB.
 
 ## Free-Tier Limits
 

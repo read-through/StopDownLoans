@@ -12,12 +12,12 @@ import type { CircleWalletConfig } from "../../src/circle-wallet/config.js";
 
 describe("Circle Wallet API client", () => {
   it("keeps the API key in the authorization header and validates the response", async () => {
-    let request: { url: string; init?: RequestInit } | null = null;
+    const captured: { request?: { url: string; init?: RequestInit } } = {};
     const result = await requestCircleSocialDeviceToken(
       config(),
       "browser-device",
       (async (url, init) => {
-        request = { url: String(url), init };
+        captured.request = { url: String(url), init };
         return Response.json({
           data: { deviceToken: "device-token", deviceEncryptionKey: "device-encryption-key" },
         });
@@ -28,10 +28,10 @@ describe("Circle Wallet API client", () => {
       deviceToken: "device-token",
       deviceEncryptionKey: "device-encryption-key",
     });
-    assert.ok(request !== null);
-    assert.equal(request.url, "https://api.circle.test/v1/w3s/users/social/token");
-    assert.equal((request.init?.headers as Record<string, string>).authorization, "Bearer circle-secret");
-    const body = JSON.parse(String(request.init?.body));
+    assert.ok(captured.request !== undefined);
+    assert.equal(captured.request.url, "https://api.circle.test/v1/w3s/users/social/token");
+    assert.equal((captured.request.init?.headers as Record<string, string>).authorization, "Bearer circle-secret");
+    const body = JSON.parse(String(captured.request.init?.body));
     assert.equal(body.deviceId, "browser-device");
     assert.match(body.idempotencyKey, /^[0-9a-f-]{36}$/);
   });
