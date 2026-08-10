@@ -120,6 +120,7 @@ export type MarketConfigEventRow = {
 };
 
 export type LoanSnapshotRow = {
+  loan_position_token: Buffer;
   loan_id: string;
   borrower: Buffer;
   principal: string;
@@ -263,6 +264,7 @@ export function mapMarketConfigEventRow(row: MarketConfigEventRow): MarketConfig
 
 export function mapLoanSnapshotRow(row: LoanSnapshotRow): LoanSnapshot {
   return {
+    loanPositionToken: bufferToHex(row.loan_position_token),
     loanId: BigInt(row.loan_id),
     borrower: bufferToHex(row.borrower),
     principal: BigInt(row.principal),

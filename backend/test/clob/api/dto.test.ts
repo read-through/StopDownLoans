@@ -241,6 +241,7 @@ describe("api dto serializers", () => {
   it("serializes loan views without bigint values", () => {
     assert.deepEqual(
       toApiLoanDto({
+        loanPositionToken: "0x0000000000000000000000000000000000000003",
         loanId: 3n,
         borrower: "0x0000000000000000000000000000000000000004",
         principal: 1_000_000_000n,

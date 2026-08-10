@@ -131,6 +131,7 @@ const expectedTableColumns: Record<string, string[]> = {
     "market_id",
     "synced_at",
     "updated_at",
+    "loan_position_token",
   ],
   rate_limit_windows: [
     "scope",
@@ -185,7 +186,12 @@ describe("CLOB migration schema contract", () => {
 });
 
 async function readAllMigrationSql(): Promise<string> {
-  const files = ["001_init_clob.sql", "002_loan_snapshots.sql", "003_rate_limits.sql"];
+  const files = [
+    "001_init_clob.sql",
+    "002_loan_snapshots.sql",
+    "003_rate_limits.sql",
+    "004_deployment_namespace.sql",
+  ];
   const contents = await Promise.all(files.map((file) => readFile(path.join(migrationsDir, file), "utf8")));
   return contents.join("\n");
 }
@@ -204,6 +210,11 @@ function parseCreateTableColumns(sql: string): Map<string, string[]> {
       .map((line) => line.split(/\s+/)[0].replace(/,$/, ""));
 
     tables.set(tableName, columns);
+  }
+
+  const addedColumnPattern = /ALTER TABLE ([a-z_]+)\s+ADD COLUMN ([a-z_]+)/g;
+  for (const match of sql.matchAll(addedColumnPattern)) {
+    tables.get(match[1])?.push(match[2]);
   }
 
   return tables;

@@ -43,7 +43,10 @@ export async function runLoanSnapshotSyncBatch(input: {
   for (const loanId of checkedLoans) {
     const loan = await getLoanChainView(input.publicClient, input.loanPositionToken, loanId);
     await withTransaction(async (client) => {
-      await upsertLoanSnapshot(client, toLoanSnapshotInput(loan));
+      await upsertLoanSnapshot(client, {
+        loanPositionToken: input.loanPositionToken,
+        ...toLoanSnapshotInput(loan),
+      });
       await createMarketConfigIfMissing(client, {
         outcomeToken: input.outcomeToken,
         marketId: loan.marketId,

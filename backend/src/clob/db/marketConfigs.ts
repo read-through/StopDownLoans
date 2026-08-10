@@ -52,13 +52,14 @@ export async function getMarketConfig(
 export async function listMarketConfigs(
   client: DbClient,
   params: {
+    outcomeToken: MarketConfig["outcomeToken"];
     limit?: number;
     after?: {
       updatedAt: Date;
       outcomeToken: MarketConfig["outcomeToken"];
       marketId: MarketConfig["marketId"];
     };
-  } = {}
+  }
 ): Promise<MarketConfig[]> {
   const result = await client.query<MarketConfigRow>(
     `
@@ -75,24 +76,26 @@ export async function listMarketConfigs(
         created_at,
         updated_at
       FROM market_configs
-      WHERE (
-        $2::timestamptz IS NULL
-        OR updated_at < $2
+      WHERE outcome_token = $1
+        AND (
+        $3::timestamptz IS NULL
+        OR updated_at < $3
         OR (
-          updated_at = $2
+          updated_at = $3
           AND (
-            outcome_token > $3
+            outcome_token > $4
             OR (
-              outcome_token = $3
-              AND market_id > $4
+              outcome_token = $4
+              AND market_id > $5
             )
           )
         )
       )
       ORDER BY updated_at DESC, outcome_token ASC, market_id ASC
-      LIMIT $1
+      LIMIT $2
     `,
     [
+      hexToBuffer(params.outcomeToken),
       params.limit ?? 100,
       params.after?.updatedAt ?? null,
       params.after === undefined ? null : hexToBuffer(params.after.outcomeToken),

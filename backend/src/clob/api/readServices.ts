@@ -125,7 +125,9 @@ export async function getMarketConfigView(
 
 export async function getMarketsView(
   client: DbClient,
-  params?: {
+  params: {
+    outcomeToken: Hex;
+    loanPositionToken: Hex;
     limit?: number;
     cursor?: string;
   }
@@ -133,9 +135,10 @@ export async function getMarketsView(
   markets: ApiMarketSummaryDto[];
   nextCursor: string | null;
 }> {
-  const limit = params?.limit ?? 100;
-  const cursor = params?.cursor === undefined ? undefined : decodeMarketConfigsCursor(params.cursor);
+  const limit = params.limit ?? 100;
+  const cursor = params.cursor === undefined ? undefined : decodeMarketConfigsCursor(params.cursor);
   const configs = await listMarketConfigs(client, {
+    outcomeToken: params.outcomeToken,
     limit: limit + 1,
     after: cursor === undefined
       ? undefined
@@ -157,7 +160,11 @@ export async function getMarketsView(
   const [yesOrders, volumes, loansByMarket] = await Promise.all([
     getLiveOrdersForOutcome(client, "YES"),
     getConfirmedUsdcVolumeByMarkets(client),
-    getLoanSnapshotsByMarketIds(client, pageConfigs.map((config) => config.marketId)),
+    getLoanSnapshotsByMarketIds(
+      client,
+      params.loanPositionToken,
+      pageConfigs.map((config) => config.marketId)
+    ),
   ]);
   const yesOrdersByMarket = groupOrdersByMarket(yesOrders);
   const volumeByMarket = new Map(
@@ -193,6 +200,7 @@ export async function getMarketsView(
 export async function getLoansView(
   client: DbClient,
   params: {
+    loanPositionToken: Hex;
     limit: number;
     cursor?: string;
   }
@@ -201,6 +209,7 @@ export async function getLoansView(
   nextCursor: string | null;
 }> {
   const loans = await listLoanSnapshots(client, {
+    loanPositionToken: params.loanPositionToken,
     limit: params.limit + 1,
     cursor: params.cursor === undefined ? undefined : parsePositiveBigintCursor(params.cursor, "loans cursor"),
   });

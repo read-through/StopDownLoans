@@ -5,33 +5,44 @@ import type { Hex, LoanSnapshot } from "../types.js";
 
 export type UpsertLoanSnapshotInput = Omit<LoanSnapshot, "syncedAt" | "updatedAt">;
 
-export async function getLoanSnapshot(client: DbClient, loanId: bigint): Promise<LoanSnapshot | null> {
+export async function getLoanSnapshot(
+  client: DbClient,
+  loanPositionToken: Hex,
+  loanId: bigint
+): Promise<LoanSnapshot | null> {
   const result = await client.query<LoanSnapshotRow>(
     `
       SELECT *
       FROM loan_snapshots
-      WHERE loan_id = $1
+      WHERE loan_position_token = $1
+        AND loan_id = $2
     `,
-    [loanId.toString()]
+    [hexToBuffer(loanPositionToken), loanId.toString()]
   );
 
   return result.rows[0] === undefined ? null : mapLoanSnapshotRow(result.rows[0]);
 }
 
-export async function getLoanSnapshotByMarketId(client: DbClient, marketId: Hex): Promise<LoanSnapshot | null> {
+export async function getLoanSnapshotByMarketId(
+  client: DbClient,
+  loanPositionToken: Hex,
+  marketId: Hex
+): Promise<LoanSnapshot | null> {
   const result = await client.query<LoanSnapshotRow>(
     `
       SELECT *
       FROM loan_snapshots
-      WHERE market_id = $1
+      WHERE loan_position_token = $1
+        AND market_id = $2
     `,
-    [hexToBuffer(marketId)]
+    [hexToBuffer(loanPositionToken), hexToBuffer(marketId)]
   );
 
   return result.rows[0] === undefined ? null : mapLoanSnapshotRow(result.rows[0]);
 }
 
 export async function listLoanSnapshots(client: DbClient, params: {
+  loanPositionToken: Hex;
   limit: number;
   cursor?: bigint;
 }): Promise<LoanSnapshot[]> {
@@ -39,11 +50,12 @@ export async function listLoanSnapshots(client: DbClient, params: {
     `
       SELECT *
       FROM loan_snapshots
-      WHERE ($2::numeric IS NULL OR loan_id <= $2)
+      WHERE loan_position_token = $1
+        AND ($3::numeric IS NULL OR loan_id <= $3)
       ORDER BY loan_id DESC
-      LIMIT $1
+      LIMIT $2
     `,
-    [params.limit, params.cursor?.toString() ?? null]
+    [hexToBuffer(params.loanPositionToken), params.limit, params.cursor?.toString() ?? null]
   );
 
   return result.rows.map(mapLoanSnapshotRow);
@@ -51,6 +63,7 @@ export async function listLoanSnapshots(client: DbClient, params: {
 
 export async function getLoanSnapshotsByMarketIds(
   client: DbClient,
+  loanPositionToken: Hex,
   marketIds: readonly Hex[]
 ): Promise<Map<string, LoanSnapshot>> {
   if (marketIds.length === 0) {
@@ -61,9 +74,10 @@ export async function getLoanSnapshotsByMarketIds(
     `
       SELECT *
       FROM loan_snapshots
-      WHERE market_id = ANY($1::bytea[])
+      WHERE loan_position_token = $1
+        AND market_id = ANY($2::bytea[])
     `,
-    [marketIds.map(hexToBuffer)]
+    [hexToBuffer(loanPositionToken), marketIds.map(hexToBuffer)]
   );
 
   return new Map(result.rows.map((row) => {
@@ -79,6 +93,7 @@ export async function upsertLoanSnapshot(
   const result = await client.query<LoanSnapshotRow>(
     `
       INSERT INTO loan_snapshots (
+        loan_position_token,
         loan_id,
         borrower,
         principal,
@@ -101,9 +116,9 @@ export async function upsertLoanSnapshot(
       )
       VALUES (
         $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
-        $11, $12, $13, $14, $15, $16, $17, $18, $19
+        $11, $12, $13, $14, $15, $16, $17, $18, $19, $20
       )
-      ON CONFLICT (loan_id)
+      ON CONFLICT (loan_position_token, loan_id)
       DO UPDATE SET
         borrower = EXCLUDED.borrower,
         principal = EXCLUDED.principal,
@@ -128,6 +143,7 @@ export async function upsertLoanSnapshot(
       RETURNING *
     `,
     [
+      hexToBuffer(input.loanPositionToken),
       input.loanId.toString(),
       hexToBuffer(input.borrower),
       input.principal.toString(),

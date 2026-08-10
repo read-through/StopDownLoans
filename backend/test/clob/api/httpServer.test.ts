@@ -332,6 +332,8 @@ describe("createClobHttpServer", () => {
         {
           client: {},
           params: {
+            outcomeToken: "0x0000000000000000000000000000000000000006",
+            loanPositionToken: "0x0000000000000000000000000000000000000003",
             limit: 100,
             cursor: undefined,
           },
@@ -494,6 +496,7 @@ describe("createClobHttpServer", () => {
         {
           client: {},
           params: {
+            loanPositionToken: "0x0000000000000000000000000000000000000003",
             limit: 25,
             cursor: "2",
           },

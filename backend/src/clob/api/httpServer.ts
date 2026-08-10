@@ -302,6 +302,7 @@ async function routeRequest(
 
   if (request.method === "GET" && path.length === 2 && path[0] === "v1" && path[1] === "loans") {
     return services.read.getLoansView(getDbClient(), {
+      loanPositionToken: context.loanPositionToken,
       limit: parseLimit(url.searchParams.get("limit")),
       cursor: parseOptionalCursor(url.searchParams.get("cursor")),
     });
@@ -318,6 +319,8 @@ async function routeRequest(
 
   if (request.method === "GET" && path.length === 2 && path[0] === "v1" && path[1] === "markets") {
     return services.read.getMarketsView(getDbClient(), {
+      outcomeToken: services.config.outcomeToken,
+      loanPositionToken: context.loanPositionToken,
       limit: parseLimit(url.searchParams.get("limit")),
       cursor: parseOptionalCursor(url.searchParams.get("cursor")),
     });

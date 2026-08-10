@@ -186,6 +186,7 @@ export type MarketConfigEvent = {
 export type LoanState = "FUNDING" | "FUNDED" | "ACTIVE" | "CANCELLED" | "REPAID" | "DEFAULTED";
 
 export type LoanSnapshot = {
+  loanPositionToken: Hex;
   loanId: bigint;
   borrower: Hex;
   principal: bigint;
