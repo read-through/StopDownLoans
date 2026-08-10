@@ -15,6 +15,7 @@
     "smoke:backend": "tsx backend/scripts/smoke-clob.ts",
     "smoke:backend:local": "tsx backend/scripts/local-smoke.ts",
     "deploy:arc-testnet": "hardhat run scripts/deploy-arc-testnet.ts --network arcTestnet --config hardhat.arc-deploy.config.ts",
+    "check:arc-deploy": "hardhat run scripts/check-arc-deploy-readiness.ts --network arcTestnet --config hardhat.arc-deploy.config.ts",
     "verify:arc-deployment": "hardhat run scripts/verify-arc-deployment.ts --network arcTestnet --config hardhat.arc-deploy.config.ts",
     "arc:create-demo-loan": "hardhat run scripts/create-arc-demo-loan.ts --network arcTestnet --config hardhat.arc-demo.config.ts",
     "arc:borrower-collateral": "hardhat run scripts/arc-borrower-collateral.ts --network arcTestnet --config hardhat.arc-demo.config.ts",

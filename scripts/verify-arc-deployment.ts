@@ -1,5 +1,5 @@
 import { network } from "hardhat";
-import { getAddress, type Address } from "viem";
+import { getAddress, keccak256, type Address, type Hex } from "viem";
 
 type DeploymentEnv = {
   loanPositionToken: Address;
@@ -8,6 +8,9 @@ type DeploymentEnv = {
   collateralToken: Address;
   expectedOwner: Address | undefined;
   expectedOperator: Address | undefined;
+  loanPositionTokenBytecodeHash: Hex;
+  outcomeTokenBytecodeHash: Hex;
+  outcomeExchangeBytecodeHash: Hex;
 };
 
 const { viem } = await network.create({
@@ -32,6 +35,17 @@ await assertEqualAddress(
 );
 await assertEqualAddress("OutcomeToken.collateralToken", await outcomeToken.read.collateralToken(), deployment.collateralToken);
 await assertEqualAddress("OutcomeExchange.usdc", await outcomeExchange.read.usdc(), deployment.collateralToken);
+await assertBytecodeHash(
+  "LoanPositionToken",
+  deployment.loanPositionToken,
+  deployment.loanPositionTokenBytecodeHash
+);
+await assertBytecodeHash("OutcomeToken", deployment.outcomeToken, deployment.outcomeTokenBytecodeHash);
+await assertBytecodeHash(
+  "OutcomeExchange",
+  deployment.outcomeExchange,
+  deployment.outcomeExchangeBytecodeHash
+);
 
 if (deployment.expectedOwner !== undefined) {
   await assertEqualAddress("LoanPositionToken.owner", await loanPositionToken.read.owner(), deployment.expectedOwner);
@@ -56,7 +70,30 @@ function readDeploymentEnv(): DeploymentEnv {
     collateralToken: readAddressEnv("USDC_ADDRESS"),
     expectedOwner: readOptionalAddressEnv("EXPECTED_OWNER_ADDRESS"),
     expectedOperator: readOptionalAddressEnv("EXPECTED_OPERATOR_ADDRESS"),
+    loanPositionTokenBytecodeHash: readHashEnv("LOAN_POSITION_TOKEN_BYTECODE_HASH"),
+    outcomeTokenBytecodeHash: readHashEnv("OUTCOME_TOKEN_BYTECODE_HASH"),
+    outcomeExchangeBytecodeHash: readHashEnv("OUTCOME_EXCHANGE_BYTECODE_HASH"),
   };
+}
+
+function readHashEnv(key: string): Hex {
+  const value = process.env[key];
+  if (value === undefined || !/^0x[a-fA-F0-9]{64}$/.test(value)) {
+    throw new Error(`${key} must be a 32-byte hex hash.`);
+  }
+  return value as Hex;
+}
+
+async function assertBytecodeHash(label: string, address: Address, expected: Hex): Promise<void> {
+  const bytecode = await publicClient.getBytecode({ address });
+  if (bytecode === undefined || bytecode === "0x") {
+    throw new Error(`${label} at ${address} has no runtime bytecode.`);
+  }
+  const actual = keccak256(bytecode);
+  if (actual.toLowerCase() !== expected.toLowerCase()) {
+    throw new Error(`${label} bytecode hash expected ${expected}, got ${actual}`);
+  }
+  console.log(`OK ${label} bytecode hash = ${actual}`);
 }
 
 function readAddressEnv(key: string): Address {

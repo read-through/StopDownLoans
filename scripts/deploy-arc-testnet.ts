@@ -1,4 +1,5 @@
 import { network } from "hardhat";
+import { readFile, writeFile } from "node:fs/promises";
 import { getAddress, keccak256, type Address, type Hex } from "viem";
 
 const ARC_TESTNET_USDC = "0x3600000000000000000000000000000000000000";
@@ -13,8 +14,21 @@ const deployerAddress = getAddress(deployer.account.address);
 const collateralToken = getAddress(process.env.COLLATERAL_TOKEN_ADDRESS ?? ARC_TESTNET_USDC);
 const erc1155MetadataUri = process.env.ERC1155_METADATA_URI ?? "";
 const platformFeeBps = 0n;
+const chainId = await publicClient.getChainId();
+const deployerGasBalance = await publicClient.getBalance({ address: deployerAddress });
+const collateralBytecode = await publicClient.getBytecode({ address: collateralToken });
 
-console.log(`Deploying StopDown contracts to chain ${await publicClient.getChainId()}`);
+if (chainId !== 5_042_002) {
+  throw new Error(`Expected ARC Testnet chain 5042002, got ${chainId}.`);
+}
+if (collateralBytecode === undefined || collateralBytecode === "0x") {
+  throw new Error(`No ARC USDC bytecode found at ${collateralToken}.`);
+}
+if (deployerGasBalance === 0n) {
+  throw new Error(`Fund ${deployerAddress} with ARC Testnet USDC before deployment.`);
+}
+
+console.log(`Deploying StopDown contracts to chain ${chainId}`);
 console.log(`Deployer: ${deployerAddress}`);
 console.log(`Collateral token: ${collateralToken}`);
 
@@ -51,6 +65,14 @@ const bytecodeHashes = {
   outcomeToken: await runtimeBytecodeHash(outcomeToken.address),
   outcomeExchange: await runtimeBytecodeHash(outcomeExchange.address),
 };
+
+await persistDeploymentEnv({
+  loanPositionToken: loanPositionToken.address,
+  outcomeToken: outcomeToken.address,
+  outcomeExchange: outcomeExchange.address,
+  collateralToken,
+}, bytecodeHashes);
+console.log("Saved deployment addresses and bytecode hashes to config/env/arc-deploy.env");
 
 printEnv({
   loanPositionToken: loanPositionToken.address,
@@ -97,4 +119,39 @@ async function runtimeBytecodeHash(address: Address): Promise<Hex> {
     throw new Error(`Deployment at ${address} has no runtime bytecode.`);
   }
   return keccak256(bytecode);
+}
+
+async function persistDeploymentEnv(addresses: {
+  loanPositionToken: Address;
+  outcomeToken: Address;
+  outcomeExchange: Address;
+  collateralToken: Address;
+}, bytecodeHashes: {
+  loanPositionToken: Hex;
+  outcomeToken: Hex;
+  outcomeExchange: Hex;
+}): Promise<void> {
+  const envPath = "config/env/arc-deploy.env";
+  let contents = await readFile(envPath, "utf8");
+  const values: Record<string, string> = {
+    LOAN_POSITION_TOKEN_ADDRESS: addresses.loanPositionToken,
+    OUTCOME_TOKEN_ADDRESS: addresses.outcomeToken,
+    OUTCOME_EXCHANGE_ADDRESS: addresses.outcomeExchange,
+    LOAN_POSITION_TOKEN_BYTECODE_HASH: bytecodeHashes.loanPositionToken,
+    OUTCOME_TOKEN_BYTECODE_HASH: bytecodeHashes.outcomeToken,
+    OUTCOME_EXCHANGE_BYTECODE_HASH: bytecodeHashes.outcomeExchange,
+    USDC_ADDRESS: addresses.collateralToken,
+    EXPECTED_OWNER_ADDRESS: deployerAddress,
+    EXPECTED_OPERATOR_ADDRESS: deployerAddress,
+  };
+
+  for (const [key, value] of Object.entries(values)) {
+    const line = `${key}=${value}`;
+    const pattern = new RegExp(`^${key}=.*$`, "m");
+    contents = pattern.test(contents)
+      ? contents.replace(pattern, line)
+      : `${contents.trimEnd()}\n${line}\n`;
+  }
+
+  await writeFile(envPath, contents, "utf8");
 }

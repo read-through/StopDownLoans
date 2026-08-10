@@ -373,6 +373,13 @@ Copy-Item config\env\arc-deploy.env.example config\env\arc-deploy.env
 Deployment and verification commands load `config/env/arc-deploy.env`, not the backend `.env`.
 Keeping `DEPLOYER_PRIVATE_KEY` empty in the committed template is intentional.
 
+Check the configured chain, ARC USDC contract, deployer address, and native gas balance without
+submitting transactions:
+
+```powershell
+npm.cmd run check:arc-deploy
+```
+
 Optional deploy env:
 
 ```powershell
@@ -387,21 +394,17 @@ npm.cmd run deploy:arc-testnet
 ```
 
 The deploy script deploys `LoanPositionToken`, `OutcomeToken`, and `OutcomeExchange`, configures the
-loan contract's outcome token once, authorizes the deployer as the first exchange operator, and
-prints backend env values.
+loan contract's outcome token once, authorizes the deployer as the first exchange operator, saves
+the new addresses and runtime bytecode hashes back to the ignored `config/env/arc-deploy.env`, and
+prints backend/frontend env values.
 
 `ERC1155_METADATA_URI` is optional and affects only future deployments. An empty value leaves the
 ERC-1155 metadata URI unset without changing mint, transfer, merge, redeem, or settlement behavior.
 
-After deployment, verify the deployed wiring:
+After deployment, verify the deployed wiring and runtime bytecode hashes. The deploy script has
+already written the required values into `config/env/arc-deploy.env`:
 
 ```powershell
-$env:LOAN_POSITION_TOKEN_ADDRESS='0x...'
-$env:OUTCOME_TOKEN_ADDRESS='0x...'
-$env:OUTCOME_EXCHANGE_ADDRESS='0x...'
-$env:USDC_ADDRESS='0x3600000000000000000000000000000000000000'
-$env:EXPECTED_OWNER_ADDRESS='0x...'
-$env:EXPECTED_OPERATOR_ADDRESS='0x...'
 npm.cmd run verify:arc-deployment
 ```
 
