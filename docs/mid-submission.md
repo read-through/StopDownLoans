@@ -191,16 +191,20 @@ book reads, and WebSocket subscription.
 
 ## ARC Testnet Evidence
 
-Live contracts:
+Current principal-based contracts:
 
 | Contract | Address |
 | --- | --- |
-| `LoanPositionToken` | `0x4f8e2d32ad62835353b70f2fa091979d513a43ac` |
-| `OutcomeToken` | `0x06c08af6a3ad503560f3010105f1ec32052c7f2f` |
-| `OutcomeExchange` | `0xddba15b2ddadec73f06fab4011b37c100efe6c30` |
+| `LoanPositionToken` | `0x6cdab73d1acf5a559604b6cd5f91a04426c5c686` |
+| `OutcomeToken` | `0x2cf1b7094f0da21b553993484e59ce5176e6177c` |
+| `OutcomeExchange` | `0xcf23faf83065bc4c0e11fa0e99ca948600f7d341` |
 | ARC USDC | `0x3600000000000000000000000000000000000000` |
 
-Current demo loan:
+The current deployment passed wiring and runtime bytecode verification. The transactions below are
+historical walkthrough evidence from the previous deployment and must not be mixed with these
+current addresses.
+
+Historical demo loan:
 
 - `LOAN_ID=3`
 - `MARKET_ID=0x1489a4e8bf6c349a62c1892e03c1206051f11bac3bdf1adaba8aaa6800322ea1`

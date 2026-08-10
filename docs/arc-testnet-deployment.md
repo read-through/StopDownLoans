@@ -1,14 +1,36 @@
 # ARC Testnet Deployment
 
-> Historical deployment evidence. These addresses use the previous collateral formula where
-> `collateralBps` was applied to repayment amount. After the principal-based formula change, the
-> contracts must be redeployed before this document can be treated as the current demo deployment.
+## Current Principal-Based Deployment
 
-Status note: current contract deployment was refreshed after the source change that moved
-`collateralBps` into borrower-controlled `createLoan(...)` parameters. Fresh current-deployment
-loan, activation, direct settlement, and CLOB-backend settlement evidence is recorded below.
+Deployment date: 2026-08-10
 
-Current deployment date: 2026-08-02
+- Chain: ARC Testnet (`5042002`)
+- ARC USDC: `0x3600000000000000000000000000000000000000`
+- Owner and initial exchange operator: `0xCF87Ab82a1bbBd62F9e0fAC67Eb5a5B0ec33DD28`
+- `LoanPositionToken`: `0x6cdab73d1acf5a559604b6cd5f91a04426c5c686`
+- `OutcomeToken`: `0x2cf1b7094f0da21b553993484e59ce5176e6177c`
+- `OutcomeExchange`: `0xcf23faf83065bc4c0e11fa0e99ca948600f7d341`
+
+Verified runtime bytecode hashes:
+
+- `LoanPositionToken`: `0x09e2a5ad5e062e7857cd5b30980277cffa3d73daf33c07c61c52bd7741bb0387`
+- `OutcomeToken`: `0x382d7041ea2dab2148eb5fee4cbfd7b42269a937da8afe0783a596f42b051b03`
+- `OutcomeExchange`: `0x491ec86a840f4c340660f4c918ff8d7ac068b06992d9deee6cdf69758e037548`
+
+`verify:arc-deployment` passed for all contract links, ARC USDC links, owners, initial operator,
+and runtime bytecode hashes. This build calculates borrower collateral from loan principal. A fresh
+loan lifecycle and CLOB trade have not yet been recorded for these addresses.
+
+## Historical Deployment Evidence
+
+> The evidence below uses the previous collateral formula where `collateralBps` was applied to
+> repayment amount. Do not configure the current backend or frontend with these old addresses.
+
+Status note: this historical contract deployment was refreshed after the source change that moved
+`collateralBps` into borrower-controlled `createLoan(...)` parameters. Its loan, activation, direct
+settlement, and CLOB-backend settlement evidence is recorded below for historical reference.
+
+Historical deployment date: 2026-08-02
 
 Network:
 
@@ -39,7 +61,7 @@ Verified wiring:
 - deployer is authorized as `OutcomeExchange` operator
 - executor `0x147a9B1454e4aC1c23d75cD476B5969a568E94f3` is authorized as `OutcomeExchange` operator
 
-Current verification:
+Historical verification:
 
 - `verify:arc-deployment` passed on 2026-08-02.
 - executor authorization transaction:
@@ -48,9 +70,9 @@ Current verification:
   public ARC RPC `request limit reached` on a follow-up read. The deployment wiring check above
   passed; the remaining issue is public RPC quota, not a known contract wiring failure.
 
-## Current Demo Loan Evidence
+## Historical Demo Loan Evidence
 
-The current walkthrough was executed on 2026-08-02 with the deployer wallet acting as the borrower
+The historical walkthrough was executed on 2026-08-02 with the deployer wallet acting as the borrower
 and lender for the smallest ARC walkthrough.
 
 Loan parameters:
@@ -62,7 +84,7 @@ Loan parameters:
 - Borrower collateral: `1.05 USDC` (`1050000` base units)
 - One loan maps to one market
 
-Current clean reviewer loan:
+Historical clean reviewer loan:
 
 - `LOAN_ID`: `3`
 - `MARKET_ID`: `0x1489a4e8bf6c349a62c1892e03c1206051f11bac3bdf1adaba8aaa6800322ea1`
@@ -85,7 +107,7 @@ shifted the withdraw freeze deadline by roughly three hours. It is left on-chain
 evidence of the timestamp pitfall; use `DateTimeOffset.UtcNow.ToUnixTimeSeconds()` for demo
 deadlines.
 
-## Current Direct Settlement Evidence
+## Historical Direct Settlement Evidence
 
 The active loan market was tested through direct `OutcomeExchange.matchOrders` settlement:
 borrower sold `0.2 YES` for `0.12 USDC` to a temporary buyer wallet.
@@ -101,7 +123,7 @@ Observed deltas:
 - Buyer USDC delta: `-0.12`
 - `ORDER_FILLED_EVENTS=2`
 
-## Current CLOB Backend Evidence
+## Historical CLOB Backend Evidence
 
 The clean reviewer active market was registered in the local CLOB database:
 

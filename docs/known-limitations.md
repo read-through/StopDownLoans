@@ -4,8 +4,8 @@ This document separates intentional MVP shortcuts from finished protocol behavio
 
 ## Must Fix After Mid-Submission
 
-- Current published ARC contract addresses predate the principal-based collateral-ratio fix and
-  require redeployment before the final public demo.
+- A principal-based ARC deployment is verified, but it does not yet have a fresh reviewer loan,
+  active market, or confirmed CLOB trade.
 
 | Priority | Area | Current shortcut | Why it exists | Better target |
 | --- | --- | --- | --- | --- |

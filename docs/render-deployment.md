@@ -30,18 +30,18 @@ The repository contains a `render.yaml` Blueprint for a public ARC testnet demo:
 
 ## First Demo Preparation
 
-The Blueprint's `initialDeployHook` registers the active reviewer market after the first successful
-service deployment. Confirm that `/v1/markets` returns the market below before submitting orders.
-The hook uses the idempotent command below. A paid Render service can rerun it from its shell:
+`render.yaml` cannot pre-register a market until a fresh current-deployment loan exists and its
+`marketId` is known. After creating and activating that loan, register it with the idempotent command
+below. A paid Render service can run it from its shell:
 
 ```sh
 node dist/backend/scripts/market-config.js --outcome-token <CURRENT_OUTCOME_TOKEN> --market-id <CURRENT_MARKET_ID> --default-tick-units 1000 --edge-tick-units 100 --lower-edge-price-units 100000 --upper-edge-price-units 900000 --min-order-outcome-amount 1
 ```
 
-The Free tier does not provide a service shell or one-off jobs. On Free, confirm that the initial
-hook succeeded in the deploy logs and that `/v1/markets` contains the reviewer market. If the hook
-did not run, fix the deployment and recreate the demo service instead of assuming a manual shell is
-available.
+The Free tier does not provide a service shell or one-off jobs. For a Free-tier demo, run the same
+command locally against the Render `DATABASE_URL` only if external database access is explicitly
+enabled, or add an authenticated market-configuration deployment path before the reviewer demo.
+Do not claim the market is registered until `/v1/markets` returns it.
 
 ## Free-Tier Limits
 

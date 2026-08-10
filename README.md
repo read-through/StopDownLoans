@@ -14,7 +14,7 @@ For the hackathon submission checklist and 3-minute video script, see
 `docs/hackathon-submission.md`. For a short hackathon reviewer guide, see
 `docs/mid-submission.md`. For the final-submission MVP roadmap and current progress estimate, see
 `docs/final-mvp-roadmap.md`. For intentional MVP shortcuts and cleanup items, see
-`docs/known-limitations.md`. Historical ARC testnet deployment addresses are recorded in
+`docs/known-limitations.md`. Current and historical ARC testnet deployment evidence is recorded in
 `docs/arc-testnet-deployment.md`. For running the live ARC testnet stack with a settlement executor
 wallet, see `docs/arc-testnet-runbook.md`. For injected user wallets, the executor wallet, Circle,
 and market-maker paths, see `docs/wallet-path.md` and `docs/circle-integration-strategy.md`. The
@@ -136,11 +136,10 @@ without requiring a live ARC deployment or funded wallets. It uses fixture-backe
 does not provide wallet actions or persist real protocol/orderbook state. Use the live ARC stack with
 an injected or Circle wallet for transaction and signature testing.
 
-Historical ARC testnet deployment addresses are recorded in `docs/arc-testnet-deployment.md`. They
-prove the earlier borrower-controlled `collateralBps` path, but a new deployment is required after
-changing the collateral-ratio base from repayment amount to principal. The earlier evidence remains:
-`LOAN_ID=3` is the current clean reviewer loan: it was created, collateralized, funded, activated,
-and traded through the backend CLOB executor/reconciliation path.
+The current principal-based contracts are deployed and bytecode-verified on ARC testnet; addresses
+and hashes are recorded in `docs/arc-testnet-deployment.md`. Historical `LOAN_ID=3` remains evidence
+of the earlier full create/fund/activate/CLOB-settlement walkthrough, but it belongs to the previous
+deployment. A fresh reviewer loan and trade must be recorded against the current addresses.
 
 The frontend uses hash routes for reviewable deep links:
 

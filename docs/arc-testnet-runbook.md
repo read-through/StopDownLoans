@@ -1,8 +1,7 @@
 # ARC Testnet Runbook
 
-> **Historical addresses below are not compatible with the current principal-based collateral
-> build. Do not start the backend with them.** Redeploy first, then replace every address and add the
-> three runtime bytecode hashes printed by `npm.cmd run deploy:arc-testnet`.
+> The addresses below are the principal-based deployment verified on 2026-08-10. The ignored
+> `config/env/arc-deploy.env` remains the local source of truth for deployment credentials.
 
 This runbook is for running the MVP against the deployed ARC testnet contracts without frontend/backend mocks.
 
@@ -11,9 +10,9 @@ path for users and the backend executor wallet for settlement.
 
 ## Contracts
 
-- `LoanPositionToken`: `<CURRENT_LOAN_POSITION_TOKEN>`
-- `OutcomeToken`: `<CURRENT_OUTCOME_TOKEN>`
-- `OutcomeExchange`: `<CURRENT_OUTCOME_EXCHANGE>`
+- `LoanPositionToken`: `0x6cdab73d1acf5a559604b6cd5f91a04426c5c686`
+- `OutcomeToken`: `0x2cf1b7094f0da21b553993484e59ce5176e6177c`
+- `OutcomeExchange`: `0xcf23faf83065bc4c0e11fa0e99ca948600f7d341`
 - ARC USDC: `0x3600000000000000000000000000000000000000`
 
 ## Local Environment
@@ -24,12 +23,12 @@ The local `.env` file is intentionally ignored by git. It must contain:
 DATABASE_URL=postgres://stopdown:stopdown@localhost:55432/stopdown
 ARC_RPC_URL=https://rpc.testnet.arc.network
 ARC_CHAIN_ID=5042002
-LOAN_POSITION_TOKEN_ADDRESS=<CURRENT_LOAN_POSITION_TOKEN>
-OUTCOME_TOKEN_ADDRESS=<CURRENT_OUTCOME_TOKEN>
-OUTCOME_EXCHANGE_ADDRESS=<CURRENT_OUTCOME_EXCHANGE>
-LOAN_POSITION_TOKEN_BYTECODE_HASH=<DEPLOY_OUTPUT_HASH>
-OUTCOME_TOKEN_BYTECODE_HASH=<DEPLOY_OUTPUT_HASH>
-OUTCOME_EXCHANGE_BYTECODE_HASH=<DEPLOY_OUTPUT_HASH>
+LOAN_POSITION_TOKEN_ADDRESS=0x6cdab73d1acf5a559604b6cd5f91a04426c5c686
+OUTCOME_TOKEN_ADDRESS=0x2cf1b7094f0da21b553993484e59ce5176e6177c
+OUTCOME_EXCHANGE_ADDRESS=0xcf23faf83065bc4c0e11fa0e99ca948600f7d341
+LOAN_POSITION_TOKEN_BYTECODE_HASH=0x09e2a5ad5e062e7857cd5b30980277cffa3d73daf33c07c61c52bd7741bb0387
+OUTCOME_TOKEN_BYTECODE_HASH=0x382d7041ea2dab2148eb5fee4cbfd7b42269a937da8afe0783a596f42b051b03
+OUTCOME_EXCHANGE_BYTECODE_HASH=0x491ec86a840f4c340660f4c918ff8d7ac068b06992d9deee6cdf69758e037548
 USDC_ADDRESS=0x3600000000000000000000000000000000000000
 EXECUTOR_PRIVATE_KEY=0x...
 ```
@@ -93,7 +92,7 @@ Register a current-deployment active ARC market in the local CLOB database after
 activating a fresh loan:
 
 ```powershell
-npm.cmd run market-config:upsert -- --outcome-token <CURRENT_OUTCOME_TOKEN> --market-id <MARKET_ID> --default-tick-units 1000 --edge-tick-units 100 --lower-edge-price-units 100000 --upper-edge-price-units 900000 --min-order-outcome-amount 1
+npm.cmd run market-config:upsert -- --outcome-token 0x2cf1b7094f0da21b553993484e59ce5176e6177c --market-id <MARKET_ID> --default-tick-units 1000 --edge-tick-units 100 --lower-edge-price-units 100000 --upper-edge-price-units 900000 --min-order-outcome-amount 1
 ```
 
 Run the backend with settlement/keeper loops:
@@ -144,7 +143,7 @@ real browser wallet to sign and submit orders through the frontend.
 Open:
 
 ```text
-http://127.0.0.1:5173/#exchange/<CURRENT_OUTCOME_TOKEN>:<MARKET_ID>
+http://127.0.0.1:5173/#exchange/0x2cf1b7094f0da21b553993484e59ce5176e6177c:<MARKET_ID>
 ```
 
 ## API-only Mode
@@ -165,12 +164,12 @@ Invoke-RestMethod http://127.0.0.1:3000/v1/loans?limit=5
 Invoke-RestMethod http://127.0.0.1:3000/v1/markets?limit=5
 ```
 
-Expected for the current demo state:
+Expected after creating and indexing a fresh current-deployment loan:
 
 - health `status = ok`;
 - health `executorEnabled = true` when `EXECUTOR_PRIVATE_KEY` is set and `dev:clob` is used;
-- loan `#3` is the current active reviewer market;
-- loan `#3` market id is `0x1489a4e8bf6c349a62c1892e03c1206051f11bac3bdf1adaba8aaa6800322ea1`.
+- the new loan appears in `/v1/loans`;
+- its linked market appears in `/v1/markets` with the same current `OutcomeToken` address.
 
 ## Live CLOB Trade Script
 
@@ -178,7 +177,7 @@ The live backend trade walkthrough submits a borrower SELL and a temporary buyer
 running CLOB API:
 
 ```powershell
-$env:LOAN_ID='3'
+$env:LOAN_ID='<CURRENT_REVIEWER_LOAN_ID>'
 $env:CLOB_API_URL='http://127.0.0.1:3000'
 npm.cmd run arc:clob-trade-active-loan
 ```

@@ -53,8 +53,8 @@ and gives borrowers a path to sell YES exposure after posting collateral.
 
 Implemented:
 
-- Solidity contracts and their historical settlement evidence exist on ARC testnet; the
-  principal-based collateral build requires a fresh deployment before the final public demo.
+- The principal-based Solidity contracts are deployed on ARC testnet and verified by wiring,
+  ownership, operator authorization, and runtime bytecode hashes.
 - ARC USDC is the lending, collateral, repayment, outcome redemption, and exchange settlement asset.
 - The frontend includes an injected-wallet ARC chain registration fallback through
   `wallet_addEthereumChain`.
@@ -67,12 +67,13 @@ Evidence:
 
 - Contracts and transaction hashes: `docs/arc-testnet-deployment.md`.
 - Live ARC runbook: `docs/arc-testnet-runbook.md`.
-- Current clean reviewer loan: `LOAN_ID=3`.
-- Current clean reviewer market:
+- Historical reviewer loan: `LOAN_ID=3`.
+- Historical reviewer market:
   `0x1489a4e8bf6c349a62c1892e03c1206051f11bac3bdf1adaba8aaa6800322ea1`.
 
 Remaining ARC work:
 
+- create, activate, and trade a fresh reviewer loan on the current verified deployment;
 - expand the existing App Kit command into optional retail onboarding and unified balance UI;
 - move from public RPC to a production-grade RPC/indexer setup for live UI demos and operations.
 
