@@ -22,8 +22,8 @@ Open `http://127.0.0.1:5173/#overview` after Vite prints its ready message.
 
 Expected wallet behavior:
 
-- `Connect wallet` offers Browser wallet and Circle Wallet;
-- Browser wallet reports that no injected provider exists when MetaMask/Rabby is unavailable;
+- `Connect wallet` lists every EIP-6963 browser wallet by name and offers Circle Wallet;
+- the dialog reports that no browser wallet exists when no injected provider is available;
 - Circle Wallet reports that it is not configured when backend Circle credentials are absent;
 - transaction, order-signing, claim, and approval actions remain unavailable without a real wallet.
 
@@ -55,8 +55,8 @@ Verify:
 1. Start PostgreSQL and the live backend as described in `docs/arc-testnet-runbook.md`.
 2. Copy `frontend/.env.arc-testnet.example` to `frontend/.env.local`.
 3. Run `npm.cmd run dev:frontend`.
-4. Open the frontend in Chrome, Brave, or another browser with MetaMask/Rabby installed.
-5. Click `Connect wallet`, then choose `Browser wallet`.
+4. Open the frontend in Chrome, Brave, or another browser with an EIP-6963 wallet installed.
+5. Click `Connect wallet`, then choose the required wallet by name.
 6. Approve adding or switching to ARC testnet chain `5042002`.
 7. Confirm that Portfolio shows the connected address, USDC, outcome balances, approvals, orders,
    lender positions, and reservations.

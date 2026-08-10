@@ -272,9 +272,10 @@ export function App() {
         <WalletConnectDialog
           injectedError={c.walletError}
           injectedStatus={c.walletStatus}
+          injectedWallets={c.injectedWalletOptions}
           onClose={() => setWalletDialogOpen(false)}
-          onInjectedWallet={() => {
-            c.connectWallet();
+          onInjectedWallet={(connectorId) => {
+            c.connectInjectedWallet(connectorId);
           }}
           onCircleWallet={c.connectCircleWallet}
         />

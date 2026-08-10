@@ -8,7 +8,7 @@ import {
   redeemDefaultCollateral,
   settleRepaidLoan,
 } from "../../chainWrites";
-import { errorMessage, formatUsdc, shortHex } from "../../lib/format";
+import { errorMessage, formatUsdc, formatUsdcInput, shortHex } from "../../lib/format";
 import { parseUsdcInput } from "../../lib/parsing";
 import {
   getLoanPaymentDepositPreflightError,
@@ -32,7 +32,7 @@ export function LoanPaymentAction(props: {
   const repayment = BigInt(props.loan.repaymentAmountRaw);
   const credited = BigInt(props.loan.creditedAmountRaw);
   const remaining = repayment > credited ? repayment - credited : 0n;
-  const [amount, setAmount] = useState(() => formatUsdc(remaining > 0n ? remaining : repayment));
+  const [amount, setAmount] = useState(() => formatUsdcInput(remaining > 0n ? remaining : repayment));
   const [status, setStatus] = useState<
     | "idle"
     | "approving"
@@ -101,7 +101,7 @@ export function LoanPaymentAction(props: {
     status !== "redeeming";
 
   useEffect(() => {
-    setAmount(formatUsdc(remaining > 0n ? remaining : repayment));
+    setAmount(formatUsdcInput(remaining > 0n ? remaining : repayment));
   }, [props.loan.loanId, remaining, repayment]);
 
   useEffect(() => {

@@ -25,7 +25,8 @@ import {
 } from "../api";
 import { subscribeBookFeed } from "../bookFeed";
 import { readWalletBalances, type WalletBalances } from "../chainReads";
-import { arcWalletChain, expectedArcChainIdHex, expectedArcChainIdNumber, frontendContracts } from "../config";
+import { expectedArcChainIdHex, expectedArcChainIdNumber, frontendContracts } from "../config";
+import { useInjectedWallet } from "../injected-wallet/useInjectedWallet";
 import { errorMessage, formatTopbarTime, shortHex, walletButtonLabel, formatUsdc } from "../lib/format";
 import {
   getMarketKey,
@@ -41,12 +42,7 @@ import type {
   Outcome,
 } from "../types";
 import {
-  getConnectedWalletAccount,
   getWalletProvider,
-  hasInjectedWallet,
-  requestWalletAccount,
-  subscribeWalletAccountsChanged,
-  switchWalletChain,
   type WalletAccount,
   type EthereumProvider,
   type WalletStatus,
@@ -88,9 +84,14 @@ export function useAppController() {
   const [feedStatus, setFeedStatus] = useState<"idle" | "connecting" | "connected" | "disconnected" | "error">("idle");
   const [feedError, setFeedError] = useState<string | null>(null);
   const [bookRefreshNonce, setBookRefreshNonce] = useState(0);
-  const [walletAccount, setWalletAccount] = useState<WalletAccount | null>(null);
-  const [walletStatus, setWalletStatus] = useState<WalletStatus>("checking");
-  const [walletError, setWalletError] = useState<string | null>(null);
+  const injectedWallet = useInjectedWallet();
+  const [walletMode, setWalletMode] = useState<"injected" | "circle">("injected");
+  const [circleWalletAccount, setCircleWalletAccount] = useState<WalletAccount | null>(null);
+  const [circleWalletStatus, setCircleWalletStatus] = useState<WalletStatus>("disconnected");
+  const [circleWalletError, setCircleWalletError] = useState<string | null>(null);
+  const walletAccount = walletMode === "circle" ? circleWalletAccount : injectedWallet.account;
+  const walletStatus = walletMode === "circle" ? circleWalletStatus : injectedWallet.status;
+  const walletError = walletMode === "circle" ? circleWalletError : injectedWallet.error;
   const [openOrders, setOpenOrders] = useState<ApiOrder[]>([]);
   const [openOrdersStatus, setOpenOrdersStatus] = useState<"idle" | "loading" | "loaded" | "error">("idle");
   const [openOrdersError, setOpenOrdersError] = useState<string | null>(null);
@@ -228,47 +229,6 @@ export function useAppController() {
     }, 15_000);
 
     return () => window.clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const refreshWallet = () => {
-      if (!hasInjectedWallet()) {
-        setWalletAccount(null);
-        setWalletStatus("unavailable");
-        setWalletError("No injected EVM wallet detected in this browser.");
-        return;
-      }
-
-      getConnectedWalletAccount()
-        .then((account) => {
-          if (cancelled) {
-            return;
-          }
-
-          setWalletAccount(account);
-          setWalletStatus(account === null ? "disconnected" : "connected");
-          setWalletError(null);
-        })
-        .catch((error: unknown) => {
-          if (cancelled) {
-            return;
-          }
-
-          setWalletAccount(null);
-          setWalletStatus("error");
-          setWalletError(error instanceof Error ? error.message : "Failed to read wallet");
-        });
-    };
-
-    refreshWallet();
-    const unsubscribe = subscribeWalletAccountsChanged(refreshWallet);
-
-    return () => {
-      cancelled = true;
-      unsubscribe();
-    };
   }, []);
 
   useEffect(() => {
@@ -654,63 +614,35 @@ export function useAppController() {
     [loanViews, marketConfigs]
   );
 
-  const connectWallet = () => {
-    if (!hasInjectedWallet()) {
-      setWalletAccount(null);
-      setWalletStatus("unavailable");
-      setWalletError("No injected EVM wallet detected. Open the app in a browser with MetaMask, Rabby, or another EVM wallet.");
-      return;
-    }
-
-    setWalletStatus("connecting");
-    setWalletError(null);
-
-    requestWalletAccount()
-      .then((account) => {
-        setWalletAccount(account);
-        setWalletStatus("connected");
-      })
-      .catch((error: unknown) => {
-        setWalletAccount(null);
-        setWalletStatus("error");
-        setWalletError(error instanceof Error ? error.message : "Failed to connect wallet");
-      });
+  const connectWallet = (connectorId?: string) => {
+    setWalletMode("injected");
+    void injectedWallet.connect(connectorId).catch(() => {
+      // Wagmi exposes the normalized connector error through injectedWallet.error.
+    });
   };
 
   const connectCircleWallet = (wallet: CircleConnectedWallet, provider: EthereumProvider) => {
-    setWalletAccount({
+    setCircleWalletAccount({
       kind: "circle",
       address: wallet.address,
       chainId: expectedArcChainIdHex,
       walletId: wallet.id,
       provider,
     });
-    setWalletStatus("connected");
-    setWalletError(null);
+    setCircleWalletStatus("connected");
+    setCircleWalletError(null);
+    setWalletMode("circle");
     setAccountRefreshNonce((value) => value + 1);
   };
 
   const switchWalletToArc = () => {
-    if (!hasInjectedWallet()) {
-      setWalletAccount(null);
-      setWalletStatus("unavailable");
-      setWalletError("No injected EVM wallet detected. Open the app in a browser with MetaMask, Rabby, or another EVM wallet.");
-      return;
-    }
-
-    setWalletStatus("connecting");
-    setWalletError(null);
-
-    switchWalletChain(expectedArcChainIdHex, arcWalletChain)
-      .then(() => requestWalletAccount())
-      .then((account) => {
-        setWalletAccount(account);
-        setWalletStatus("connected");
+    setWalletMode("injected");
+    void injectedWallet.switchToArc()
+      .then(() => {
         setAccountRefreshNonce((value) => value + 1);
       })
-      .catch((error: unknown) => {
-        setWalletStatus("error");
-        setWalletError(error instanceof Error ? error.message : "Failed to switch wallet to ARC");
+      .catch(() => {
+        // Wagmi exposes the normalized chain error through injectedWallet.error.
       });
   };
 
@@ -879,7 +811,9 @@ export function useAppController() {
     walletStatus,
     walletError,
     walletOnExpectedChain,
+    injectedWalletOptions: injectedWallet.options,
     connectWallet: handleWalletAction,
+    connectInjectedWallet: connectWallet,
     connectCircleWallet,
     refreshAll,
     dashboardStats,
@@ -957,6 +891,6 @@ export function useAppController() {
     formatTopbarTime,
     shortHex,
     walletButtonLabel,
-    hasInjectedWallet,
+    hasInjectedWallet: () => injectedWallet.options.length > 0,
   };
 }

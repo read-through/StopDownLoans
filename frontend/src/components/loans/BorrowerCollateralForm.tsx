@@ -4,7 +4,7 @@ import { approveUsdcOutcomeToken, depositBorrowerCollateral } from "../../chainW
 import type { LoanDetail } from "../../types";
 import type { WalletAccount } from "../../wallet";
 import { getWalletProvider } from "../../wallet";
-import { errorMessage, formatUsdc, shortHex } from "../../lib/format";
+import { errorMessage, formatUsdc, formatUsdcInput, shortHex } from "../../lib/format";
 import { parseUsdcInput } from "../../lib/parsing";
 import { getBorrowerCollateralPreflightError } from "../../lib/preflight";
 import { ArrowRight } from "lucide-react";
@@ -21,7 +21,7 @@ export function BorrowerCollateralForm(props: {
   const required = BigInt(props.loan.borrowerCollateralAmountRaw);
   const deposited = BigInt(props.loan.borrowerCollateralDepositedAmountRaw);
   const remaining = required > deposited ? required - deposited : 0n;
-  const [amount, setAmount] = useState(() => formatUsdc(remaining));
+  const [amount, setAmount] = useState(() => formatUsdcInput(remaining));
   const [status, setStatus] = useState<"idle" | "approving" | "depositing" | "deposited" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
@@ -48,7 +48,7 @@ export function BorrowerCollateralForm(props: {
     status !== "depositing";
 
   useEffect(() => {
-    setAmount(formatUsdc(remaining));
+    setAmount(formatUsdcInput(remaining));
   }, [props.loan.loanId, remaining]);
 
   useEffect(() => {

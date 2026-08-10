@@ -5,14 +5,13 @@ Circle-specific integration boundaries are detailed in `docs/circle-integration-
 
 ## Current Live ARC Path
 
-The production-like MVP path is wallet-agnostic and uses an injected EVM provider:
+The production-like MVP path is wallet-agnostic and uses injected EVM providers through Wagmi:
 
-- browser wallet exposes `window.ethereum`;
-- frontend requests accounts with `eth_requestAccounts`;
-- frontend verifies `eth_chainId` against ARC testnet `5042002`;
-- if a connected wallet is on the wrong chain, frontend requests `wallet_switchEthereumChain`;
-- if the wallet does not know ARC testnet, frontend falls back to `wallet_addEthereumChain` with
-  ARC chain id, RPC URL, explorer URL, and USDC-as-gas currency metadata;
+- Wagmi discovers all EIP-6963 providers and lists each wallet separately;
+- the user selects a connector, which owns the account, chain state, and EIP-1193 provider used by
+  subsequent actions;
+- Wagmi connects or switches the selected wallet to ARC testnet `5042002`, adding the chain when
+  the wallet does not know it;
 - frontend sends contract transactions with `eth_sendTransaction`;
 - frontend signs orders and cancellations with `eth_signTypedData_v4`;
 - backend verifies EIP-712 signatures and never stores user private keys.

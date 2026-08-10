@@ -104,13 +104,19 @@ export function formatTradePrice(trade: ApiTrade): string {
 }
 
 export function formatUsdc(value: bigint): string {
+  const [whole, fraction] = formatUsdcInput(value).split(".");
+  const wholeText = addThousandsSeparators(whole);
+
+  return fraction === undefined ? wholeText : `${wholeText}.${fraction}`;
+}
+
+export function formatUsdcInput(value: bigint): string {
   const units = 1_000_000n;
   const whole = value / units;
   const fraction = value % units;
   const fractionText = fraction.toString().padStart(6, "0").replace(/0+$/, "");
-  const wholeText = addThousandsSeparators(whole.toString());
 
-  return fractionText.length === 0 ? wholeText : `${wholeText}.${fractionText}`;
+  return fractionText.length === 0 ? whole.toString() : `${whole.toString()}.${fractionText}`;
 }
 
 export function formatTradeTime(value: string): string {
