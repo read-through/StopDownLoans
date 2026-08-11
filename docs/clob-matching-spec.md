@@ -306,10 +306,14 @@ is covered again. This preserves older price-time priority. Pending matched amou
 released by this process; any deficit consisting only of pending amounts remains visible until the
 corresponding settlement reaches a terminal state.
 
-The reconciliation update locks the reservation row first, then its candidate LIVE orders, and
-applies order cancellations plus reservation releases in one PostgreSQL transaction. The on-chain
+The reconciliation update locks the reservation key, then the reservation row and its candidate
+LIVE orders, and applies order cancellations plus reservation releases in one PostgreSQL transaction. The on-chain
 balance or allowance remains an external snapshot; settlement preflight is still the final guard
 if that snapshot changes again after reconciliation.
+
+Order admission and reconciliation acquire the same PostgreSQL transaction advisory lock for the
+reservation key before reading its current amount. Concurrent submissions for one balance are
+therefore serialized, including the first reservation where no row exists yet.
 
 A bounded background scan checks reservations sequentially with a keyset cursor. Each reservation
 uses the actual ERC-20 balance and allowance, or the ERC-1155 balance and operator approval. RPC

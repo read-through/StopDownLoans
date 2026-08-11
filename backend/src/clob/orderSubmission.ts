@@ -3,7 +3,12 @@ import { getErc1155Balance, getErc20Allowance, getErc20Balance, getFilledAmount,
 import { withTransaction, type DbClient } from "./db/client.js";
 import { getMarketConfig } from "./db/marketConfigs.js";
 import { cancelOrderAvailableRemainder, getMakerCandidatesForTaker, getOrderByHash, increaseOrderPending, insertOrder } from "./db/orders.js";
-import { decreaseReservation, getReservation, increaseReservation } from "./db/reservations.js";
+import {
+  decreaseReservation,
+  getReservation,
+  increaseReservation,
+  lockReservationKey,
+} from "./db/reservations.js";
 import { createTradeWithFills, type CreatedTradeWithFills } from "./db/trades.js";
 import { matchTakerOrder } from "./matching.js";
 import type { OutcomeExchangeDomain } from "./orderSigning.js";
@@ -117,7 +122,10 @@ async function validateAdmission(
       getExistingOrder: (orderHash) => getOrderByHash(client, orderHash),
       getMarketConfig: (outcomeToken, marketId) =>
         getMarketConfig(client, outcomeToken, marketId),
-      getReservation: (key) => getReservation(client, key),
+      getReservation: async (key) => {
+        await lockReservationKey(client, key);
+        return getReservation(client, key);
+      },
     },
     chain: {
       isOutcomeMarketActive: (outcomeToken, marketId) =>

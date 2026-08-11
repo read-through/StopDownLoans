@@ -9,7 +9,11 @@ import { attachClobWebSocketFeed } from "../../backend/src/clob/api/webSocketFee
 import { closePool, getPool } from "../../backend/src/clob/db/client.js";
 import { upsertMarketConfig } from "../../backend/src/clob/db/marketConfigs.js";
 import { getOrderByHash } from "../../backend/src/clob/db/orders.js";
-import { getReservation, getReservationsPage } from "../../backend/src/clob/db/reservations.js";
+import {
+  getReservation,
+  getReservationsPage,
+  lockReservationKey,
+} from "../../backend/src/clob/db/reservations.js";
 import { getTradeById, getTradeFillsByTradeId } from "../../backend/src/clob/db/trades.js";
 import { getSettlementAttemptsByTrade } from "../../backend/src/clob/db/settlementAttempts.js";
 import { executeMatchedTradeWithRetry } from "../../backend/src/clob/executor/retry.js";
@@ -38,6 +42,45 @@ const orderTypes = {
 } as const;
 
 describe("CLOB local EVM e2e fixture", () => {
+  it(
+    "serializes concurrent work for the same reservation key",
+    { skip: databaseSkipReason },
+    async () => {
+      const first = await getPool().connect();
+      const second = await getPool().connect();
+      const key = {
+        maker: "0x0000000000000000000000000000000000000001" as Hex,
+        assetType: "ERC20" as const,
+        assetAddress: "0x0000000000000000000000000000000000000002" as Hex,
+        tokenId: 0n,
+      };
+
+      try {
+        await first.query("BEGIN");
+        await second.query("BEGIN");
+        await lockReservationKey(first, key);
+
+        let secondAcquired = false;
+        const secondLock = lockReservationKey(second, key).then(() => {
+          secondAcquired = true;
+        });
+        await new Promise((resolve) => setTimeout(resolve, 20));
+        assert.equal(secondAcquired, false);
+
+        await first.query("COMMIT");
+        await withTimeout(secondLock, 1_000, "Second reservation lock was not released");
+        assert.equal(secondAcquired, true);
+        await second.query("COMMIT");
+      } finally {
+        await first.query("ROLLBACK").catch(() => {});
+        await second.query("ROLLBACK").catch(() => {});
+        first.release();
+        second.release();
+        await closePool();
+      }
+    }
+  );
+
   it("prepares active market, balances, approvals, and signed orders", async () => {
     const fixture = await deployClobE2EFixture();
 

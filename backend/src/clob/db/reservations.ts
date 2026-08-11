@@ -12,6 +12,12 @@ export type ReservationKey = {
 
 export type ReservationCursor = ReservationKey;
 
+export async function lockReservationKey(client: DbClient, key: ReservationKey): Promise<void> {
+  await client.query("SELECT pg_advisory_xact_lock(hashtextextended($1, 0))", [
+    serializeReservationKey(key),
+  ]);
+}
+
 export async function getReservation(
   client: DbClient,
   key: ReservationKey
@@ -266,4 +272,13 @@ async function deleteEmptyReservation(
   );
 
   return null;
+}
+
+function serializeReservationKey(key: ReservationKey): string {
+  return [
+    key.maker.toLowerCase(),
+    key.assetType,
+    key.assetAddress.toLowerCase(),
+    key.tokenId.toString(),
+  ].join(":");
 }

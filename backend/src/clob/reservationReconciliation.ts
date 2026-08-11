@@ -6,6 +6,7 @@ import {
 import {
   decreaseReservation,
   getReservationForUpdate,
+  lockReservationKey,
   type ReservationKey,
 } from "./db/reservations.js";
 import { deriveOutcomeTokenId } from "./reservationKeys.js";
@@ -38,6 +39,7 @@ export async function reconcileReservationAvailabilityTx(
     throw new Error(`availableAmount must be non-negative: ${input.availableAmount.toString()}`);
   }
 
+  await lockReservationKey(client, input.key);
   const reservation = await getReservationForUpdate(client, input.key);
   if (reservation === null) {
     return {
