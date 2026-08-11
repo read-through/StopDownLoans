@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { buildOrderReservationKey } from "../../src/clob/reservationKeys.js";
+import { encodeAbiParameters, keccak256 } from "viem";
+import { buildOrderReservationKey, deriveOutcomeTokenId } from "../../src/clob/reservationKeys.js";
 
 describe("buildOrderReservationKey", () => {
   it("uses USDC tokenId 0 for BUY orders", () => {
@@ -44,6 +45,21 @@ describe("buildOrderReservationKey", () => {
         assetAddress: "0x0000000000000000000000000000000000000002",
         tokenId: 123n,
       }
+    );
+  });
+});
+
+describe("deriveOutcomeTokenId", () => {
+  it("matches OutcomeToken abi.encode market outcome derivation", () => {
+    const marketId = `0x${"12".repeat(32)}` as const;
+
+    assert.equal(
+      deriveOutcomeTokenId(marketId, "YES"),
+      BigInt(keccak256(encodeAbiParameters([{ type: "bytes32" }, { type: "uint8" }], [marketId, 1])))
+    );
+    assert.equal(
+      deriveOutcomeTokenId(marketId, "NO"),
+      BigInt(keccak256(encodeAbiParameters([{ type: "bytes32" }, { type: "uint8" }], [marketId, 2])))
     );
   });
 });

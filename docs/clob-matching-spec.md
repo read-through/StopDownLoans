@@ -306,6 +306,11 @@ is covered again. This preserves older price-time priority. Pending matched amou
 released by this process; any deficit consisting only of pending amounts remains visible until the
 corresponding settlement reaches a terminal state.
 
+The reconciliation update locks the reservation row first, then its candidate LIVE orders, and
+applies order cancellations plus reservation releases in one PostgreSQL transaction. The on-chain
+balance or allowance remains an external snapshot; settlement preflight is still the final guard
+if that snapshot changes again after reconciliation.
+
 ## Book Data Model
 
 The MVP book is keyed by outcome-token market:

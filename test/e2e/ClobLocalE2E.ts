@@ -8,11 +8,13 @@ import { createClobHttpServer } from "../../backend/src/clob/api/httpServer.js";
 import { attachClobWebSocketFeed } from "../../backend/src/clob/api/webSocketFeed.js";
 import { closePool, getPool } from "../../backend/src/clob/db/client.js";
 import { upsertMarketConfig } from "../../backend/src/clob/db/marketConfigs.js";
+import { getOrderByHash } from "../../backend/src/clob/db/orders.js";
 import { getReservation } from "../../backend/src/clob/db/reservations.js";
 import { getTradeById, getTradeFillsByTradeId } from "../../backend/src/clob/db/trades.js";
 import { getSettlementAttemptsByTrade } from "../../backend/src/clob/db/settlementAttempts.js";
 import { executeMatchedTradeWithRetry } from "../../backend/src/clob/executor/retry.js";
 import { reconcileOutcomeExchangeEventsOnce } from "../../backend/src/clob/reconciliationLoop.js";
+import { reconcileReservationAvailability } from "../../backend/src/clob/reservationReconciliation.js";
 import { hashContractOrder } from "../../backend/src/clob/orderSigning.js";
 import type { Hex, SignedOrderInput } from "../../backend/src/clob/types.js";
 
@@ -101,6 +103,98 @@ describe("CLOB local EVM e2e fixture", () => {
             totalRemainingOutcomeAmount: fixture.sellerOutcomeAmount.toString(),
           },
         ]);
+      } finally {
+        await close();
+        await closePool();
+      }
+    }
+  );
+
+  it(
+    "atomically cancels uncovered SELL and BUY remainders and releases their reservations",
+    { skip: databaseSkipReason },
+    async () => {
+      const fixture = await deployClobE2EFixture();
+      await upsertTestMarketConfig(fixture);
+
+      const server = createClobHttpServer({
+        config: await testClobConfig(fixture),
+        publicClient: fixture.publicClient,
+      });
+      const { baseUrl, close } = await listen(server);
+
+      try {
+        const existingBuyerReservation = await getReservation(getPool(), {
+          maker: fixture.buyer.account.address,
+          assetType: "ERC20",
+          assetAddress: fixture.collateralToken.address,
+          tokenId: 0n,
+        });
+        const existingBuyerReservedAmount = existingBuyerReservation?.reservedAmount ?? 0n;
+        await topUpBuyerForExistingUsdcReservations(fixture);
+        await postJson(`${baseUrl}/v1/orders`, {
+          order: toOrderDto(fixture.makerBackendOrder),
+          signature: fixture.makerSignature,
+          timeInForce: "GTC",
+          priceUnits: "600000",
+        });
+
+        const result = await reconcileReservationAvailability({
+          key: {
+            maker: fixture.seller.account.address,
+            assetType: "ERC1155",
+            assetAddress: fixture.outcomeToken.address,
+            tokenId: fixture.yesTokenId,
+          },
+          availableAmount: 0n,
+        });
+
+        assert.deepEqual(
+          result.cancelledOrders.map((order) => order.orderHash),
+          [fixture.makerOrderHash]
+        );
+        assert.equal(result.projectedReservedAmount, 0n);
+        assert.equal(result.unresolvedDeficit, 0n);
+        assert.equal((await getOrderByHash(getPool(), fixture.makerOrderHash))?.status, "CANCELLED");
+        assert.equal(
+          await getReservation(getPool(), {
+            maker: fixture.seller.account.address,
+            assetType: "ERC1155",
+            assetAddress: fixture.outcomeToken.address,
+            tokenId: fixture.yesTokenId,
+          }),
+          null
+        );
+
+        await postJson(`${baseUrl}/v1/orders`, {
+          order: toOrderDto(fixture.takerBackendOrder),
+          signature: fixture.takerSignature,
+          timeInForce: "GTC",
+          priceUnits: "700000",
+        });
+
+        const buyResult = await reconcileReservationAvailability({
+          key: {
+            maker: fixture.buyer.account.address,
+            assetType: "ERC20",
+            assetAddress: fixture.collateralToken.address,
+            tokenId: 0n,
+          },
+          availableAmount: existingBuyerReservedAmount,
+        });
+
+        assert.equal(buyResult.cancelledOrders[0]?.orderHash, fixture.takerOrderHash);
+        assert.equal(buyResult.cancelledOrders.length >= 1, true);
+        assert.equal(buyResult.projectedReservedAmount, existingBuyerReservedAmount);
+        assert.equal(buyResult.unresolvedDeficit, 0n);
+        assert.equal((await getOrderByHash(getPool(), fixture.takerOrderHash))?.status, "CANCELLED");
+        const remainingBuyerReservation = await getReservation(getPool(), {
+          maker: fixture.buyer.account.address,
+          assetType: "ERC20",
+          assetAddress: fixture.collateralToken.address,
+          tokenId: 0n,
+        });
+        assert.equal(remainingBuyerReservation?.reservedAmount ?? 0n, existingBuyerReservedAmount);
       } finally {
         await close();
         await closePool();

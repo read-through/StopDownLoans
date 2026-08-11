@@ -2,6 +2,7 @@ import type { ClobOrder, Hex, OrderStatus, Outcome, SubmitOrderInput } from "../
 import type { DbClient } from "./client.js";
 import { hexToBuffer } from "./hex.js";
 import { mapOrderRow, type OrderRow } from "./rows.js";
+import type { ReservationKey } from "./reservations.js";
 
 export type InsertOrderInput = SubmitOrderInput & {
   orderHash: Hex;
@@ -330,6 +331,50 @@ export async function getExpiredAvailableOrdersForUpdate(
       FOR UPDATE SKIP LOCKED
     `,
     [params.now, params.limit]
+  );
+
+  return result.rows.map(mapOrderRow);
+}
+
+export async function getLiveOrdersForReservationForUpdate(
+  client: DbClient,
+  key: ReservationKey
+): Promise<ClobOrder[]> {
+  const result = await client.query<OrderRow>(
+    `
+      SELECT
+        order_hash,
+        maker,
+        outcome_token,
+        market_id,
+        outcome,
+        side,
+        outcome_amount,
+        usdc_amount,
+        expiration,
+        nonce,
+        signature,
+        time_in_force,
+        remaining_outcome_amount,
+        pending_matched_outcome_amount,
+        status,
+        accepted_sequence,
+        created_at,
+        updated_at
+      FROM orders
+      WHERE maker = $1
+        AND status = 'LIVE'
+        AND remaining_outcome_amount > pending_matched_outcome_amount
+        AND side = $2
+        AND ($3::bytea IS NULL OR outcome_token = $3)
+      ORDER BY accepted_sequence DESC
+      FOR UPDATE
+    `,
+    [
+      hexToBuffer(key.maker),
+      sideToDb(key.assetType === "ERC20" ? "BUY" : "SELL"),
+      key.assetType === "ERC1155" ? hexToBuffer(key.assetAddress) : null,
+    ]
   );
 
   return result.rows.map(mapOrderRow);

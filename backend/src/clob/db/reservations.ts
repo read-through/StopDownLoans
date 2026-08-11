@@ -44,6 +44,41 @@ export async function getReservation(
   return mapReservationRow(result.rows[0]);
 }
 
+export async function getReservationForUpdate(
+  client: DbClient,
+  key: ReservationKey
+): Promise<Reservation | null> {
+  const result = await client.query<ReservationRow>(
+    `
+      SELECT
+        maker,
+        asset_type,
+        asset_address,
+        token_id,
+        reserved_amount,
+        updated_at
+      FROM reservations
+      WHERE maker = $1
+        AND asset_type = $2
+        AND asset_address = $3
+        AND token_id = $4
+      FOR UPDATE
+    `,
+    [
+      hexToBuffer(key.maker),
+      key.assetType,
+      hexToBuffer(key.assetAddress),
+      key.tokenId.toString(),
+    ]
+  );
+
+  if (result.rowCount === 0) {
+    return null;
+  }
+
+  return mapReservationRow(result.rows[0]);
+}
+
 export async function getReservationsByMaker(
   client: DbClient,
   maker: Hex
