@@ -300,6 +300,12 @@ Reservation is reduced when:
 
 The contract does not enforce backend reservations. It only enforces actual balance and allowance during settlement.
 
+If on-chain balance or allowance falls below an existing reservation, backend cancels complete
+available remainders newest-first by descending `acceptedSequence` until the remaining reservation
+is covered again. This preserves older price-time priority. Pending matched amounts are never
+released by this process; any deficit consisting only of pending amounts remains visible until the
+corresponding settlement reaches a terminal state.
+
 ## Book Data Model
 
 The MVP book is keyed by outcome-token market:
