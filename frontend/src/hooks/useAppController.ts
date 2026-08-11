@@ -635,6 +635,19 @@ export function useAppController() {
     setAccountRefreshNonce((value) => value + 1);
   };
 
+  const disconnectWallet = () => {
+    if (walletMode === "circle") {
+      setCircleWalletAccount(null);
+      setCircleWalletStatus("disconnected");
+      setCircleWalletError(null);
+      return;
+    }
+
+    void injectedWallet.disconnect().catch(() => {
+      // Wagmi exposes the normalized disconnect error through injectedWallet.error.
+    });
+  };
+
   const switchWalletToArc = () => {
     setWalletMode("injected");
     void injectedWallet.switchToArc()
@@ -815,6 +828,7 @@ export function useAppController() {
     connectWallet: handleWalletAction,
     connectInjectedWallet: connectWallet,
     connectCircleWallet,
+    disconnectWallet,
     refreshAll,
     dashboardStats,
     selectedLoanDetail,

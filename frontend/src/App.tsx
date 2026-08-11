@@ -3,6 +3,7 @@ import {
   BarChart3,
   CircleDollarSign,
   LineChart,
+  LogOut,
   Radio,
   RefreshCcw,
   Wallet,
@@ -113,6 +114,17 @@ export function App() {
                   ? c.shortHex(c.walletAccount.address)
                   : "Switch to ARC"}
             </button>
+            {c.walletAccount !== null && (
+              <button
+                aria-label="Disconnect wallet"
+                className="iconButton topbarIconButton"
+                onClick={() => void c.disconnectWallet()}
+                title="Disconnect wallet"
+                type="button"
+              >
+                <LogOut size={17} />
+              </button>
+            )}
           </div>
         </header>
 

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useConnect, useConnection, useConnectors, useSwitchChain } from "wagmi";
+import { useConnect, useConnection, useConnectors, useDisconnect, useSwitchChain } from "wagmi";
 import { expectedArcChainIdNumber } from "../config";
 import type { EthereumProvider, WalletAccount, WalletStatus } from "../wallet";
 
@@ -13,6 +13,7 @@ export function useInjectedWallet() {
   const connection = useConnection();
   const connectors = useConnectors();
   const connectMutation = useConnect();
+  const disconnectMutation = useDisconnect();
   const switchMutation = useSwitchChain();
   const [account, setAccount] = useState<WalletAccount | null>(null);
   const [providerError, setProviderError] = useState<string | null>(null);
@@ -58,7 +59,7 @@ export function useInjectedWallet() {
   );
 
   const status: WalletStatus =
-    connectMutation.isPending || switchMutation.isPending || connection.isConnecting || connection.isReconnecting
+    connectMutation.isPending || disconnectMutation.isPending || switchMutation.isPending || connection.isConnecting || connection.isReconnecting
       ? "connecting"
       : providerError !== null || connectMutation.error !== null || switchMutation.error !== null
         ? "error"
@@ -71,6 +72,7 @@ export function useInjectedWallet() {
   const error =
     providerError ??
     (connectMutation.error === null ? null : message(connectMutation.error, "Failed to connect wallet")) ??
+    (disconnectMutation.error === null ? null : message(disconnectMutation.error, "Failed to disconnect wallet")) ??
     (switchMutation.error === null ? null : message(switchMutation.error, "Failed to switch wallet to ARC"));
 
   const connect = async (connectorId?: string) => {
@@ -88,12 +90,19 @@ export function useInjectedWallet() {
     await switchMutation.mutateAsync({ chainId: expectedArcChainIdNumber });
   };
 
+  const disconnect = async () => {
+    await disconnectMutation.mutateAsync(
+      connection.connector === undefined ? undefined : { connector: connection.connector },
+    );
+  };
+
   return {
     account,
     status,
     error,
     options,
     connect,
+    disconnect,
     switchToArc,
   };
 }
