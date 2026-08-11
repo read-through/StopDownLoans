@@ -311,6 +311,11 @@ applies order cancellations plus reservation releases in one PostgreSQL transact
 balance or allowance remains an external snapshot; settlement preflight is still the final guard
 if that snapshot changes again after reconciliation.
 
+A bounded background scan checks reservations sequentially with a keyset cursor. Each reservation
+uses the actual ERC-20 balance and allowance, or the ERC-1155 balance and operator approval. RPC
+errors, including exhausted rate-limit retries, abort the current batch before that reservation is
+changed; they are never converted into a zero balance.
+
 ## Book Data Model
 
 The MVP book is keyed by outcome-token market:
@@ -1919,6 +1924,8 @@ RECEIPT_SWEEP_LIMIT
 RECEIPT_DROPPED_TIMEOUT_MS
 MARKET_CONFIG_EVENT_SWEEP_INTERVAL_MS
 MARKET_CONFIG_EVENT_SWEEP_LIMIT
+RESERVATION_RECONCILIATION_INTERVAL_MS
+RESERVATION_RECONCILIATION_LIMIT
 ```
 
 `EXECUTOR_PRIVATE_KEY` is optional. If it is empty, the backend still serves the API and runs

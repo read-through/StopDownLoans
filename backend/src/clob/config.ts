@@ -29,6 +29,8 @@ export type ClobBackendConfig = {
   receiptDroppedTimeoutMs: number;
   marketConfigEventSweepIntervalMs: number;
   marketConfigEventSweepLimit: number;
+  reservationReconciliationIntervalMs: number;
+  reservationReconciliationLimit: number;
 };
 
 export function loadClobBackendConfig(env: NodeJS.ProcessEnv = process.env): ClobBackendConfig {
@@ -112,6 +114,14 @@ export function loadClobBackendConfig(env: NodeJS.ProcessEnv = process.env): Clo
     marketConfigEventSweepLimit: parsePositiveInteger(
       env.MARKET_CONFIG_EVENT_SWEEP_LIMIT ?? "100",
       "MARKET_CONFIG_EVENT_SWEEP_LIMIT"
+    ),
+    reservationReconciliationIntervalMs: parsePositiveInteger(
+      env.RESERVATION_RECONCILIATION_INTERVAL_MS ?? "30000",
+      "RESERVATION_RECONCILIATION_INTERVAL_MS"
+    ),
+    reservationReconciliationLimit: parsePositiveInteger(
+      env.RESERVATION_RECONCILIATION_LIMIT ?? "5",
+      "RESERVATION_RECONCILIATION_LIMIT"
     ),
   };
 }

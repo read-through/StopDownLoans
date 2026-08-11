@@ -9,7 +9,7 @@ import { attachClobWebSocketFeed } from "../../backend/src/clob/api/webSocketFee
 import { closePool, getPool } from "../../backend/src/clob/db/client.js";
 import { upsertMarketConfig } from "../../backend/src/clob/db/marketConfigs.js";
 import { getOrderByHash } from "../../backend/src/clob/db/orders.js";
-import { getReservation } from "../../backend/src/clob/db/reservations.js";
+import { getReservation, getReservationsPage } from "../../backend/src/clob/db/reservations.js";
 import { getTradeById, getTradeFillsByTradeId } from "../../backend/src/clob/db/trades.js";
 import { getSettlementAttemptsByTrade } from "../../backend/src/clob/db/settlementAttempts.js";
 import { executeMatchedTradeWithRetry } from "../../backend/src/clob/executor/retry.js";
@@ -138,6 +138,32 @@ describe("CLOB local EVM e2e fixture", () => {
           timeInForce: "GTC",
           priceUnits: "600000",
         });
+
+        const reservationPage = await getReservationsPage(getPool(), {
+          limit: 10_000,
+          after: null,
+          usdc: fixture.collateralToken.address,
+          outcomeToken: fixture.outcomeToken.address,
+        });
+        assert.equal(
+          reservationPage.every(
+            (reservation) =>
+              (reservation.assetType === "ERC20" &&
+                reservation.assetAddress === fixture.collateralToken.address) ||
+              (reservation.assetType === "ERC1155" &&
+                reservation.assetAddress === fixture.outcomeToken.address)
+          ),
+          true
+        );
+        assert.equal(
+          reservationPage.some(
+            (reservation) =>
+              reservation.maker === fixture.seller.account.address &&
+              reservation.assetAddress === fixture.outcomeToken.address &&
+              reservation.tokenId === fixture.yesTokenId
+          ),
+          true
+        );
 
         const result = await reconcileReservationAvailability({
           key: {

@@ -80,6 +80,10 @@ services:
         value: "10000"
       - key: MARKET_CONFIG_EVENT_SWEEP_INTERVAL_MS
         value: "5000"
+      - key: RESERVATION_RECONCILIATION_INTERVAL_MS
+        value: "30000"
+      - key: RESERVATION_RECONCILIATION_LIMIT
+        value: "5"
       - key: PUBLIC_ARC_CHAIN_ID
         value: "5042002"
       - key: PUBLIC_ARC_CHAIN_NAME

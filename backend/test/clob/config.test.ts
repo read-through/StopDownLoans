@@ -33,6 +33,8 @@ describe("loadClobBackendConfig", () => {
         MARKET_CONFIG_EVENT_SWEEP_LIMIT: "100",
         LOAN_SNAPSHOT_SYNC_INTERVAL_MS: "3000",
         LOAN_SNAPSHOT_SYNC_LIMIT: "100",
+        RESERVATION_RECONCILIATION_INTERVAL_MS: "30000",
+        RESERVATION_RECONCILIATION_LIMIT: "5",
       }),
       {
         databaseUrl: "postgres://stopdown:stopdown@localhost:5432/stopdown",
@@ -62,6 +64,8 @@ describe("loadClobBackendConfig", () => {
         marketConfigEventSweepLimit: 100,
         loanSnapshotSyncIntervalMs: 3000,
         loanSnapshotSyncLimit: 100,
+        reservationReconciliationIntervalMs: 30000,
+        reservationReconciliationLimit: 5,
       }
     );
   });

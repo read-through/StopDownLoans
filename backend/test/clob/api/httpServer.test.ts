@@ -740,6 +740,8 @@ function testConfig() {
     marketConfigEventSweepLimit: 100,
     loanSnapshotSyncIntervalMs: 3000,
     loanSnapshotSyncLimit: 100,
+    reservationReconciliationIntervalMs: 30_000,
+    reservationReconciliationLimit: 5,
   };
 }
 

@@ -24,6 +24,10 @@ import {
   loadRateLimitCleanupConfig,
   startRateLimitCleanupLoop,
 } from "../src/platform/rateLimit.js";
+import {
+  runReservationReconciliationBatch,
+  startReservationReconciliationLoop,
+} from "../src/clob/reservationReconciliationWorker.js";
 
 await loadDotEnv();
 
@@ -140,6 +144,24 @@ const stopRateLimitCleanup = backgroundLoopsEnabled
       },
     })
   : () => {};
+const stopReservationReconciliation = backgroundLoopsEnabled
+  ? startReservationReconciliationLoop({
+      intervalMs: config.reservationReconciliationIntervalMs,
+      run: (after) =>
+        runReservationReconciliationBatch({
+          publicClient,
+          outcomeExchange: config.outcomeExchange,
+          usdc: config.usdc,
+          outcomeToken: config.outcomeToken,
+          limit: config.reservationReconciliationLimit,
+          after,
+          bookFeedPublisher,
+        }),
+      onError: (error) => {
+        console.error("Reservation reconciliation failed:", error);
+      },
+    })
+  : () => {};
 const walletClient =
   config.executorPrivateKey === null
     ? null
@@ -206,6 +228,7 @@ async function shutdown(): Promise<void> {
   stopLoanSnapshotSync();
   stopMarketConfigEventSweep();
   stopRateLimitCleanup();
+  stopReservationReconciliation();
   stopExecutor();
   stopLendingKeeper();
   await webSocketFeed.close();

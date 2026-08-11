@@ -10,6 +10,8 @@ export type ReservationKey = {
   tokenId: bigint;
 };
 
+export type ReservationCursor = ReservationKey;
+
 export async function getReservation(
   client: DbClient,
   key: ReservationKey
@@ -97,6 +99,51 @@ export async function getReservationsByMaker(
       ORDER BY asset_type ASC, asset_address ASC, token_id ASC
     `,
     [hexToBuffer(maker)]
+  );
+
+  return result.rows.map(mapReservationRow);
+}
+
+export async function getReservationsPage(
+  client: DbClient,
+  params: {
+    limit: number;
+    after: ReservationCursor | null;
+    usdc: Hex;
+    outcomeToken: Hex;
+  }
+): Promise<Reservation[]> {
+  const result = await client.query<ReservationRow>(
+    `
+      SELECT
+        maker,
+        asset_type,
+        asset_address,
+        token_id,
+        reserved_amount,
+        updated_at
+      FROM reservations
+      WHERE (
+          (asset_type = 'ERC20' AND asset_address = $5)
+          OR (asset_type = 'ERC1155' AND asset_address = $6)
+        )
+        AND (
+          $1::bytea IS NULL
+          OR ROW(maker, asset_type, asset_address, token_id)
+            > ROW($1::bytea, $2::text, $3::bytea, $4::numeric)
+        )
+      ORDER BY maker ASC, asset_type ASC, asset_address ASC, token_id ASC
+      LIMIT $7
+    `,
+    [
+      params.after === null ? null : hexToBuffer(params.after.maker),
+      params.after?.assetType ?? null,
+      params.after === null ? null : hexToBuffer(params.after.assetAddress),
+      params.after?.tokenId.toString() ?? null,
+      hexToBuffer(params.usdc),
+      hexToBuffer(params.outcomeToken),
+      params.limit,
+    ]
   );
 
   return result.rows.map(mapReservationRow);
